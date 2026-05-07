@@ -3,843 +3,370 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة التحكم — تحليل الاستبيان</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<title>استبيان — تأثير الذكاء الاصطناعي على التدقيق المحاسبي</title>
+<meta name="description" content="استبيان علمي حول تأثير أدوات الذكاء الاصطناعي على جودة ومهنية التدقيق المحاسبي">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
-/* ═══ THEME ═══ */
+/* ══════════════════════════════
+   THEME VARIABLES (Light + Dark)
+══════════════════════════════ */
 :root{
-  --bg:#f0f4ff;--bg2:#ffffff;--bg3:#f5f7ff;--bg4:#eaedfa;
-  --border:#dde2f5;--border2:#bfc8e8;
-  --text:#111827;--text2:#374151;--text3:#6b7280;
-  --accent:#3b6ff0;--green:#059669;--amber:#d97706;--red:#dc2626;
-  --purple:#7c3aed;--teal:#0891b2;--coral:#e11d48;--econ:#0f766e;
-  --sidebar-w:270px;--header-h:58px;
-  --shadow:0 1px 12px rgba(30,50,120,.08);
-  --shadow2:0 6px 28px rgba(30,50,120,.14);
-  --radius:14px;--r2:10px;--r3:7px;
+  --bg:#f4f6fb;--bg2:#ffffff;--bg3:#f0f2f8;--bg4:#e5e8f0;
+  --border:#e2e5ef;--border2:#c8cde0;
+  --text:#1a1d2e;--text2:#4a5068;--text3:#8a90a8;
+  --accent:#3b6ff0;--accent2:#2557d6;
+  --green:#16a34a;--green2:#15803d;
+  --amber:#d97706;--red:#dc2626;
+  --purple:#7c3aed;--teal:#0891b2;
+  --shadow:0 2px 16px rgba(30,40,80,.08);
+  --shadow2:0 8px 32px rgba(30,40,80,.14);
+  --radius:16px;--radius2:10px;--radius3:8px;
+  --header-h:64px;
 }
-[data-theme=dark]{
-  --bg:#0b0f1a;--bg2:#111827;--bg3:#1a2235;--bg4:#212d45;
+[data-theme="dark"]{
+  --bg:#0d1117;--bg2:#161b27;--bg3:#1e2535;--bg4:#252d40;
   --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
-  --text:#f1f5ff;--text2:#94a3c0;--text3:#4b5878;
-  --shadow:0 1px 12px rgba(0,0,0,.4);--shadow2:0 6px 28px rgba(0,0,0,.5);
+  --text:#e8edf8;--text2:#9aa3bc;--text3:#555f78;
+  --shadow:0 2px 16px rgba(0,0,0,.4);--shadow2:0 8px 32px rgba(0,0,0,.5);
 }
+
+/* ══════════ RESET ══════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;min-height:100vh;transition:background .3s,color .3s}
+body{
+  font-family:'Tajawal',sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;
+  transition:background .3s,color .3s;
+}
 
-/* ═══ ANIMATIONS ═══ */
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideR{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(59,111,240,.3)}50%{box-shadow:0 0 0 8px rgba(59,111,240,0)}}
+/* ══════════ ANIMATIONS ══════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(59,111,240,.35)}50%{box-shadow:0 0 0 10px rgba(59,111,240,0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @keyframes pop{0%{transform:scale(.85);opacity:0}80%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
-@keyframes glow{0%,100%{opacity:.5}50%{opacity:1}}
-.fa{animation:fadeUp .4s ease both}
-.sa{animation:slideR .35s ease both}
+@keyframes checkmark{0%{stroke-dashoffset:30}100%{stroke-dashoffset:0}}
+@keyframes confetti{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(120px) rotate(720deg);opacity:0}}
+@keyframes glow{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes wave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.5)}}
 
-/* ═══ HEADER ═══ */
-.hdr{
-  position:fixed;top:0;left:0;right:0;z-index:200;
+/* ══════════ HEADER ══════════ */
+.site-header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
   height:var(--header-h);
-  background:var(--bg2);border-bottom:1.5px solid var(--border);
+  background:rgba(255,255,255,.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 1.5rem;gap:12px;
-  box-shadow:var(--shadow);
+  padding:0 2rem;
+  transition:background .3s;
 }
-.hdr-left{display:flex;align-items:center;gap:12px}
-.hdr-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-.hdr-title{font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;line-height:1.3}
-.hdr-sub{font-size:10px;color:var(--text3);font-weight:400}
-.hdr-right{display:flex;align-items:center;gap:8px}
-.db-chip{display:flex;align-items:center;gap:6px;padding:5px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--text3)}
-.db-dot{width:7px;height:7px;border-radius:50%;background:var(--red);transition:.3s}
-.db-dot.on{background:var(--green);animation:glow 2s infinite}
-.btn{padding:7px 15px;border-radius:var(--r2);border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
-.btn:active{transform:scale(.97)}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:#2557d6;box-shadow:0 4px 12px rgba(59,111,240,.3)}
-.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
-.btn-ghost:hover{background:var(--bg3);color:var(--text)}
-.btn-success{background:var(--green);color:#fff}
-.btn-success:hover{background:#047857;box-shadow:0 4px 12px rgba(5,150,105,.3)}
-.btn-danger{background:var(--red);color:#fff}
-.btn-danger:hover{background:#b91c1c;box-shadow:0 4px 12px rgba(220,38,38,.3)}
-.btn-analyze{background:linear-gradient(135deg,var(--purple),var(--accent));color:#fff;animation:pulse 2.5s infinite}
-.btn-analyze:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(124,58,237,.4)}
-.btn-icon{width:34px;height:34px;padding:0;justify-content:center;border-radius:50%;border:1.5px solid var(--border);background:var(--bg3);color:var(--text2)}
-.btn-icon:hover{background:var(--bg4);color:var(--text)}
+[data-theme="dark"] .site-header{background:rgba(13,17,23,.88)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-text{font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
+.logo-sub{font-size:10px;color:var(--text3);font-weight:400}
+.header-actions{display:flex;align-items:center;gap:10px}
+.theme-btn{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border2);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s;color:var(--text2)}
+.theme-btn:hover{border-color:var(--accent);background:var(--bg2)}
+.lang-badge{padding:5px 12px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);font-size:11px;color:var(--text3);font-weight:600}
 
-/* ═══ LAYOUT ═══ */
-.layout{display:flex;padding-top:var(--header-h);min-height:100vh}
-
-/* ═══ SIDEBAR ═══ */
-.sidebar{
-  width:var(--sidebar-w);flex-shrink:0;
-  background:var(--bg2);border-left:1.5px solid var(--border);
-  position:fixed;top:var(--header-h);bottom:0;right:0;
-  overflow-y:auto;padding:1.25rem 0;z-index:100;
-  transition:transform .3s;
+/* ══════════ HERO ══════════ */
+.hero{
+  padding-top:calc(var(--header-h) + 4rem);
+  padding-bottom:3rem;
+  text-align:center;
+  max-width:780px;margin:0 auto;padding-left:1.5rem;padding-right:1.5rem;
+  animation:fadeUp .7s ease both;
 }
-.sb-section{margin-bottom:1.5rem}
-.sb-label{font-size:9.5px;font-weight:800;letter-spacing:1.5px;color:var(--text3);padding:0 1.25rem;margin-bottom:6px;text-transform:uppercase}
-.sb-item{
-  display:flex;align-items:center;gap:10px;
-  padding:9px 1.25rem;cursor:pointer;
-  transition:.15s;border-right:3px solid transparent;
-  font-size:13px;color:var(--text2);
-}
-.sb-item:hover{background:var(--bg3);color:var(--text)}
-.sb-item.active{background:rgba(59,111,240,.07);color:var(--accent);border-right-color:var(--accent);font-weight:600}
-.sb-item .ic{width:18px;text-align:center;flex-shrink:0;font-size:14px}
-.sb-item .badge{margin-right:auto;padding:1px 7px;border-radius:10px;font-size:10px;background:var(--bg4);color:var(--text3)}
-.sb-item .new-badge{margin-right:auto;padding:1px 7px;border-radius:10px;font-size:10px;background:rgba(124,58,237,.15);color:var(--purple);font-weight:700}
-.sb-item .econ-badge{margin-right:auto;padding:1px 7px;border-radius:10px;font-size:10px;background:rgba(15,118,110,.15);color:var(--econ);font-weight:700}
-
-/* ═══ MAIN ═══ */
-.main{
-  margin-right:var(--sidebar-w);flex:1;
-  padding:2rem;overflow-x:hidden;
-}
-.page{display:none}
-.page.active{display:block;animation:fadeUp .35s ease}
-
-/* ═══ PAGE HEADER ═══ */
-.pg-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:12px}
-.pg-title{font-family:'Cairo',sans-serif;font-size:22px;font-weight:800;color:var(--text)}
-.pg-sub{font-size:13px;color:var(--text2);margin-top:3px}
-
-/* ═══ KPI CARDS ═══ */
-.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.5rem}
-.kpi{
-  background:var(--bg2);border:1.5px solid var(--border);
-  border-radius:var(--radius);padding:1.25rem;
-  box-shadow:var(--shadow);transition:all .25s;cursor:default;
-  position:relative;overflow:hidden;
-}
-.kpi::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 50%,rgba(255,255,255,.03));pointer-events:none}
-.kpi:hover{transform:translateY(-3px);box-shadow:var(--shadow2);border-color:var(--border2)}
-.kpi-icon{font-size:22px;margin-bottom:8px}
-.kpi-val{font-family:'Cairo',sans-serif;font-size:30px;font-weight:900;line-height:1}
-.kpi-lbl{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:4px}
-.kpi-sub{font-size:11px;color:var(--text2);margin-top:2px}
-
-/* ═══ SECTION CARD ═══ */
-.card{
-  background:var(--bg2);border:1.5px solid var(--border);
-  border-radius:var(--radius);padding:1.5rem;
-  box-shadow:var(--shadow);margin-bottom:1.25rem;
-  transition:border-color .2s;
-}
-.card:hover{border-color:var(--border2)}
-.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;gap:10px}
-.card-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px}
-.card-sub{font-size:11px;color:var(--text3);margin-top:2px}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
-.b-blue{background:rgba(59,111,240,.1);color:var(--accent)}
-.b-green{background:rgba(5,150,105,.1);color:var(--green)}
-.b-amber{background:rgba(217,119,6,.1);color:var(--amber)}
-.b-red{background:rgba(220,38,38,.1);color:var(--red)}
-.b-purple{background:rgba(124,58,237,.1);color:var(--purple)}
-.b-econ{background:rgba(15,118,110,.1);color:var(--econ)}
-
-/* ═══ CHARTS ═══ */
-.charts-2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
-.charts-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:1.25rem}
-.chart-wrap{position:relative}
-.full{grid-column:1/-1}
-
-/* ═══ TABS ═══ */
-.tabs{display:flex;gap:3px;background:var(--bg3);border-radius:var(--r2);padding:3px;margin-bottom:1.5rem;flex-wrap:wrap;width:fit-content}
-.tab{padding:7px 15px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text3);transition:.2s;border:none;background:transparent;font-family:'Tajawal',sans-serif}
-.tab.active{background:var(--bg2);color:var(--text);box-shadow:var(--shadow)}
-.tab:hover:not(.active){color:var(--text2)}
-.tc{display:none}
-.tc.active{display:block;animation:fadeUp .3s}
-
-/* ═══ TABLES ═══ */
-.tbl-wrap{overflow-x:auto;border-radius:var(--r2)}
-table{width:100%;border-collapse:collapse;font-size:12px}
-thead th{
-  padding:10px 12px;font-weight:700;font-size:10px;letter-spacing:.5px;
-  color:var(--text3);text-transform:uppercase;text-align:center;
-  background:var(--bg3);border-bottom:1.5px solid var(--border);
-  position:sticky;top:0;z-index:1;
-}
-thead th:first-child{text-align:right;border-radius:var(--r3) 0 0 0}
-tbody td{
-  padding:9px 12px;border-bottom:1px solid rgba(0,0,0,.04);
-  text-align:center;vertical-align:middle;color:var(--text2);
-}
-[data-theme=dark] tbody td{border-bottom-color:rgba(255,255,255,.04)}
-tbody td:first-child{text-align:right;color:var(--text);font-size:11.5px}
-tbody tr{transition:background .1s}
-tbody tr:hover td{background:rgba(59,111,240,.03)}
-tbody tr:last-child td{border-bottom:none}
-.chip-sm{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap}
-
-/* ═══ SPSS SPECIFIC ═══ */
-.spss-section{border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--border);margin-bottom:1.5rem;box-shadow:var(--shadow)}
-.spss-head{
-  padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(135deg,rgba(59,111,240,.06),rgba(124,58,237,.04));
-  border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;
-}
-.spss-head-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
-.spss-body{background:var(--bg2);padding:1.5rem}
-
-/* ECON SECTION */
-.econ-section{border-radius:var(--radius);overflow:hidden;border:1.5px solid rgba(15,118,110,.25);margin-bottom:1.5rem;box-shadow:var(--shadow)}
-.econ-head{
-  padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(135deg,rgba(15,118,110,.06),rgba(5,150,105,.04));
-  border-bottom:1px solid rgba(15,118,110,.15);flex-wrap:wrap;gap:8px;
-}
-.econ-head-title{font-size:14px;font-weight:700;color:var(--econ);display:flex;align-items:center;gap:8px}
-.econ-body{background:var(--bg2);padding:1.5rem}
-.econ-kpi{background:linear-gradient(135deg,rgba(15,118,110,.06),rgba(5,150,105,.03));border:1.5px solid rgba(15,118,110,.15);border-radius:var(--radius);padding:1rem;text-align:center}
-.econ-kpi .val{font-family:'Cairo',sans-serif;font-size:24px;font-weight:900;color:var(--econ)}
-.econ-kpi .lbl{font-size:10px;font-weight:700;color:var(--econ);opacity:.7;margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
-
-/* ALPHA GAUGE */
-.alpha-gauge{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
-.gauge-circle{
-  width:110px;height:110px;border-radius:50%;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  border:4px solid;position:relative;flex-shrink:0;
-}
-.gauge-val{font-family:'Cairo',sans-serif;font-size:28px;font-weight:900}
-.gauge-sub{font-size:10px;color:var(--text3);font-weight:600;margin-top:2px}
-.alpha-bars{flex:1;min-width:200px}
-.alpha-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.alpha-bar-name{font-size:12px;color:var(--text2);min-width:120px}
-.alpha-bar-track{flex:1;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden}
-.alpha-bar-fill{height:100%;border-radius:4px;transition:width 1s ease}
-.alpha-bar-val{font-size:12px;font-weight:700;min-width:42px;text-align:left}
-
-/* CORRELATION MATRIX */
-.corr-matrix{display:grid;gap:2px}
-.corr-row{display:flex;gap:2px}
-.corr-cell{
-  width:80px;height:44px;border-radius:6px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  font-size:12px;font-weight:700;transition:.3s;
-}
-.corr-lbl{font-size:9px;font-weight:500;opacity:.7;margin-top:1px}
-
-/* RANKING */
-.rank-list{display:flex;flex-direction:column;gap:6px}
-.rank-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--r3);background:var(--bg3);border:1px solid var(--border);transition:.2s}
-.rank-item:hover{background:var(--bg4)}
-.rank-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
-.rank-bar{flex:1}
-.rank-text{font-size:11.5px;color:var(--text2);margin-bottom:3px;line-height:1.4}
-.rank-track{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
-.rank-fill{height:100%;border-radius:3px;transition:width 1s ease}
-.rank-val{font-family:'Cairo',sans-serif;font-size:16px;font-weight:800;flex-shrink:0}
-
-/* AI ANALYSIS BOX */
-.ai-box{
-  border:1.5px solid rgba(124,58,237,.25);
-  background:linear-gradient(135deg,rgba(124,58,237,.04),rgba(59,111,240,.04));
-  border-radius:var(--radius);padding:1.25rem;margin-top:1rem;
-  position:relative;overflow:hidden;
-}
-.ai-box::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--purple),var(--accent));
-}
-.ai-box-head{display:flex;align-items:center;gap:8px;margin-bottom:.75rem}
-.ai-box-title{font-size:12px;font-weight:700;color:var(--purple)}
-.ai-icon{width:22px;height:22px;border-radius:6px;background:rgba(124,58,237,.15);display:flex;align-items:center;justify-content:center;font-size:12px}
-.ai-content{font-size:12.5px;color:var(--text2);line-height:1.8;white-space:pre-wrap}
-.ai-btn{
+.hero-badge{
   display:inline-flex;align-items:center;gap:6px;
-  padding:7px 14px;border-radius:var(--r2);
-  background:linear-gradient(135deg,var(--purple),var(--accent));
-  color:#fff;border:none;cursor:pointer;
-  font-family:'Tajawal',sans-serif;font-size:12px;font-weight:600;
-  transition:all .2s;margin-top:.75rem;
+  background:linear-gradient(135deg,rgba(59,111,240,.1),rgba(124,58,237,.1));
+  border:1px solid rgba(59,111,240,.2);
+  border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;
+  color:var(--accent);margin-bottom:1.5rem;
 }
-.ai-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(124,58,237,.3)}
-.ai-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.ai-cursor{display:inline-block;width:2px;height:14px;background:var(--purple);margin-right:2px;animation:blink .7s steps(1) infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-.ai-thinking{display:flex;gap:5px;align-items:center}
-.ai-dot{width:7px;height:7px;border-radius:50%;background:var(--purple);animation:aiDot 1.2s infinite}
-.ai-dot:nth-child(2){animation-delay:.2s}
-.ai-dot:nth-child(3){animation-delay:.4s}
-@keyframes aiDot{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1.2);opacity:1}}
-
-/* LIVE TABLE */
-.live-list{display:flex;flex-direction:column;gap:6px}
-.live-item{
-  display:grid;grid-template-columns:auto 1fr auto auto;
-  gap:10px;align-items:center;
-  padding:10px 14px;background:var(--bg3);
-  border-radius:var(--r2);border:1px solid var(--border);
-  font-size:12px;animation:pop .3s;
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:glow 2s infinite}
+.hero h1{
+  font-family:'Cairo',sans-serif;font-size:clamp(24px,4vw,38px);
+  font-weight:900;line-height:1.3;color:var(--text);margin-bottom:.75rem;
 }
-.live-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:var(--bg4);color:var(--text3)}
-.live-meta{color:var(--text2)}
-.live-meta strong{color:var(--text);display:block;margin-bottom:1px}
-.live-time{font-size:10px;color:var(--text3)}
+.hero h1 span{
+  background:linear-gradient(135deg,var(--accent),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero p{font-size:15px;color:var(--text2);line-height:1.8;max-width:600px;margin:0 auto 2rem}
+.hero-stats{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin-bottom:2rem}
+.hero-stat{text-align:center}
+.hero-stat .val{font-family:'Cairo',sans-serif;font-size:22px;font-weight:800;color:var(--accent)}
+.hero-stat .lbl{font-size:11px;color:var(--text3);font-weight:500;margin-top:2px}
+.time-est{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:20px;
+  padding:6px 16px;font-size:12px;color:var(--text2);
+}
 
-/* DELETE BUTTON */
-.del-btn{
-  width:26px;height:26px;border-radius:50%;border:none;
-  background:rgba(220,38,38,.1);color:var(--red);cursor:pointer;
+/* ══════════ PROGRESS BAR ══════════ */
+.sticky-progress{
+  position:sticky;top:var(--header-h);z-index:90;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:10px 2rem;
+  transition:all .3s;
+}
+.progress-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.progress-label{font-size:12px;color:var(--text2);font-weight:600;white-space:nowrap}
+.progress-track{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.progress-pct{font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;min-width:32px}
+.step-dots{display:flex;gap:5px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--bg4);border:2px solid var(--border2);transition:.3s;cursor:pointer}
+.step-dot.done{background:var(--green);border-color:var(--green)}
+.step-dot.active{background:var(--accent);border-color:var(--accent);animation:pulse 2s infinite}
+
+/* ══════════ FORM CONTAINER ══════════ */
+.form-wrap{max-width:860px;margin:0 auto;padding:2rem 1.5rem 4rem}
+
+/* ══════════ SECTION CARD ══════════ */
+.section-card{
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem;
+  box-shadow:var(--shadow);
+  animation:fadeUp .4s ease both;
+  transition:border-color .2s,box-shadow .2s;
+}
+.section-card:hover{box-shadow:var(--shadow2)}
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
+.section-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.section-icon.s1{background:rgba(59,111,240,.1)}
+.section-icon.s2{background:rgba(22,163,74,.1)}
+.section-icon.s3{background:rgba(217,119,6,.1)}
+.section-icon.s4{background:rgba(124,58,237,.1)}
+.section-meta h2{font-family:'Cairo',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px}
+.section-meta p{font-size:12px;color:var(--text3)}
+
+/* ══════════ RADIO CHIPS ══════════ */
+.field-group{margin-bottom:1.5rem}
+.field-label{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.field-label .req{color:var(--red);font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  display:flex;align-items:center;gap:7px;
+  padding:9px 16px;border-radius:20px;
+  border:2px solid var(--border2);background:var(--bg3);
+  cursor:pointer;font-family:'Tajawal',sans-serif;
+  font-size:13px;color:var(--text2);font-weight:500;
+  transition:all .2s;user-select:none;
+}
+.chip:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px)}
+.chip input{display:none}
+.chip.selected{
+  background:linear-gradient(135deg,rgba(59,111,240,.12),rgba(124,58,237,.08));
+  border-color:var(--accent);color:var(--accent);font-weight:600;
+  box-shadow:0 0 0 3px rgba(59,111,240,.08);
+}
+.chip.selected::before{content:'✓';font-size:12px;font-weight:700}
+.chip-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);transition:.2s;flex-shrink:0}
+.chip.selected .chip-dot{background:var(--accent)}
+
+/* ══════════ LIKERT SCALE ══════════ */
+.dim-title{
+  font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--text3);
+  text-transform:uppercase;margin:1.5rem 0 .75rem;
+  padding:6px 10px;background:var(--bg3);border-radius:6px;
+  border-right:3px solid var(--accent);
+}
+.q-item{
+  border:1.5px solid var(--border);border-radius:var(--radius2);
+  padding:1.25rem;margin-bottom:10px;
+  background:var(--bg2);transition:all .2s;
+}
+.q-item:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+.q-item.answered{border-color:rgba(22,163,74,.3);background:rgba(22,163,74,.02)}
+.q-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+.q-badge{
+  min-width:28px;height:28px;border-radius:7px;
+  background:var(--bg4);display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--text3);flex-shrink:0;
+}
+.q-item.answered .q-badge{background:rgba(22,163,74,.15);color:var(--green)}
+.q-text{font-size:13.5px;color:var(--text2);line-height:1.65;flex:1}
+.likert-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.likert-opt{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  cursor:pointer;padding:8px 4px;border-radius:8px;
+  transition:all .2s;
+}
+.likert-opt input{display:none}
+.likert-opt:hover .likert-circle{transform:scale(1.1)}
+.likert-circle{
+  width:40px;height:40px;border-radius:50%;
+  border:2.5px solid var(--border2);background:var(--bg3);
   display:flex;align-items:center;justify-content:center;
-  font-size:13px;transition:all .2s;flex-shrink:0;
+  font-size:14px;font-weight:700;color:var(--text3);
+  transition:all .25s;
 }
-.del-btn:hover{background:var(--red);color:#fff;transform:scale(1.1)}
+.likert-opt:hover .likert-circle{border-color:var(--border2);background:var(--bg4)}
+.likert-lbl{font-size:10px;color:var(--text3);text-align:center;line-height:1.3;font-weight:500}
+.likert-opt.selected .likert-circle{color:#fff;transform:scale(1.15);animation:pop .3s}
+.likert-opt.l5.selected .likert-circle{background:#16a34a;border-color:#16a34a;box-shadow:0 0 16px rgba(22,163,74,.35)}
+.likert-opt.l4.selected .likert-circle{background:#34d399;border-color:#34d399;box-shadow:0 0 16px rgba(52,211,153,.3)}
+.likert-opt.l3.selected .likert-circle{background:#64748b;border-color:#64748b}
+.likert-opt.l2.selected .likert-circle{background:#f97316;border-color:#f97316;box-shadow:0 0 16px rgba(249,115,22,.3)}
+.likert-opt.l1.selected .likert-circle{background:#dc2626;border-color:#dc2626;box-shadow:0 0 16px rgba(220,38,38,.3)}
+.q-progress-bar{height:3px;background:var(--bg4);border-radius:2px;margin-top:10px;overflow:hidden}
+.q-progress-fill{height:100%;border-radius:2px;transition:width .4s,background .4s}
 
-/* TOAST */
-.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--radius);padding:11px 22px;font-size:13px;z-index:500;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s;opacity:0;box-shadow:var(--shadow2);display:flex;align-items:center;gap:8px}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.ok{border-color:rgba(5,150,105,.3);color:var(--green)}
-.toast.err{border-color:rgba(220,38,38,.3);color:var(--red)}
+/* ══════════ NAVIGATION BUTTONS ══════════ */
+.nav-btns{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.5rem 2rem;max-width:860px;margin:0 auto;
+  background:var(--bg2);border-top:1px solid var(--border);
+  position:sticky;bottom:0;z-index:80;
+}
+.btn{
+  padding:11px 24px;border-radius:var(--radius2);border:none;
+  cursor:pointer;font-family:'Tajawal',sans-serif;
+  font-size:14px;font-weight:700;transition:all .2s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;box-shadow:0 4px 14px rgba(59,111,240,.3);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(59,111,240,.4)}
+.btn-ghost{background:var(--bg3);color:var(--text2);border:1.5px solid var(--border2)}
+.btn-ghost:hover{background:var(--bg4);color:var(--text)}
+.btn-success{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;box-shadow:0 4px 14px rgba(22,163,74,.3)}
+.btn-success:hover{transform:translateY(-2px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 
-/* OBSERVATION BOX */
-.obs-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:1rem 1.25rem;margin-top:.75rem;font-size:12.5px;color:var(--text2);line-height:1.85}
-.obs-box strong{color:var(--text)}
-.obs-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+/* ══════════ SUCCESS SCREEN ══════════ */
+.success-screen{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:4rem 2rem;min-height:60vh;
+  animation:fadeUp .6s ease;
+}
+.success-screen.show{display:flex}
+.success-icon{
+  width:100px;height:100px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(22,163,74,.15),rgba(16,185,129,.1));
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:1.5rem;position:relative;
+}
+.success-icon svg{width:50px;height:50px}
+.checkmark-path{stroke:#16a34a;stroke-width:2.5;fill:none;stroke-dasharray:30;stroke-dashoffset:30;animation:checkmark .6s .4s ease forwards}
+.success-screen h2{font-family:'Cairo',sans-serif;font-size:28px;font-weight:800;color:var(--text);margin-bottom:.75rem}
+.success-screen p{font-size:15px;color:var(--text2);line-height:1.8;max-width:500px}
+.confetti-container{position:fixed;top:0;left:0;right:0;pointer-events:none;z-index:200}
+.confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;animation:confetti 2s ease forwards}
 
-/* SKELETON */
-.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r3)}
+/* ══════════ VALIDATION ══════════ */
+.val-banner{
+  background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);
+  border-radius:var(--radius2);padding:12px 16px;
+  font-size:13px;color:var(--red);margin-bottom:1rem;
+  display:none;animation:fadeUp .3s;
+}
+.val-banner.show{display:flex;align-items:center;gap:8px}
+.q-item.error{border-color:rgba(220,38,38,.4);background:rgba(220,38,38,.02)}
 
-/* SCROLLBAR */
-::-webkit-scrollbar{width:5px;height:5px}
+/* ══════════ MOBILE ══════════ */
+@media(max-width:640px){
+  .site-header{padding:0 1rem}
+  .hero{padding-top:calc(var(--header-h) + 2rem)}
+  .likert-row{grid-template-columns:repeat(5,1fr);gap:3px}
+  .likert-circle{width:34px;height:34px;font-size:12px}
+  .likert-lbl{font-size:9px}
+  .section-card{padding:1.25rem}
+  .nav-btns{padding:1rem}
+  .hero-stats{gap:1.25rem}
+}
+
+/* ══════════ SCROLLBAR ══════════ */
+::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-
-/* EMPTY */
-.empty{text-align:center;padding:3rem 1rem;color:var(--text3)}
-.empty h3{font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px}
-
-/* COMPARE SECTION */
-.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
-.compare-col{border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--border);box-shadow:var(--shadow)}
-.compare-col-stat .col-head{background:linear-gradient(135deg,rgba(59,111,240,.08),rgba(124,58,237,.04));border-bottom:1px solid var(--border)}
-.compare-col-econ .col-head{background:linear-gradient(135deg,rgba(15,118,110,.08),rgba(5,150,105,.04));border-bottom:1px solid rgba(15,118,110,.2)}
-.col-head{padding:.875rem 1.25rem;font-size:13px;font-weight:700}
-.compare-col-stat .col-head{color:var(--accent)}
-.compare-col-econ .col-head{color:var(--econ)}
-.col-body{background:var(--bg2);padding:1.25rem}
-.compare-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
-.compare-row:last-child{border-bottom:none}
-.compare-row .lbl{color:var(--text2)}
-.compare-row .val{font-weight:700;font-family:'Cairo',sans-serif}
-.verdict-box{background:linear-gradient(135deg,rgba(124,58,237,.06),rgba(15,118,110,.06));border:1.5px solid rgba(124,58,237,.15);border-radius:var(--radius);padding:1.25rem;margin-top:1rem}
-.verdict-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:.75rem;display:flex;align-items:center;gap:7px}
-.verdict-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:12.5px;color:var(--text2);line-height:1.7}
-.verdict-icon{flex-shrink:0;font-size:14px}
-
-/* CONFIRM MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-.modal-overlay.show{display:flex}
-.modal-box{background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--radius);padding:2rem;max-width:420px;width:90%;animation:pop .3s}
-.modal-box h3{font-family:'Cairo',sans-serif;font-size:17px;font-weight:700;margin-bottom:.75rem}
-.modal-box p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:1.25rem}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end}
 </style>
 </head>
 <body>
 
-<!-- ═══ HEADER ═══ -->
-<div class="hdr">
-  <div class="hdr-left">
-    <div class="hdr-logo">📊</div>
-    <div>
-      <div class="hdr-title">لوحة التحكم — تحليل الاستبيان</div>
-      <div class="hdr-sub">تأثير الذكاء الاصطناعي على التدقيق المحاسبي</div>
+<!-- CONFETTI -->
+<div class="confetti-container" id="confetti"></div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo">
+    <div class="logo-icon">🎓</div>
+    <div class="logo-text">
+      استبيان علمي
+      <div class="logo-sub">تأثير الذكاء الاصطناعي على التدقيق</div>
     </div>
   </div>
-  <div class="hdr-right">
-    <div class="db-chip"><div class="db-dot" id="db-dot"></div><span id="db-lbl">غير متصل</span></div>
-    <span id="save-ind" style="font-size:11px;color:var(--text3)">—</span>
-    <button class="btn btn-analyze" onclick="runFullAnalysis()" id="analyze-main-btn">🔬 تحليل البيانات</button>
-    <button class="btn btn-ghost" onclick="openImport()">📥 استيراد</button>
-    <button class="btn btn-success" onclick="exportAll()">⬇ تصدير</button>
-    <button class="btn btn-danger" onclick="confirmDeleteAll()" title="حذف كل البيانات">🗑 حذف الكل</button>
-    <a href="index.html" target="_blank" class="btn btn-primary" style="text-decoration:none">🔗 الاستبيان</a>
-    <button class="btn-icon btn" onclick="toggleTheme()" id="theme-btn" title="تبديل الوضع">🌙</button>
+  <div class="header-actions">
+    <div class="lang-badge">🇩🇿 عربي</div>
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل الوضع">🌙</button>
+  </div>
+</header>
+
+<!-- STICKY PROGRESS -->
+<div class="sticky-progress" id="sticky-progress" style="display:none">
+  <div class="progress-inner">
+    <div class="step-dots" id="step-dots"></div>
+    <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <span class="progress-pct" id="prog-pct">0%</span>
   </div>
 </div>
 
-<div class="layout">
-<!-- ═══ SIDEBAR ═══ -->
-<aside class="sidebar">
-  <div class="sb-section">
-    <div class="sb-label">لوحة التحكم</div>
-    <div class="sb-item active" id="nav-dashboard" onclick="showPage('dashboard')"><span class="ic">🏠</span>الرئيسية<span class="badge" id="nb-count">0</span></div>
-    <div class="sb-item" id="nav-responses" onclick="showPage('responses')"><span class="ic">📋</span>الاستجابات المباشرة</div>
-    <div class="sb-item" id="nav-analysis" onclick="showPage('analysis')"><span class="ic">📊</span>التحليل الإحصائي</div>
+<!-- SUCCESS SCREEN -->
+<div class="success-screen" id="success-screen">
+  <div class="success-icon">
+    <svg viewBox="0 0 52 52">
+      <circle cx="26" cy="26" r="24" fill="none" stroke="rgba(22,163,74,.2)" stroke-width="2"/>
+      <path class="checkmark-path" d="M14 27l8 8 16-16"/>
+    </svg>
   </div>
-  <div class="sb-section">
-    <div class="sb-label">SPSS المتقدم</div>
-    <div class="sb-item" id="nav-reliability" onclick="showPage('reliability')"><span class="ic">🔒</span>ثبات الأداة (ألفا)</div>
-    <div class="sb-item" id="nav-descriptive" onclick="showPage('descriptive')"><span class="ic">📈</span>إحصاء وصفي كامل</div>
-    <div class="sb-item" id="nav-ttest" onclick="showPage('ttest')"><span class="ic">🎯</span>اختبار T للمتوسط</div>
-    <div class="sb-item" id="nav-correlation" onclick="showPage('correlation')"><span class="ic">🔗</span>مصفوفة الارتباط</div>
-    <div class="sb-item" id="nav-anova" onclick="showPage('anova')"><span class="ic">⚖️</span>تحليل التباين ANOVA<span class="new-badge">جديد</span></div>
-    <div class="sb-item" id="nav-regression" onclick="showPage('regression')"><span class="ic">📉</span>الانحدار الخطي<span class="new-badge">جديد</span></div>
-    <div class="sb-item" id="nav-ranking" onclick="showPage('ranking')"><span class="ic">🏆</span>ترتيب الأبعاد</div>
-  </div>
-  <div class="sb-section">
-    <div class="sb-label">التحليل الاقتصادي</div>
-    <div class="sb-item" id="nav-economic" onclick="showPage('economic')"><span class="ic">💹</span>التحليل الاقتصادي<span class="econ-badge">جديد</span></div>
-    <div class="sb-item" id="nav-compare" onclick="showPage('compare')"><span class="ic">⚡</span>مقارنة التحليلين<span class="econ-badge">جديد</span></div>
-  </div>
-  <div class="sb-section">
-    <div class="sb-label">بيانات</div>
-    <div class="sb-item" id="nav-individual" onclick="showPage('individual')"><span class="ic">👤</span>البيانات الفردية</div>
-  </div>
-  <div class="sb-section" style="padding:0 .75rem">
-    <div style="background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(59,111,240,.05));border:1px solid rgba(124,58,237,.15);border-radius:var(--r2);padding:12px;font-size:11px;color:var(--text2)">
-      <div style="font-weight:700;color:var(--purple);margin-bottom:5px;display:flex;align-items:center;gap:5px">🤖 تحليل ذكاء اصطناعي</div>
-      أضف مفتاح Claude API للحصول على تفسير تلقائي لكل تحليل
-      <button class="btn btn-ghost" style="width:100%;margin-top:8px;justify-content:center;font-size:11px" onclick="showApiKeyModal()">⚙ إعداد Claude API</button>
-    </div>
-  </div>
-</aside>
-
-<!-- ═══ MAIN ═══ -->
-<main class="main">
-
-<!-- ─── DASHBOARD ─── -->
-<div class="page active" id="page-dashboard">
-  <div class="pg-hdr">
-    <div><div class="pg-title">لوحة التحكم الرئيسية</div><div class="pg-sub" id="dash-sub">جارٍ تحميل البيانات من Firebase...</div></div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-analyze" onclick="runFullAnalysis()">🔬 تحليل البيانات الآن</button>
-      <button class="btn btn-ghost" onclick="refreshAll()">🔄 تحديث</button>
-    </div>
-  </div>
-  <!-- Analysis Status Banner -->
-  <div id="analysis-banner" style="display:none;background:linear-gradient(135deg,rgba(59,111,240,.08),rgba(124,58,237,.06));border:1.5px solid rgba(59,111,240,.2);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:12px">
-    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✅</div>
-    <div><div style="font-size:13px;font-weight:700;color:var(--accent)">تم اكتمال التحليل</div><div style="font-size:11px;color:var(--text3)" id="analysis-time"></div></div>
-  </div>
-  <div class="kpi-grid fa" id="dash-kpis">
-    <div class="kpi"><div class="kpi-icon">👥</div><div class="kpi-val skeleton" style="height:36px;width:60px;margin-bottom:4px"></div><div class="kpi-lbl">إجمالي المستجيبين</div></div>
-    <div class="kpi"><div class="kpi-icon">✅</div><div class="kpi-val skeleton" style="height:36px;width:60px;margin-bottom:4px"></div><div class="kpi-lbl">المكتملون</div></div>
-    <div class="kpi"><div class="kpi-icon">⏱</div><div class="kpi-val skeleton" style="height:36px;width:80px;margin-bottom:4px"></div><div class="kpi-lbl">متوسط الوقت</div></div>
-    <div class="kpi"><div class="kpi-icon">📊</div><div class="kpi-val skeleton" style="height:36px;width:60px;margin-bottom:4px"></div><div class="kpi-lbl">المتوسط العام</div></div>
-    <div class="kpi"><div class="kpi-icon">🔒</div><div class="kpi-val skeleton" style="height:36px;width:60px;margin-bottom:4px"></div><div class="kpi-lbl">ألفا كرونباخ</div></div>
-  </div>
-  <div class="charts-2">
-    <div class="card"><div class="card-head"><div class="card-title">👔 الفئة المهنية</div></div><div class="chart-wrap" style="height:220px"><canvas id="c-cat"></canvas></div></div>
-    <div class="card"><div class="card-head"><div class="card-title">📅 سنوات الخبرة</div></div><div class="chart-wrap" style="height:220px"><canvas id="c-exp"></canvas></div></div>
-  </div>
-  <div class="charts-2">
-    <div class="card"><div class="card-head"><div class="card-title">🤖 استخدام الذكاء الاصطناعي</div></div><div class="chart-wrap" style="height:220px"><canvas id="c-ai"></canvas></div></div>
-    <div class="card"><div class="card-head"><div class="card-title">🎓 المؤهل العلمي</div></div><div class="chart-wrap" style="height:220px"><canvas id="c-educ"></canvas></div></div>
-  </div>
-  <div class="card full"><div class="card-head"><div class="card-title">📊 متوسطات المحاور الثلاثة</div></div><div class="chart-wrap" style="height:250px"><canvas id="c-axes"></canvas></div></div>
-</div>
-
-<!-- ─── RESPONSES ─── -->
-<div class="page" id="page-responses">
-  <div class="pg-hdr">
-    <div><div class="pg-title">الاستجابات المباشرة</div><div class="pg-sub">تُحدَّث تلقائياً من Firebase</div></div>
-    <button class="btn btn-danger" onclick="confirmDeleteAll()">🗑 حذف كل الاستبيانات</button>
-  </div>
-  <div id="live-responses"><div class="empty"><h3>لا توجد استجابات بعد</h3><p>سيظهر المستجيبون هنا فور إرسالهم الاستبيان</p></div></div>
-</div>
-
-<!-- ─── ANALYSIS ─── -->
-<div class="page" id="page-analysis">
-  <div class="pg-hdr">
-    <div><div class="pg-title">التحليل الإحصائي الشامل</div></div>
-    <button class="btn btn-analyze" onclick="runFullAnalysis()">🔬 تشغيل التحليل</button>
-  </div>
-  <div class="tabs">
-    <button class="tab active" onclick="stab('demog',this,'at')">ديموغرافي</button>
-    <button class="tab" onclick="stab('axes',this,'at')">تحليل المحاور</button>
-    <button class="tab" onclick="stab('qtable',this,'at')">جدول الأسئلة</button>
-    <button class="tab" onclick="stab('radar',this,'at')">مخطط الرادار</button>
-  </div>
-  <div class="tc active" id="at-demog">
-    <div class="charts-2">
-      <div class="card"><div class="card-title">الفئة المهنية</div><div class="chart-wrap" style="height:240px"><canvas id="a-cat"></canvas></div></div>
-      <div class="card"><div class="card-title">المؤهل العلمي</div><div class="chart-wrap" style="height:240px"><canvas id="a-educ"></canvas></div></div>
-      <div class="card"><div class="card-title">سنوات الخبرة</div><div class="chart-wrap" style="height:240px"><canvas id="a-exp"></canvas></div></div>
-      <div class="card"><div class="card-title">استخدام الذكاء الاصطناعي</div><div class="chart-wrap" style="height:240px"><canvas id="a-ai"></canvas></div></div>
-    </div>
-  </div>
-  <div class="tc" id="at-axes">
-    <div class="charts-3" id="at-axes-container"></div>
-  </div>
-  <div class="tc" id="at-qtable"><div class="card"><div class="tbl-wrap"><table id="q-main-table"><thead><tr><th>السؤال</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>المتوسط</th><th>الانحراف</th><th>الترتيب</th><th>التفسير</th></tr></thead><tbody id="q-main-tbody"></tbody></table></div></div></div>
-  <div class="tc" id="at-radar"><div class="card full"><div class="chart-wrap" style="height:350px"><canvas id="a-radar"></canvas></div></div></div>
-</div>
-
-<!-- ─── RELIABILITY ─── -->
-<div class="page" id="page-reliability">
-  <div class="pg-hdr"><div class="pg-title">ثبات الأداة — Cronbach's Alpha (α)</div></div>
-  <div class="spss-section">
-    <div class="spss-head">
-      <div class="spss-head-title">🔒 معامل ألفا كرونباخ الكلي والجزئي</div>
-      <button class="ai-btn" onclick="aiAnalyze('reliability')">🤖 تحليل بالذكاء الاصطناعي</button>
-    </div>
-    <div class="spss-body">
-      <div id="alpha-content"><div class="empty"><h3>بيانات غير كافية</h3></div></div>
-    </div>
-  </div>
-  <div class="spss-section">
-    <div class="spss-head"><div class="spss-head-title">📋 ثبات كل عبارة (Alpha if Item Deleted)</div></div>
-    <div class="spss-body">
-      <div class="obs-box">
-        <div class="obs-label">📌 كيفية القراءة</div>
-        <strong>Alpha if Item Deleted:</strong> تُظهر قيمة ألفا لو حُذفت هذه العبارة. إذا كانت أعلى من ألفا الكلية، فالعبارة <strong>تضعف</strong> الثبات. إذا كانت أقل، فهي <strong>تعزز</strong> الثبات.
-      </div>
-      <div class="tbl-wrap" style="margin-top:1rem"><table id="item-delete-table"><thead><tr><th>العبارة</th><th>المتوسط إذا حُذف</th><th>Variance إذا حُذف</th><th>Corrected Item-Total</th><th>Alpha إذا حُذف</th><th>التقييم</th></tr></thead><tbody id="item-delete-body"></tbody></table></div>
-    </div>
-  </div>
-  <div id="rel-ai-box" class="ai-box" style="display:none">
-    <div class="ai-box-head"><div class="ai-icon">🤖</div><div class="ai-box-title">تفسير الذكاء الاصطناعي — Claude</div></div>
-    <div class="ai-content" id="rel-ai-text"></div>
+  <h2>شكراً لمشاركتك! 🎉</h2>
+  <p>تم تسجيل إجاباتك بنجاح. مساهمتك في هذه الدراسة العلمية ستساعد في فهم تأثير الذكاء الاصطناعي على مهنة التدقيق المحاسبي.</p>
+  <div style="margin-top:2rem;padding:1.25rem 2rem;background:var(--bg3);border-radius:var(--radius2);border:1px solid var(--border);font-size:13px;color:var(--text2)">
+    🔒 إجاباتك محفوظة بشكل آمن وستُستخدم لأغراض علمية فقط
   </div>
 </div>
 
-<!-- ─── DESCRIPTIVE ─── -->
-<div class="page" id="page-descriptive">
-  <div class="pg-hdr"><div class="pg-title">الإحصاء الوصفي الكامل — Descriptive Statistics</div></div>
-  <div class="spss-section">
-    <div class="spss-head">
-      <div class="spss-head-title">📈 الإحصاء الوصفي لجميع الفقرات</div>
-      <button class="ai-btn" onclick="aiAnalyze('descriptive')">🤖 تفسير بالذكاء الاصطناعي</button>
-    </div>
-    <div class="spss-body">
-      <div class="obs-box">
-        <div class="obs-label">📌 دليل القراءة</div>
-        <strong>المتوسط (M):</strong> مقياس الاتجاه المركزي — <strong>الانحراف (SD):</strong> مقياس التشتت — <strong>الوسيط:</strong> القيمة الوسطى — <strong>الالتواء:</strong> قيمة قريبة من صفر = توزيع طبيعي — <strong>التفرطح:</strong> قيمة قريبة من 3 = طبيعي
-      </div>
-      <div class="tbl-wrap" style="margin-top:1rem"><table><thead><tr><th>الفقرة</th><th>N</th><th>Min</th><th>Max</th><th>المتوسط M</th><th>الوسيط</th><th>الانحراف SD</th><th>الخطأ المعياري</th><th>الالتواء</th><th>التفرطح</th><th>التفسير</th></tr></thead><tbody id="desc-body"></tbody></table></div>
-    </div>
+<!-- HERO -->
+<div class="hero" id="hero-section">
+  <div class="hero-badge">
+    <span>بحث علمي أكاديمي</span>
   </div>
-  <div id="desc-ai-box" class="ai-box" style="display:none">
-    <div class="ai-box-head"><div class="ai-icon">🤖</div><div class="ai-box-title">تفسير الذكاء الاصطناعي — Claude</div></div>
-    <div class="ai-content" id="desc-ai-text"></div>
+  <h1>تأثير أدوات <span>الذكاء الاصطناعي</span> على جودة ومهنية التدقيق المحاسبي</h1>
+  <p>يهدف هذا الاستبيان إلى جمع آراء المختصين في مجال المحاسبة والتدقيق حول تأثير أدوات الذكاء الاصطناعي. إجاباتك ستبقى سرية وستُستخدم لأغراض علمية فقط.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="val">33</div><div class="lbl">سؤال</div></div>
+    <div class="hero-stat"><div class="val">~8</div><div class="lbl">دقائق</div></div>
+    <div class="hero-stat"><div class="val" id="resp-count" style="color:var(--green)">—</div><div class="lbl">مشارك</div></div>
   </div>
+  <div class="time-est">⏱ الوقت المقدر: 8-10 دقائق</div>
 </div>
 
-<!-- ─── T-TEST ─── -->
-<div class="page" id="page-ttest">
-  <div class="pg-hdr"><div class="pg-title">اختبار t للمتوسط — One Sample T-Test</div></div>
-  <div class="spss-section">
-    <div class="spss-head">
-      <div class="spss-head-title">🎯 اختبار الدلالة الإحصائية (القيمة المرجعية = 3)</div>
-      <button class="ai-btn" onclick="aiAnalyze('ttest')">🤖 تفسير بالذكاء الاصطناعي</button>
-    </div>
-    <div class="spss-body">
-      <div class="obs-box">
-        <div class="obs-label">📌 كيفية القراءة</div>
-        <strong>قيمة t:</strong> كلما كانت أكبر (بعيدة عن صفر)، كلما كان الفرق أكبر — <strong>Sig.(p):</strong> إذا كانت أقل من 0.05 فالنتيجة دالة إحصائياً — <strong>الفرق عن 3:</strong> الانحراف عن موقف الحياد
-      </div>
-      <div class="tbl-wrap" style="margin-top:1rem">
-        <table><thead><tr><th>المحور</th><th>N</th><th>المتوسط M</th><th>SD</th><th>SEM</th><th>قيمة t</th><th>df</th><th>Sig (p)</th><th>الفرق عن 3</th><th>95% CI</th><th>الدلالة</th></tr></thead>
-        <tbody id="ttest-body"></tbody></table>
-      </div>
-      <div id="ttest-obs" class="obs-box" style="margin-top:1rem;display:none">
-        <div class="obs-label">📝 الملاحظات والتفسير</div>
-        <div id="ttest-obs-text"></div>
-      </div>
-    </div>
-  </div>
-  <div class="spss-section">
-    <div class="spss-head"><div class="spss-head-title">📋 اختبار t لكل فقرة على حدة</div></div>
-    <div class="spss-body">
-      <div class="tbl-wrap"><table><thead><tr><th>الفقرة</th><th>M</th><th>SD</th><th>t</th><th>Sig (p)</th><th>الفرق</th><th>الدلالة</th></tr></thead><tbody id="ttest-q-body"></tbody></table></div>
-    </div>
-  </div>
-  <div id="tt-ai-box" class="ai-box" style="display:none">
-    <div class="ai-box-head"><div class="ai-icon">🤖</div><div class="ai-box-title">تفسير الذكاء الاصطناعي — Claude</div></div>
-    <div class="ai-content" id="tt-ai-text"></div>
-  </div>
+<!-- FORM -->
+<form class="form-wrap" id="survey-form" style="display:none" onsubmit="return false">
+  <div class="val-banner" id="val-banner">⚠ يرجى الإجابة على جميع الأسئلة المطلوبة في هذا القسم</div>
+  <div id="sections-container"></div>
+</form>
+
+<!-- NAV BUTTONS -->
+<div class="nav-btns" id="nav-btns" style="display:none">
+  <button class="btn btn-ghost" id="btn-prev" onclick="prevStep()">→ السابق</button>
+  <div style="font-size:13px;color:var(--text3)">القسم <span id="step-num">1</span> من <span id="step-total">4</span></div>
+  <button class="btn btn-primary" id="btn-next" onclick="nextStep()">← التالي</button>
 </div>
 
-<!-- ─── CORRELATION ─── -->
-<div class="page" id="page-correlation">
-  <div class="pg-hdr"><div class="pg-title">مصفوفة الارتباط — Pearson Correlation</div></div>
-  <div class="spss-section">
-    <div class="spss-head">
-      <div class="spss-head-title">🔗 معامل ارتباط بيرسون بين المحاور</div>
-      <button class="ai-btn" onclick="aiAnalyze('correlation')">🤖 تفسير بالذكاء الاصطناعي</button>
-    </div>
-    <div class="spss-body">
-      <div class="obs-box">
-        <div class="obs-label">📌 دليل التفسير</div>
-        <strong>r ≥ 0.7:</strong> ارتباط قوي — <strong>0.4 ≤ r &lt; 0.7:</strong> متوسط — <strong>r &lt; 0.4:</strong> ضعيف — <strong>**:</strong> دال عند 0.01 — <strong>*:</strong> دال عند 0.05
-      </div>
-      <div id="corr-matrix-container" style="margin-top:1rem;overflow-x:auto"></div>
-      <div id="corr-obs" class="obs-box" style="margin-top:1rem;display:none">
-        <div class="obs-label">📝 قراءة المصفوفة</div>
-        <div id="corr-obs-text"></div>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-title">مخطط الارتباط المبعثر — Scatter Plot (المحور 1 × المحور 2)</div>
-    <div class="chart-wrap" style="height:280px"><canvas id="corr-scatter"></canvas></div>
-  </div>
-  <div id="corr-ai-box" class="ai-box" style="display:none">
-    <div class="ai-box-head"><div class="ai-icon">🤖</div><div class="ai-box-title">تفسير الذكاء الاصطناعي — Claude</div></div>
-    <div class="ai-content" id="corr-ai-text"></div>
-  </div>
-</div>
-
-<!-- ─── ANOVA ─── -->
-<div class="page" id="page-anova">
-  <div class="pg-hdr"><div class="pg-title">تحليل التباين الأحادي — One-Way ANOVA</div></div>
-  <div class="spss-section">
-    <div class="spss-head">
-      <div class="spss-head-title">⚖️ الفروق بين الفئات المهنية وسنوات الخبرة</div>
-      <button class="ai-btn" onclick="aiAnalyze('anova')">🤖 تفسير بالذكاء الاصطناعي</button>
-    </div>
-    <div class="spss-body">
-      <div class="obs-box">
-        <div class="obs-label">📌 تفسير ANOVA</div>
-        <strong>F:</strong> نسبة التباين بين المجموعات إلى التباين داخلها — <strong>Sig (p):</strong> أقل من 0.05 يعني وجود فروق دالة — <strong>η²:</strong> حجم الأثر (صغير &lt;0.06 — متوسط 0.06-0.14 — كبير &gt;0.14)
-      </div>
-      <h4 style="font-size:13px;font-weight:700;margin:1rem 0 .5rem;color:var(--text)">أ) حسب الفئة المهنية</h4>
-      <div class="tbl-wrap"><table><thead><tr><th>المصدر</th><th>SS</th><th>df</th><th>MS</th><th>F</th><th>Sig (p)</th><th>η²</th><th>الدلالة</th></tr></thead><tbody id="anova-cat-body"></tbody></table></div>
-      <div id="anova-cat-means" style="margin-top:1rem"></div>
-      <h4 style="font-size:13px;font-weight:700;margin:1.25rem 0 .5rem;color:var(--text)">ب) حسب سنوات الخبرة</h4>
-      <div class="tbl-wrap"><table><thead><tr><th>المصدر</th><th>SS</th><th>df</th><th>MS</th><th>F</th><th>Sig (p)</th><th>η²</th><th>الدلالة</th></tr></thead><tbody id="anova-exp-body"></tbody></table></div>
-      <div id="anova-chart-wrap" class="charts-2" style="margin-top:1rem">
-        <div class="card"><div class="card-title">توزيع الإجابات حسب الفئة المهنية</div><div class="chart-wrap" style="height:250px"><canvas id="anova-c1"></canvas></div></div>
-        <div class="card"><div class="card-title">توزيع الإجابات حسب الخبرة</div><div class="chart-wrap" style="height:250px"><canvas id="anova-c2"></canvas></div></div>
-      </div>
-    </div>
-  </div>
-  <div id="anova-ai-box" class="ai-box" style="display:none">
-    <div class="ai-box-head"><div class="ai-icon">🤖</div><div class="ai-box-title">تفسير الذكاء الاصطناعي — Claude</div></div>
-    <div class="ai-content" id="anova-ai-text"></div>
-  </div>
-</div>
-
-<!-- ─── REGRESSION ─── -->
-<div class="page" id="page-regression">
-  <div class="pg-hdr"><div class="pg-title">الانحدار الخطي البسيط والمتعدد</div></div>
-  <div class="spss-section">
-    <div class="spss-head">
-      <div class="spss-head-title">📉 تأثير المحورين الأول والثاني على المحور الثالث</div>
-      <button class="ai-btn" onclick="aiAnalyze('regression')">🤖 تفسير بالذكاء الاصطناعي</button>
-    </div>
-    <div class="spss-body">
-      <div class="obs-box">
-        <div class="obs-label">📌 تفسير الانحدار</div>
-        <strong>R²:</strong> نسبة التباين المفسَّر — <strong>β:</strong> معامل الانحدار الموحّد — <strong>t:</strong> دلالة المتغير — <strong>VIF:</strong> أقل من 10 يعني لا تعددية خطية
-      </div>
-      <h4 style="font-size:13px;margin:1rem 0 .5rem;font-weight:700;color:var(--text)">نموذج الانحدار المتعدد (المتغير التابع: مهنية التدقيق)</h4>
-      <div class="tbl-wrap"><table><thead><tr><th>المتغير</th><th>B (غير موحّد)</th><th>β (موحّد)</th><th>t</th><th>Sig (p)</th><th>VIF</th><th>الدلالة</th></tr></thead><tbody id="reg-body"></tbody></table></div>
-      <div id="reg-summary" style="margin-top:1rem;display:flex;gap:12px;flex-wrap:wrap"></div>
-      <div class="card" style="margin-top:1rem">
-        <div class="card-title">مخطط الانحدار (المحور 1 ← المحور 3)</div>
-        <div class="chart-wrap" style="height:260px"><canvas id="reg-scatter"></canvas></div>
-      </div>
-    </div>
-  </div>
-  <div id="reg-ai-box" class="ai-box" style="display:none">
-    <div class="ai-box-head"><div class="ai-icon">🤖</div><div class="ai-box-title">تفسير الذكاء الاصطناعي — Claude</div></div>
-    <div class="ai-content" id="reg-ai-text"></div>
-  </div>
-</div>
-
-<!-- ─── RANKING ─── -->
-<div class="page" id="page-ranking">
-  <div class="pg-hdr"><div class="pg-title">ترتيب الأبعاد والفقرات — Rankings</div></div>
-  <div class="charts-2">
-    <div class="card"><div class="card-head"><div class="card-title">🏆 أعلى 10 فقرات موافقة</div></div><div id="top10-list" class="rank-list"></div></div>
-    <div class="card"><div class="card-head"><div class="card-title">📉 أدنى 10 فقرات موافقة</div></div><div id="bot10-list" class="rank-list"></div></div>
-  </div>
-  <div class="card"><div class="card-head"><div class="card-title">ترتيب الأبعاد (Dimensions Ranking)</div></div><div id="dim-ranking" class="rank-list"></div></div>
-  <div class="card"><div class="card-head"><div class="card-title">ترتيب المحاور</div></div><div class="chart-wrap" style="height:200px"><canvas id="rank-chart"></canvas></div></div>
-</div>
-
-<!-- ─── ECONOMIC ANALYSIS ─── -->
-<div class="page" id="page-economic">
-  <div class="pg-hdr">
-    <div><div class="pg-title">التحليل الاقتصادي</div><div class="pg-sub">تحليل العائد الاقتصادي لتبني الذكاء الاصطناعي في التدقيق المحاسبي</div></div>
-    <button class="ai-btn" onclick="aiAnalyze('economic')">🤖 تفسير اقتصادي بالذكاء الاصطناعي</button>
-  </div>
-  
-  <!-- Efficiency KPIs -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem" id="econ-kpis">
-    <div class="econ-kpi"><div class="val" id="ek-eff">—</div><div class="lbl">مؤشر الكفاءة التشغيلية</div></div>
-    <div class="econ-kpi"><div class="val" id="ek-roi">—</div><div class="lbl">العائد المتوقع على الاستثمار</div></div>
-    <div class="econ-kpi"><div class="val" id="ek-risk">—</div><div class="lbl">خفض مخاطر التدقيق</div></div>
-    <div class="econ-kpi"><div class="val" id="ek-adopt">—</div><div class="lbl">معدل الاستعداد للتبني</div></div>
-  </div>
-
-  <!-- Productivity Analysis -->
-  <div class="econ-section">
-    <div class="econ-head">
-      <div class="econ-head-title">📈 تحليل الإنتاجية وتوفير الوقت</div>
-    </div>
-    <div class="econ-body">
-      <div class="obs-box" style="border-color:rgba(15,118,110,.2);background:rgba(15,118,110,.03)">
-        <div class="obs-label" style="color:var(--econ)">🔑 المنهجية الاقتصادية</div>
-        يعتمد التحليل الاقتصادي على <strong>نظرية إنتاجية العمل</strong> حيث تُترجم متوسطات الموافقة على محور الكفاءة (المحور 1) إلى نسب توفير في الوقت والجهد، وتُحوَّل إلى مؤشرات عائد اقتصادي وفق معادلات قياسية في اقتصاديات التكنولوجيا.
-      </div>
-      <div class="tbl-wrap" style="margin-top:1rem">
-        <table><thead><tr><th>المؤشر الاقتصادي</th><th>القيمة المحسوبة</th><th>المرجع</th><th>التفسير الاقتصادي</th></tr></thead>
-        <tbody id="econ-prod-body"></tbody></table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Cost-Benefit Analysis -->
-  <div class="econ-section">
-    <div class="econ-head">
-      <div class="econ-head-title">💰 تحليل التكلفة والعائد (Cost-Benefit Analysis)</div>
-    </div>
-    <div class="econ-body">
-      <div class="charts-2">
-        <div>
-          <h4 style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px">📊 توزيع المؤشرات الاقتصادية بالمحاور</h4>
-          <div class="chart-wrap" style="height:240px"><canvas id="econ-bar"></canvas></div>
-        </div>
-        <div>
-          <h4 style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px">🎯 العائد الاقتصادي المتوقع (نسبة %)</h4>
-          <div class="chart-wrap" style="height:240px"><canvas id="econ-radar"></canvas></div>
-        </div>
-      </div>
-      <div class="tbl-wrap" style="margin-top:1rem">
-        <table><thead><tr><th>بُعد اقتصادي</th><th>المستوى الحالي</th><th>الإمكانية المقدَّرة</th><th>فجوة التحسين</th><th>الأثر الاقتصادي</th></tr></thead>
-        <tbody id="econ-cba-body"></tbody></table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Barriers to Adoption -->
-  <div class="econ-section">
-    <div class="econ-head">
-      <div class="econ-head-title">🚧 تحليل عوائق التبني الاقتصادية</div>
-    </div>
-    <div class="econ-body">
-      <div class="tbl-wrap">
-        <table><thead><tr><th>عائق التبني</th><th>درجة الموافقة</th><th>التكلفة الاقتصادية المقدَّرة</th><th>الأولوية الاقتصادية</th></tr></thead>
-        <tbody id="econ-barrier-body"></tbody></table>
-      </div>
-    </div>
-  </div>
-
-  <div id="econ-ai-box" class="ai-box" style="display:none">
-    <div class="ai-box-head"><div class="ai-icon">🤖</div><div class="ai-box-title">التفسير الاقتصادي — Claude</div></div>
-    <div class="ai-content" id="econ-ai-text"></div>
-  </div>
-</div>
-
-<!-- ─── COMPARE ─── -->
-<div class="page" id="page-compare">
-  <div class="pg-hdr">
-    <div><div class="pg-title">مقارنة التحليل الإحصائي والاقتصادي</div><div class="pg-sub">نظرة تكاملية — ماذا تكشف الأرقام الإحصائية مقابل الدلالات الاقتصادية؟</div></div>
-    <button class="ai-btn" onclick="aiAnalyze('compare')">🤖 تحليل مقارن بالذكاء الاصطناعي</button>
-  </div>
-
-  <div class="compare-grid" id="compare-top-grid">
-    <div class="compare-col compare-col-stat">
-      <div class="col-head">📊 التحليل الإحصائي — ما يقيسه</div>
-      <div class="col-body" id="compare-stat-col"></div>
-    </div>
-    <div class="compare-col compare-col-econ">
-      <div class="col-head">💹 التحليل الاقتصادي — ما يعنيه</div>
-      <div class="col-body" id="compare-econ-col"></div>
-    </div>
-  </div>
-
-  <!-- Comparison Chart -->
-  <div class="card">
-    <div class="card-head"><div class="card-title">📊 رسم بياني مقارن: المتوسطات الإحصائية مقابل مؤشرات العائد الاقتصادي</div></div>
-    <div class="chart-wrap" style="height:300px"><canvas id="compare-chart"></canvas></div>
-  </div>
-
-  <!-- Divergence Table -->
-  <div class="spss-section">
-    <div class="spss-head"><div class="spss-head-title">🔍 جدول التقاطع والتباين بين التحليلين</div></div>
-    <div class="spss-body">
-      <div class="tbl-wrap">
-        <table><thead><tr><th>البُعد</th><th>النتيجة الإحصائية</th><th>الدلالة الاقتصادية</th><th>درجة الاتساق</th><th>التوصية</th></tr></thead>
-        <tbody id="compare-table-body"></tbody></table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Verdict -->
-  <div class="verdict-box" id="verdict-box">
-    <div class="verdict-title">🏁 الاستنتاجات التكاملية</div>
-    <div id="verdict-content"></div>
-  </div>
-
-  <div id="compare-ai-box" class="ai-box" style="display:none">
-    <div class="ai-box-head"><div class="ai-icon">🤖</div><div class="ai-box-title">التحليل المقارن — Claude</div></div>
-    <div class="ai-content" id="compare-ai-text"></div>
-  </div>
-</div>
-
-<!-- ─── INDIVIDUAL ─── -->
-<div class="page" id="page-individual">
-  <div class="pg-hdr"><div class="pg-title">البيانات الفردية لكل مستجيب</div></div>
-  <div id="ind-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px"></div>
-</div>
-
-</main>
-</div><!-- /layout -->
-
-<!-- IMPORT MODAL -->
-<div id="import-modal" class="modal-overlay">
-  <div class="modal-box">
-    <h3>📥 استيراد بيانات</h3>
-    <div style="border:2px dashed var(--border2);border-radius:var(--r2);padding:2rem;text-align:center;cursor:pointer;font-size:13px;color:var(--text3)" onclick="document.getElementById('fi').click()" id="dz" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor=''" ondrop="handleDrop(event)">
-      📁 اسحب ملف JSON أو CSV هنا<br><small style="margin-top:4px;display:block">أو انقر للاختيار</small>
-    </div>
-    <input type="file" id="fi" style="display:none" accept=".json,.csv" onchange="handleImportFile(event)">
-    <div id="import-msg" style="margin-top:1rem;font-size:13px;display:none"></div>
-    <div class="modal-actions" style="margin-top:1.5rem">
-      <button class="btn btn-ghost" onclick="document.getElementById('import-modal').classList.remove('show')">إغلاق</button>
-      <button class="btn btn-primary" id="import-ok" style="display:none" onclick="confirmImport()">✓ استيراد</button>
-    </div>
-  </div>
-</div>
-
-<!-- API KEY MODAL -->
-<div id="api-modal" class="modal-overlay">
-  <div class="modal-box">
-    <h3>🤖 إعداد Claude API</h3>
-    <p>أدخل مفتاح API الخاص بك من <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a><br>المفتاح يُحفظ محلياً في متصفحك فقط ولا يُرسل لأي جهة.</p>
-    <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border2);border-radius:var(--r2);background:var(--bg3);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;margin-bottom:12px">
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="document.getElementById('api-modal').classList.remove('show')">إلغاء</button>
-      <button class="btn btn-primary" onclick="saveApiKey()">💾 حفظ المفتاح</button>
-    </div>
-  </div>
-</div>
-
-<!-- DELETE ALL MODAL -->
-<div id="delete-modal" class="modal-overlay">
-  <div class="modal-box">
-    <h3 style="color:var(--red)">🗑 تأكيد حذف البيانات</h3>
-    <p>هل أنت متأكد من حذف <strong id="del-count">جميع</strong> الاستبيانات؟<br>هذا الإجراء <strong>لا يمكن التراجع عنه</strong> وسيُحذف من Firebase أيضاً.</p>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="document.getElementById('delete-modal').classList.remove('show')">إلغاء</button>
-      <button class="btn btn-danger" onclick="executeDeleteAll()">🗑 حذف نهائي</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<!-- Firebase -->
+<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, set, remove, push, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, push, onValue, increment, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-// ─── ضع هنا إعدادات Firebase الخاصة بك ───
 const firebaseConfig = {
   apiKey: "AIzaSyB5ivtHu4iNCz-F9HQXoSCT4j2UaG9_ICw",
   authDomain: "survey-ai-project-3f4b8.firebaseapp.com",
@@ -851,1050 +378,362 @@ const firebaseConfig = {
   measurementId: "G-2HS5E941FP"
 };
 
+let db = null;
 try {
   if (!firebaseConfig.apiKey.includes('YOUR')) {
     const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    window.__fbdb = { db, ref, onValue, set, remove, push, get };
-    document.getElementById('db-dot').classList.add('on');
-    document.getElementById('db-lbl').textContent = 'Firebase متصل';
-
-    // Live listener — يُشغّل التحليل تلقائياً عند وصول بيانات جديدة
-    onValue(ref(db, 'submissions'), snap => {
-      const data = snap.val();
-      if (data) {
-        const arr = Object.entries(data).map(([k,v]) => ({...v, _key: k}));
-        window.__submissions = arr;
-        window.__respondents = arr;
-        respondents = arr;
-        refreshAll();
-        renderLiveResponses(arr);
-        // تشغيل التحليل الكامل تلقائياً
-        setTimeout(() => runFullAnalysis(true), 500);
-      } else {
-        respondents = [];
-        window.__respondents = [];
-        refreshAll();
-        renderLiveResponses([]);
-      }
+    db = getDatabase(app);
+    window.__db = { db, ref, push, onValue, increment, set, get };
+    // Load count
+    onValue(ref(db, 'meta/count'), snap => {
+      const el = document.getElementById('resp-count');
+      if (el) el.textContent = snap.val() || 0;
     });
   }
-} catch(e) { console.warn('Firebase init error:', e); }
+} catch(e) { console.warn('Firebase offline'); }
 </script>
 
 <script>
-// ═══════════════════════════════════
-//  CONSTANTS
-// ═══════════════════════════════════
+// ═══════════════════════
+//  QUESTIONS DATA
+// ═══════════════════════
 const QUESTIONS = [
-  {id:1,text:"تساهم أدوات الذكاء الاصطناعي في أتمتة المهام الروتينية في التدقيق",axis:1,dim:"الأتمتة وتحليل البيانات"},
-  {id:2,text:"تساعد هذه الأدوات في تحليل البيانات المالية بكفاءة",axis:1,dim:"الأتمتة وتحليل البيانات"},
-  {id:3,text:"تقلل الأدوات الذكية من الوقت اللازم لإنجاز مهام التدقيق",axis:1,dim:"الأتمتة وتحليل البيانات"},
-  {id:4,text:"تساعد أدوات الذكاء الاصطناعي في اكتشاف الأخطاء المحاسبية بدقة",axis:1,dim:"الكشف والتحليل المتقدم"},
-  {id:5,text:"تساهم هذه الأدوات في الكشف عن أنماط الاحتيال المعقدة",axis:1,dim:"الكشف والتحليل المتقدم"},
-  {id:6,text:"تدعم أدوات الذكاء الاصطناعي تحليل المخاطر بطريقة أكثر عمقاً",axis:1,dim:"الكشف والتحليل المتقدم"},
-  {id:7,text:"أدوات الذكاء الاصطناعي تفتقر إلى القدرة على فهم السياق القانوني والمهني",axis:1,dim:"حدود الاستخدام"},
-  {id:8,text:"تعتمد دقة نتائج هذه الأدوات على جودة البيانات المدخلة",axis:1,dim:"حدود الاستخدام"},
-  {id:9,text:"قد تحتوي مخرجات الذكاء الاصطناعي على أخطاء غير ظاهرة للمدقق",axis:1,dim:"حدود الاستخدام"},
-  {id:10,text:"يثير استخدام الذكاء الاصطناعي السحابي مخاوف تتعلق بسرية بيانات العملاء",axis:1,dim:"حدود الاستخدام"},
-  {id:11,text:"يساهم الذكاء الاصطناعي في تحسين جودة أدلة الإثبات التدقيقية",axis:2,dim:"كفاية وملاءمة الأدلة"},
-  {id:12,text:"يساعد في الحصول على أدلة تدقيق أكثر ملائمة لاتخاذ القرار",axis:2,dim:"كفاية وملاءمة الأدلة"},
-  {id:13,text:"يعزز الذكاء الاصطناعي من موثوقية نتائج التدقيق",axis:2,dim:"كفاية وملاءمة الأدلة"},
-  {id:14,text:"يزيد الذكاء الاصطناعي من نطاق التغطية مقارنة بأسلوب العينات التقليدي",axis:2,dim:"نطاق وعمق التدقيق"},
-  {id:15,text:"يساهم في توسيع عمق الاختبارات التدقيقية",axis:2,dim:"نطاق وعمق التدقيق"},
-  {id:16,text:"يساعد في فحص عدد أكبر من العمليات المالية",axis:2,dim:"نطاق وعمق التدقيق"},
-  {id:17,text:"يساعد الذكاء الاصطناعي في تعزيز استنتاجات الحكم المهني للمدقق",axis:2,dim:"دعم اتخاذ القرار"},
-  {id:18,text:"يساعد في تحديد مناطق الخطر الجوهرية بشكل أدق",axis:2,dim:"دعم اتخاذ القرار"},
-  {id:19,text:"يساهم في تحسين تقييم المخاطر وفق معايير التدقيق",axis:2,dim:"دعم اتخاذ القرار"},
-  {id:20,text:"تتطلب مخرجات الذكاء الاصطناعي مراجعة بشرية مستمرة",axis:2,dim:"القيود"},
-  {id:21,text:"لا يمكن الاعتماد على الذكاء الاصطناعي بشكل كامل في اتخاذ قرارات تدقيقية",axis:2,dim:"القيود"},
-  {id:22,text:"يساهم الذكاء الاصطناعي في تحسين كفاءة المدقق",axis:3,dim:"الكفاءة المهنية"},
-  {id:23,text:"يعزز قدرة المدقق على التحليل الاستشرافي للمخاطر",axis:3,dim:"الكفاءة المهنية"},
-  {id:24,text:"يقلل من احتمالية عدم اكتشاف الأخطاء الجوهرية",axis:3,dim:"الكفاءة المهنية"},
-  {id:25,text:"يدعم التكامل بين خبرة المدقق وقدرات الذكاء الاصطناعي جودة العمل",axis:3,dim:"الحكم المهني والاستقلالية"},
-  {id:26,text:"قد يؤدي الاعتماد المفرط على الذكاء الاصطناعي إلى إضعاف الحكم المهني",axis:3,dim:"الحكم المهني والاستقلالية"},
-  {id:27,text:"يبقى المدقق مسؤولاً عن الرأي النهائي رغم استخدام الذكاء الاصطناعي",axis:3,dim:"الحكم المهني والاستقلالية"},
-  {id:28,text:"تواجه المؤسسات صعوبات تقنية في تطبيق أدوات الذكاء الاصطناعي",axis:3,dim:"التحديات المهنية"},
-  {id:29,text:"يمثل نقص التدريب الرقمي عائقاً أمام استخدام هذه الأدوات",axis:3,dim:"التحديات المهنية"},
-  {id:30,text:"يحد تعقيد بعض الأنظمة من استخدامها العملي",axis:3,dim:"التحديات المهنية"},
-  {id:31,text:"سيصبح الذكاء الاصطناعي جزءاً من مهنة التدقيق مستقبلاً",axis:3,dim:"مستقبل المهنة"},
-  {id:32,text:"ستتطلب المهنة مهارات رقمية وتحليلية متقدمة",axis:3,dim:"مستقبل المهنة"},
-  {id:33,text:"سيعتمد التدقيق على نموذج تكاملي بين الإنسان والتكنولوجيا",axis:3,dim:"مستقبل المهنة"}
+  {id:1,text:"تساهم أدوات الذكاء الاصطناعي في أتمتة المهام الروتينية في التدقيق",axis:1,dim:"البعد الأول: الأتمتة وتحليل البيانات"},
+  {id:2,text:"تساعد هذه الأدوات في تحليل البيانات المالية بكفاءة",axis:1,dim:"البعد الأول: الأتمتة وتحليل البيانات"},
+  {id:3,text:"تقلل الأدوات الذكية من الوقت اللازم لإنجاز مهام التدقيق",axis:1,dim:"البعد الأول: الأتمتة وتحليل البيانات"},
+  {id:4,text:"تساعد أدوات الذكاء الاصطناعي في اكتشاف الأخطاء المحاسبية بدقة",axis:1,dim:"البعد الثاني: الكشف والتحليل المتقدم"},
+  {id:5,text:"تساهم هذه الأدوات في الكشف عن أنماط الاحتيال المعقدة",axis:1,dim:"البعد الثاني: الكشف والتحليل المتقدم"},
+  {id:6,text:"تدعم أدوات الذكاء الاصطناعي تحليل المخاطر بطريقة أكثر عمقاً",axis:1,dim:"البعد الثاني: الكشف والتحليل المتقدم"},
+  {id:7,text:"أدوات الذكاء الاصطناعي تفتقر إلى القدرة على فهم السياق القانوني والمهني",axis:1,dim:"البعد الثالث: حدود الاستخدام"},
+  {id:8,text:"تعتمد دقة نتائج هذه الأدوات على جودة البيانات المدخلة",axis:1,dim:"البعد الثالث: حدود الاستخدام"},
+  {id:9,text:"قد تحتوي مخرجات الذكاء الاصطناعي على أخطاء غير ظاهرة للمدقق",axis:1,dim:"البعد الثالث: حدود الاستخدام"},
+  {id:10,text:"يثير استخدام الذكاء الاصطناعي السحابي مخاوف تتعلق بسرية بيانات العملاء",axis:1,dim:"البعد الثالث: حدود الاستخدام"},
+  {id:11,text:"يساهم الذكاء الاصطناعي في تحسين جودة أدلة الإثبات التدقيقية",axis:2,dim:"البعد الأول: كفاية وملاءمة الأدلة"},
+  {id:12,text:"يساعد في الحصول على أدلة تدقيق أكثر ملائمة لاتخاذ القرار",axis:2,dim:"البعد الأول: كفاية وملاءمة الأدلة"},
+  {id:13,text:"يعزز الذكاء الاصطناعي من موثوقية نتائج التدقيق",axis:2,dim:"البعد الأول: كفاية وملاءمة الأدلة"},
+  {id:14,text:"يزيد الذكاء الاصطناعي من نطاق التغطية مقارنة بأسلوب العينات التقليدي",axis:2,dim:"البعد الثاني: نطاق وعمق التدقيق"},
+  {id:15,text:"يساهم في توسيع عمق الاختبارات التدقيقية",axis:2,dim:"البعد الثاني: نطاق وعمق التدقيق"},
+  {id:16,text:"يساعد في فحص عدد أكبر من العمليات المالية",axis:2,dim:"البعد الثاني: نطاق وعمق التدقيق"},
+  {id:17,text:"يساعد الذكاء الاصطناعي في تعزيز استنتاجات الحكم المهني للمدقق",axis:2,dim:"البعد الثالث: دعم اتخاذ القرار"},
+  {id:18,text:"يساعد في تحديد مناطق الخطر الجوهرية بشكل أدق",axis:2,dim:"البعد الثالث: دعم اتخاذ القرار"},
+  {id:19,text:"يساهم في تحسين تقييم المخاطر وفق معايير التدقيق",axis:2,dim:"البعد الثالث: دعم اتخاذ القرار"},
+  {id:20,text:"تتطلب مخرجات الذكاء الاصطناعي مراجعة بشرية مستمرة",axis:2,dim:"البعد الرابع: القيود"},
+  {id:21,text:"لا يمكن الاعتماد على الذكاء الاصطناعي بشكل كامل في اتخاذ قرارات تدقيقية",axis:2,dim:"البعد الرابع: القيود"},
+  {id:22,text:"يساهم الذكاء الاصطناعي في تحسين كفاءة المدقق",axis:3,dim:"البعد الأول: الكفاءة المهنية"},
+  {id:23,text:"يعزز قدرة المدقق على التحليل الاستشرافي للمخاطر",axis:3,dim:"البعد الأول: الكفاءة المهنية"},
+  {id:24,text:"يقلل من احتمالية عدم اكتشاف الأخطاء الجوهرية",axis:3,dim:"البعد الأول: الكفاءة المهنية"},
+  {id:25,text:"يدعم التكامل بين خبرة المدقق وقدرات الذكاء الاصطناعي جودة العمل",axis:3,dim:"البعد الثاني: الحكم المهني والاستقلالية"},
+  {id:26,text:"قد يؤدي الاعتماد المفرط على الذكاء الاصطناعي إلى إضعاف الحكم المهني",axis:3,dim:"البعد الثاني: الحكم المهني والاستقلالية"},
+  {id:27,text:"يبقى المدقق مسؤولاً عن الرأي النهائي رغم استخدام الذكاء الاصطناعي",axis:3,dim:"البعد الثاني: الحكم المهني والاستقلالية"},
+  {id:28,text:"تواجه المؤسسات صعوبات تقنية في تطبيق أدوات الذكاء الاصطناعي",axis:3,dim:"البعد الثالث: التحديات المهنية"},
+  {id:29,text:"يمثل نقص التدريب الرقمي عائقاً أمام استخدام هذه الأدوات",axis:3,dim:"البعد الثالث: التحديات المهنية"},
+  {id:30,text:"يحد تعقيد بعض الأنظمة من استخدامها العملي",axis:3,dim:"البعد الثالث: التحديات المهنية"},
+  {id:31,text:"سيصبح الذكاء الاصطناعي جزءاً من مهنة التدقيق مستقبلاً",axis:3,dim:"البعد الرابع: مستقبل المهنة"},
+  {id:32,text:"ستتطلب المهنة مهارات رقمية وتحليلية متقدمة",axis:3,dim:"البعد الرابع: مستقبل المهنة"},
+  {id:33,text:"سيعتمد التدقيق على نموذج تكاملي بين الإنسان والتكنولوجيا",axis:3,dim:"البعد الرابع: مستقبل المهنة"}
 ];
-const CAT_L=["أستاذ جامعي / أكاديمي","محاسب معتمد","مدقق حسابات"];
-const EDUC_L=["ليسانس","ماستر","دكتوراه","شهادة مهنية متخصصة"];
-const EXP_L=["1-5 سنوات","6-10 سنوات","11-15 سنة","أكثر من 15 سنة"];
-const AI_L=["لا أستخدمها","استخدام محدود","استخدام متوسط","استخدام مكثف"];
-const AX_NAMES=["أدوات الذكاء الاصطناعي","جودة التدقيق","مهنية التدقيق"];
-const AX_COL=["#3b6ff0","#059669","#d97706"];
-const LIK_C=["#059669","#34d399","#64748b","#f97316","#dc2626"];
 
-let respondents=[];
-let charts={};
-let pendingImport=null;
-let deleteTargetKey=null;
+const CAT_L  = ["أستاذ جامعي / أكاديمي","محاسب معتمد","مدقق حسابات"];
+const EDUC_L = ["ليسانس","ماستر","دكتوراه","شهادة مهنية متخصصة"];
+const EXP_L  = ["1-5 سنوات","6-10 سنوات","11-15 سنة","أكثر من 15 سنة"];
+const AI_L   = ["لا أستخدمها","استخدام محدود","استخدام متوسط","استخدام مكثف"];
+const LIK_L  = ["أوافق بشدة","أوافق","محايد","لا أوافق","لا أوافق بشدة"];
+const LIK_CLS= ["l5","l4","l3","l2","l1"];
 
-// ═══════════════════════════════════
-//  STATS
-// ═══════════════════════════════════
-function getComp(){ return respondents.filter(r=>r.answers&&QUESTIONS.every(q=>r.answers[q.id]!==undefined)); }
-function getQVals(qid,comp){ return comp.map(r=>r.answers[qid]).filter(v=>v!==undefined); }
-function mean(arr){ return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0; }
-function std(arr,m){ if(arr.length<2)return 0; const mv=m??mean(arr); return Math.sqrt(arr.reduce((s,x)=>s+Math.pow(x-mv,2),0)/arr.length); }
-function stdS(arr,m){ if(arr.length<2)return 0; const mv=m??mean(arr); return Math.sqrt(arr.reduce((s,x)=>s+Math.pow(x-mv,2),0)/(arr.length-1)); }
-function getQM(qid){ return mean(getQVals(qid,getComp())); }
-function getAxM(ax){ const qs=QUESTIONS.filter(q=>q.axis===ax); return mean(qs.map(q=>getQM(q.id))); }
-function interp(m){
-  if(m>=4.2)return{l:"موافقة عالية جداً",c:"#059669",b:"rgba(5,150,105,.1)"};
-  if(m>=3.4)return{l:"موافقة عالية",c:"#10b981",b:"rgba(16,185,129,.1)"};
-  if(m>=2.6)return{l:"محايد",c:"#64748b",b:"rgba(100,116,139,.1)"};
-  if(m>=1.8)return{l:"موافقة منخفضة",c:"#f97316",b:"rgba(249,115,22,.1)"};
-  return{l:"موافقة منخفضة جداً",c:"#dc2626",b:"rgba(220,38,38,.1)"};
-}
-function chip(m){ const i=interp(m); return `<span class="chip-sm" style="background:${i.b};color:${i.c}">${i.l}</span>`; }
+// Steps: 0=info, 1=axis1, 2=axis2, 3=axis3
+const STEPS = [
+  { id:'info', label:'المعلومات الشخصية' },
+  { id:'axis1', label:'المحور الأول' },
+  { id:'axis2', label:'المحور الثاني' },
+  { id:'axis3', label:'المحور الثالث' }
+];
 
-function pearson(x,y){
-  const n=x.length; if(!n)return 0;
-  const mx=mean(x),my=mean(y);
-  const num=x.reduce((s,v,i)=>s+(v-mx)*(y[i]-my),0);
-  const dx=Math.sqrt(x.reduce((s,v)=>s+Math.pow(v-mx,2),0));
-  const dy=Math.sqrt(y.reduce((s,v)=>s+Math.pow(v-my,2),0));
-  return dx&&dy?num/(dx*dy):0;
-}
+let currentStep = 0;
+let answers = { info:{}, q:{} };
+let startTime = Date.now();
 
-function cronbach(qs){
-  const comp=getComp(); if(comp.length<2)return 0;
-  const k=qs.length;
-  const vars=qs.map(q=>{ const v=getQVals(q.id,comp); const m=mean(v); return v.reduce((s,x)=>s+Math.pow(x-m,2),0)/v.length; });
-  const totals=comp.map(r=>qs.reduce((s,q)=>s+(r.answers[q.id]||0),0));
-  const m=mean(totals),totV=totals.reduce((s,x)=>s+Math.pow(x-m,2),0)/totals.length;
-  if(!totV)return 1;
-  return(k/(k-1))*(1-vars.reduce((a,b)=>a+b,0)/totV);
-}
-
-function ttest(vals,mu=3){
-  const n=vals.length; if(n<2)return{t:0,p:1,ci:[0,0],m:0,s:0,sem:0,df:0};
-  const m=mean(vals),s=stdS(vals,m),sem=s/Math.sqrt(n);
-  const t=(m-mu)/sem;
-  const df=n-1;
-  const p=2*(1-tCDF(Math.abs(t),df));
-  const tc=1.96;
-  return{t,p,m,s,sem,df,ci:[m-tc*sem,m+tc*sem]};
-}
-function tCDF(t,df){
-  const x=df/(df+t*t);
-  let p=0.5*ibeta(x,df/2,0.5);
-  return 1-p;
-}
-function ibeta(x,a,b){
-  if(x<=0)return 0; if(x>=1)return 1;
-  let result=0,term=1;
-  for(let i=0;i<200;i++){
-    if(i>0)term*=(i-b)*x/i;
-    result+=term/(a+i);
-    if(Math.abs(term/(a+i))<1e-12)break;
-  }
-  return Math.min(1,Math.max(0,Math.pow(x,a)*Math.pow(1-x,b)*result));
-}
-
-function anova(groups){
-  const allVals=groups.flatMap(g=>g.vals);
-  const gm=mean(allVals);
-  const k=groups.length,N=allVals.length;
-  const SSB=groups.reduce((s,g)=>s+g.vals.length*Math.pow(mean(g.vals)-gm,2),0);
-  const SSW=groups.reduce((s,g)=>{const m=mean(g.vals);return s+g.vals.reduce((ss,v)=>ss+Math.pow(v-m,2),0)},0);
-  const dfB=k-1,dfW=N-k;
-  const MSB=SSB/dfB,MSW=SSW/dfW;
-  const F=MSW>0?MSB/MSW:0;
-  const p=fPval(F,dfB,dfW);
-  const eta2=SSB/(SSB+SSW);
-  return{SSB,SSW,dfB,dfW,MSB,MSW,F,p,eta2};
-}
-function fPval(F,df1,df2){
-  if(F<=0)return 1;
-  const x=df2/(df2+df1*F);
-  return ibeta(x,df2/2,df1/2);
-}
-
-function skewness(arr){
-  const n=arr.length,m=mean(arr),s=std(arr,m);
-  if(!s)return 0;
-  return arr.reduce((a,v)=>a+Math.pow((v-m)/s,3),0)/n;
-}
-function kurtosis(arr){
-  const n=arr.length,m=mean(arr),s=std(arr,m);
-  if(!s)return 0;
-  return arr.reduce((a,v)=>a+Math.pow((v-m)/s,4),0)/n-3;
-}
-function median(arr){
-  const s=[...arr].sort((a,b)=>a-b);
-  const m=Math.floor(s.length/2);
-  return s.length%2?s[m]:(s[m-1]+s[m])/2;
-}
-
-function linReg(x,y){
-  const n=x.length,mx=mean(x),my=mean(y);
-  const Sxy=x.reduce((s,v,i)=>s+(v-mx)*(y[i]-my),0);
-  const Sxx=x.reduce((s,v)=>s+Math.pow(v-mx,2),0);
-  const b=Sxx?Sxy/Sxx:0;
-  const a=my-b*mx;
-  const yHat=x.map(v=>a+b*v);
-  const SSRes=y.reduce((s,v,i)=>s+Math.pow(v-yHat[i],2),0);
-  const SSTot=y.reduce((s,v)=>s+Math.pow(v-my,2),0);
-  const r2=SSTot?1-SSRes/SSTot:0;
-  return{a,b,r2,yHat};
-}
-
-// ═══════════════════════════════════
-//  ECONOMIC ANALYSIS FUNCTIONS
-// ═══════════════════════════════════
-function calcEconIndicators(){
-  const comp=getComp(); if(!comp.length) return null;
-  const axM=[1,2,3].map(ax=>getAxM(ax));
-  // Translate Likert (1-5) scores to economic indicators
-  const efficiencyScore = axM[0]; // Axis 1: AI tools efficiency
-  const qualityScore = axM[1];    // Axis 2: audit quality
-  const profScore = axM[2];       // Axis 3: professionalism
-
-  // Efficiency index: (M-1)/4 * 100 = percentage gain
-  const efficiencyPct = ((efficiencyScore-1)/4*100).toFixed(1);
-  // ROI estimate: efficiency gain mapped to productivity return
-  const roiPct = (((efficiencyScore-1)/4)*65+10).toFixed(1); // 10-75% scale
-  // Risk reduction: quality axis
-  const riskRedPct = (((qualityScore-1)/4)*55+15).toFixed(1); // 15-70% scale
-  // Adoption readiness: professionalism axis
-  const adoptPct = (((profScore-1)/4)*80+10).toFixed(1); // 10-90% scale
-
-  return {axM, efficiencyPct, roiPct, riskRedPct, adoptPct, efficiencyScore, qualityScore, profScore};
-}
-
-function renderEconomic(){
-  const comp=getComp(); if(!comp.length)return;
-  const econ=calcEconIndicators();
-  if(!econ)return;
-  const {axM,efficiencyPct,roiPct,riskRedPct,adoptPct,efficiencyScore,qualityScore,profScore}=econ;
-
-  // KPIs
-  document.getElementById('ek-eff').textContent = efficiencyPct + '%';
-  document.getElementById('ek-roi').textContent = roiPct + '%';
-  document.getElementById('ek-risk').textContent = riskRedPct + '%';
-  document.getElementById('ek-adopt').textContent = adoptPct + '%';
-
-  // Productivity table
-  const prodRows = [
-    {ind:'نسبة أتمتة المهام الروتينية',val:((axM[0]-1)/4*60+10).toFixed(1)+'%',ref:'McKinsey (2023)',interp:'إمكانية أتمتة ما بين 10-70% من مهام التدقيق'},
-    {ind:'توفير الوقت في تحليل البيانات',val:((getQM(3)-1)/4*50+15).toFixed(1)+'%',ref:'Deloitte Insights (2024)',interp:'تقليص وقت التحليل اليدوي بشكل ملموس'},
-    {ind:'دقة الكشف عن الأخطاء والاحتيال',val:((getQM(4)+getQM(5))/2).toFixed(2)+'/5',ref:'ICAEW Report (2023)',interp:'تحسين دقة الكشف مقارنة بالأساليب التقليدية'},
-    {ind:'توسع نطاق التغطية التدقيقية',val:((axM[1]-1)/4*80+20).toFixed(1)+'%',ref:'PwC Tech Survey (2024)',interp:'زيادة نسبة العمليات الخاضعة للفحص'},
-    {ind:'تحسين كفاءة المدقق',val:((axM[2]-1)/4*70+15).toFixed(1)+'%',ref:'IIA Research (2023)',interp:'المكسب الشامل في الكفاءة المهنية'},
-  ];
-  document.getElementById('econ-prod-body').innerHTML = prodRows.map(r=>`
-    <tr>
-      <td><strong>${r.ind}</strong></td>
-      <td style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:800;color:var(--econ)">${r.val}</td>
-      <td style="font-size:11px;color:var(--text3)">${r.ref}</td>
-      <td>${r.interp}</td>
-    </tr>`).join('');
-
-  // Cost-Benefit table
-  const dims = {};
-  QUESTIONS.forEach(q=>{if(!dims[q.dim])dims[q.dim]=[];dims[q.dim].push(q)});
-  const cbaRows = Object.entries(dims).map(([d,qs])=>{
-    const m = mean(qs.map(q=>getQM(q.id)));
-    const current = ((m-1)/4*100).toFixed(1);
-    const potential = Math.min(100, ((m-1)/4*100 + 20)).toFixed(1);
-    const gap = (potential - current).toFixed(1);
-    const impact = m >= 3.5 ? 'عالي ✅' : m >= 2.5 ? 'متوسط ⚠' : 'منخفض ❌';
-    return `<tr>
-      <td><strong>${d}</strong></td>
-      <td style="color:var(--accent);font-weight:700">${current}%</td>
-      <td style="color:var(--econ);font-weight:700">${potential}%</td>
-      <td style="color:var(--amber);font-weight:700">+${gap}%</td>
-      <td>${impact}</td>
-    </tr>`;
-  });
-  document.getElementById('econ-cba-body').innerHTML = cbaRows.join('');
-
-  // Barriers
-  const barrierQs = QUESTIONS.filter(q=>q.dim==='التحديات المهنية'||q.dim==='حدود الاستخدام');
-  document.getElementById('econ-barrier-body').innerHTML = barrierQs.map(q=>{
-    const m=getQM(q.id);
-    const cost = m>=3.5 ? 'عالية جداً' : m>=2.5 ? 'متوسطة' : 'منخفضة';
-    const costCol = m>=3.5 ? 'var(--red)' : m>=2.5 ? 'var(--amber)' : 'var(--green)';
-    const priority = m>=3.5 ? 'عاجل' : m>=2.5 ? 'مهم' : 'منخفض';
-    return `<tr>
-      <td>${q.text}</td>
-      <td style="font-weight:700;color:${interp(m).c}">${m.toFixed(2)} — ${interp(m).l}</td>
-      <td style="font-weight:700;color:${costCol}">${cost}</td>
-      <td><span class="badge ${m>=3.5?'b-red':m>=2.5?'b-amber':'b-green'}">${priority}</span></td>
-    </tr>`;
-  }).join('');
-
-  // Charts
-  const econBarEl = document.getElementById('econ-bar');
-  if(econBarEl){
-    if(charts['econ-bar'])charts['econ-bar'].destroy();
-    charts['econ-bar'] = new Chart(econBarEl, {
-      type:'bar',
-      data:{
-        labels:AX_NAMES,
-        datasets:[
-          {label:'المتوسط الإحصائي (1-5)',data:axM,backgroundColor:['rgba(59,111,240,.7)','rgba(5,150,105,.7)','rgba(217,119,6,.7)'],borderColor:AX_COL,borderWidth:2,borderRadius:6,yAxisID:'y'},
-          {label:'الكفاءة الاقتصادية %',data:axM.map(m=>((m-1)/4*100)),backgroundColor:'rgba(15,118,110,.3)',borderColor:'#0f766e',borderWidth:2,borderRadius:6,type:'line',yAxisID:'y2'}
-        ]
-      },
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'var(--text2)',font:{family:'Tajawal'}}}},scales:{y:{min:1,max:5,ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.06)'}},y2:{position:'left',min:0,max:100,ticks:{color:'var(--econ)',callback:v=>v+'%'},grid:{display:false}}}}
-    });
-  }
-  const econRadarEl = document.getElementById('econ-radar');
-  if(econRadarEl){
-    if(charts['econ-radar'])charts['econ-radar'].destroy();
-    const econDims = ['أتمتة المهام','الكشف والتحليل','نطاق التغطية','دعم القرار','الكفاءة المهنية'];
-    const econVals = [
-      ((getQM(1)+getQM(2)+getQM(3))/3-1)/4*100,
-      ((getQM(4)+getQM(5)+getQM(6))/3-1)/4*100,
-      ((getQM(14)+getQM(15)+getQM(16))/3-1)/4*100,
-      ((getQM(17)+getQM(18)+getQM(19))/3-1)/4*100,
-      ((getQM(22)+getQM(23)+getQM(24))/3-1)/4*100
-    ];
-    charts['econ-radar'] = new Chart(econRadarEl,{type:'radar',data:{labels:econDims,datasets:[{label:'العائد الاقتصادي %',data:econVals,backgroundColor:'rgba(15,118,110,.15)',borderColor:'#0f766e',borderWidth:2.5,pointBackgroundColor:'#0f766e',pointRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'var(--text2)',font:{family:'Tajawal'}}}},scales:{r:{min:0,max:100,ticks:{color:'#9ca3af',backdropColor:'transparent',callback:v=>v+'%'},grid:{color:'rgba(0,0,0,.08)'},pointLabels:{color:'var(--text2)',font:{size:11,family:'Tajawal'}}}}}});
-  }
-}
-
-function renderCompare(){
-  const comp=getComp(); if(!comp.length)return;
-  const axM=[1,2,3].map(ax=>getAxM(ax));
-  const econ=calcEconIndicators();
-  if(!econ)return;
-
-  // Statistical column
-  document.getElementById('compare-stat-col').innerHTML = `
-    <div class="compare-row"><span class="lbl">متوسط المحور 1 (أدوات الذكاء الاصطناعي)</span><span class="val" style="color:${interp(axM[0]).c}">${axM[0].toFixed(3)}</span></div>
-    <div class="compare-row"><span class="lbl">متوسط المحور 2 (جودة التدقيق)</span><span class="val" style="color:${interp(axM[1]).c}">${axM[1].toFixed(3)}</span></div>
-    <div class="compare-row"><span class="lbl">متوسط المحور 3 (مهنية التدقيق)</span><span class="val" style="color:${interp(axM[2]).c}">${axM[2].toFixed(3)}</span></div>
-    <div class="compare-row"><span class="lbl">ألفا كرونباخ الكلي</span><span class="val" style="color:var(--green)">${cronbach(QUESTIONS).toFixed(3)}</span></div>
-    <div class="compare-row"><span class="lbl">الارتباط (م1 × م3)</span><span class="val">${pearson(comp.map(r=>QUESTIONS.filter(q=>q.axis===1).reduce((s,q)=>s+(r.answers[q.id]||0),0)),comp.map(r=>QUESTIONS.filter(q=>q.axis===3).reduce((s,q)=>s+(r.answers[q.id]||0),0))).toFixed(3)}</span></div>
-    <div class="compare-row"><span class="lbl">المتوسط العام للاستبيان</span><span class="val" style="color:var(--accent)">${mean(axM).toFixed(3)}</span></div>
-    <div style="margin-top:1rem;padding:.75rem;background:rgba(59,111,240,.06);border-radius:var(--r2);font-size:11.5px;color:var(--text2);line-height:1.7">
-      <strong style="color:var(--accent)">الدلالة الإحصائية:</strong><br>
-      تُظهر الأرقام مستوى الاتفاق على أثر الذكاء الاصطناعي، حيث القيم أعلى من 3.4 تُشير إلى موافقة عالية على الأثر الإيجابي.
-    </div>`;
-
-  // Economic column
-  document.getElementById('compare-econ-col').innerHTML = `
-    <div class="compare-row"><span class="lbl">مؤشر الكفاءة التشغيلية</span><span class="val" style="color:var(--econ)">${econ.efficiencyPct}%</span></div>
-    <div class="compare-row"><span class="lbl">العائد المتوقع على الاستثمار (ROI)</span><span class="val" style="color:var(--econ)">${econ.roiPct}%</span></div>
-    <div class="compare-row"><span class="lbl">تخفيض مخاطر التدقيق</span><span class="val" style="color:var(--econ)">${econ.riskRedPct}%</span></div>
-    <div class="compare-row"><span class="lbl">معدل الاستعداد للتبني</span><span class="val" style="color:var(--econ)">${econ.adoptPct}%</span></div>
-    <div class="compare-row"><span class="lbl">فجوة التحسين الاقتصادي</span><span class="val" style="color:var(--amber)">${(100-parseFloat(econ.adoptPct)).toFixed(1)}%</span></div>
-    <div class="compare-row"><span class="lbl">الأثر الاقتصادي الإجمالي</span><span class="val" style="color:var(--econ)">${((parseFloat(econ.roiPct)+parseFloat(econ.riskRedPct))/2).toFixed(1)}%</span></div>
-    <div style="margin-top:1rem;padding:.75rem;background:rgba(15,118,110,.06);border-radius:var(--r2);font-size:11.5px;color:var(--text2);line-height:1.7">
-      <strong style="color:var(--econ)">الدلالة الاقتصادية:</strong><br>
-      تُترجَم أرقام الموافقة إلى مؤشرات إنتاجية وعائد اقتصادي حقيقي قابل للقياس في السوق.
-    </div>`;
-
-  // Comparison chart
-  const compareEl=document.getElementById('compare-chart');
-  if(compareEl){
-    if(charts['compare-chart'])charts['compare-chart'].destroy();
-    charts['compare-chart']=new Chart(compareEl,{
-      type:'bar',
-      data:{
-        labels:['المحور 1\n(إحصائي)','المحور 1\n(اقتصادي)','المحور 2\n(إحصائي)','المحور 2\n(اقتصادي)','المحور 3\n(إحصائي)','المحور 3\n(اقتصادي)'],
-        datasets:[{
-          label:'القيمة',
-          data:[axM[0],(axM[0]-1)/4*5+1,axM[1],(axM[1]-1)/4*5+1,axM[2],(axM[2]-1)/4*5+1],
-          backgroundColor:['rgba(59,111,240,.7)','rgba(15,118,110,.7)','rgba(5,150,105,.7)','rgba(15,118,110,.7)','rgba(217,119,6,.7)','rgba(15,118,110,.7)'],
-          borderColor:['#3b6ff0','#0f766e','#059669','#0f766e','#d97706','#0f766e'],
-          borderWidth:2,borderRadius:8
-        }]
-      },
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:5,ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.06)'}},x:{ticks:{color:'var(--text2)',font:{family:'Tajawal',size:11}},grid:{display:false}}}}
-    });
-  }
-
-  // Comparison table
-  const tableData=[
-    {dim:'أدوات الذكاء الاصطناعي',stat:`${axM[0].toFixed(2)} — ${interp(axM[0]).l}`,econ:`كفاءة ${econ.efficiencyPct}%`,consistency:Math.abs(axM[0]-3.5)<0.5?'عالي':'متوسط',rec:'تعزيز التدريب على الأدوات'},
-    {dim:'جودة أدلة التدقيق',stat:`${axM[1].toFixed(2)} — ${interp(axM[1]).l}`,econ:`خفض المخاطر ${econ.riskRedPct}%`,consistency:Math.abs(axM[1]-3.5)<0.5?'عالي':'متوسط',rec:'الاستثمار في جودة البيانات'},
-    {dim:'مهنية التدقيق',stat:`${axM[2].toFixed(2)} — ${interp(axM[2]).l}`,econ:`ROI ${econ.roiPct}%`,consistency:Math.abs(axM[2]-3.5)<0.5?'عالي':'متوسط',rec:'برامج التأهيل المهني الرقمي'},
-  ];
-  document.getElementById('compare-table-body').innerHTML=tableData.map(r=>{
-    const c=r.consistency==='عالي';
-    return`<tr>
-      <td><strong>${r.dim}</strong></td>
-      <td>${r.stat}</td>
-      <td style="color:var(--econ);font-weight:700">${r.econ}</td>
-      <td><span class="badge ${c?'b-green':'b-amber'}">${r.consistency}</span></td>
-      <td style="font-size:11px;color:var(--text2)">${r.rec}</td>
-    </tr>`;
-  }).join('');
-
-  // Verdict
-  const avgStat=mean(axM);
-  const avgEcon=(parseFloat(econ.efficiencyPct)+parseFloat(econ.roiPct)+parseFloat(econ.riskRedPct))/3;
-  document.getElementById('verdict-content').innerHTML=[
-    {icon:'📊',text:`<strong>على الصعيد الإحصائي:</strong> المتوسط العام بلغ ${avgStat.toFixed(2)} من 5، وهو يدل على ${interp(avgStat).l} لأثر الذكاء الاصطناعي في مهنة التدقيق المحاسبي.`},
-    {icon:'💹',text:`<strong>على الصعيد الاقتصادي:</strong> يُقدَّر متوسط الكسب الاقتصادي بـ ${avgEcon.toFixed(1)}%، مما يشير إلى إمكانية تحسين ملموسة في الإنتاجية والعائد على الاستثمار.`},
-    {icon:'⚡',text:`<strong>الاتساق بين التحليلين:</strong> ${avgStat>=3.5&&avgEcon>=40?'يوجد توافق إيجابي واضح — الموافقة العالية تُترجَم إلى عائد اقتصادي مرتفع.':avgStat<3.5&&avgEcon<40?'يوجد توافق سلبي — التحفظ الإحصائي يُوافق التوقعات الاقتصادية المنخفضة.':'يوجد تباين نسبي يستدعي مزيداً من الدراسة لتحديد أسباب الفجوة بين الإدراك والعائد الفعلي.'}`},
-    {icon:'🎯',text:`<strong>التوصية الجامعة:</strong> يُنصح باعتماد نهج تكاملي يجمع بين ${avgStat>=3.5?'تعزيز':'تطوير'} البنية التكنولوجية و${avgEcon>=40?'استثمار':'تطوير'} برامج التأهيل المهني لتحقيق الحد الأقصى من العائد الاقتصادي.`}
-  ].map(v=>`<div class="verdict-item"><span class="verdict-icon">${v.icon}</span><span>${v.text}</span></div>`).join('');
-}
-
-// ═══════════════════════════════════
-//  RENDER FUNCTIONS
-// ═══════════════════════════════════
-function refreshAll(){
-  const comp=getComp(),n=comp.length;
-  document.getElementById('nb-count').textContent=n;
-  document.getElementById('dash-sub').textContent=`${n} مستجيب مكتمل — آخر تحديث: ${new Date().toLocaleTimeString('ar-DZ',{hour:'2-digit',minute:'2-digit'})}`;
-  if(n===0){
-    document.getElementById('dash-kpis').innerHTML=`<div class="kpi" style="grid-column:1/-1;text-align:center;padding:2rem"><div class="kpi-icon" style="font-size:36px">📭</div><div style="font-size:14px;color:var(--text3);margin-top:8px">لا توجد بيانات بعد — انتظر وصول الاستبيانات أو استورد بيانات</div></div>`;
-    return;
-  }
-  renderDash();
-}
-
-function renderDash(){
-  const comp=getComp(),n=comp.length;
-  if(!n)return;
-  const axM=[1,2,3].map(ax=>getAxM(ax));
-  const gm=mean(axM);
-  const gi=interp(gm);
-  const alpha=cronbach(QUESTIONS);
-  const avgDur=mean(comp.map(r=>r.duration||0));
-  document.getElementById('dash-kpis').innerHTML=`
-    <div class="kpi fa"><div class="kpi-icon">👥</div><div class="kpi-val" style="color:var(--accent)">${respondents.length}</div><div class="kpi-lbl">إجمالي المستجيبين</div><div class="kpi-sub">${n} مكتمل</div></div>
-    <div class="kpi fa"><div class="kpi-icon">📊</div><div class="kpi-val" style="color:${gi.c}">${gm.toFixed(2)}</div><div class="kpi-lbl">المتوسط العام</div><div class="kpi-sub">${gi.l}</div></div>
-    <div class="kpi fa"><div class="kpi-icon">⏱</div><div class="kpi-val" style="color:var(--teal)">${avgDur?Math.round(avgDur/60)+'د':'—'}</div><div class="kpi-lbl">متوسط الوقت</div></div>
-    ${axM.map((m,i)=>{const ip=interp(m);return`<div class="kpi fa"><div class="kpi-icon">${['🤖','📋','👔'][i]}</div><div class="kpi-val" style="color:${ip.c}">${m.toFixed(2)}</div><div class="kpi-lbl">المحور ${i+1}</div><div class="kpi-sub">${ip.l}</div></div>`}).join('')}
-    <div class="kpi fa" style="grid-column:span 1"><div class="kpi-icon">🔒</div><div class="kpi-val" style="color:${alpha>=.7?'var(--green)':'var(--amber)'}">${alpha.toFixed(3)}</div><div class="kpi-lbl">ألفا كرونباخ</div><div class="kpi-sub">${alpha>=.9?'ممتاز':alpha>=.7?'جيد':'مقبول'}</div></div>`;
-  destroyCharts();
-  const catC={},educC={},expC={},aiC={};
-  comp.forEach(r=>{catC[r.category]=(catC[r.category]||0)+1;educC[r.education]=(educC[r.education]||0)+1;expC[r.experience]=(expC[r.experience]||0)+1;aiC[r.aiUsage]=(aiC[r.aiUsage]||0)+1});
-  doughnut('c-cat',CAT_L,CAT_L.map(l=>catC[l]||0),['#3b6ff0','#059669','#d97706']);
-  doughnut('c-exp',EXP_L,EXP_L.map(l=>expC[l]||0),['#059669','#34d399','#0891b2','#3b6ff0']);
-  doughnut('c-ai',AI_L,AI_L.map(l=>aiC[l]||0),['#dc2626','#f97316','#059669','#3b6ff0']);
-  doughnut('c-educ',EDUC_L,EDUC_L.map(l=>educC[l]||0),['#3b6ff0','#7c3aed','#059669','#e11d48']);
-  bar('c-axes',AX_NAMES,axM,AX_COL,[1,5]);
-}
-
-// ─── Full Analysis Runner (the main "Analyze" button) ───
-function runFullAnalysis(silent=false){
-  const comp=getComp();
-  if(!comp.length){
-    if(!silent)showToast('لا توجد بيانات كافية للتحليل','err');
-    return;
-  }
-  if(!silent){
-    const btn=document.getElementById('analyze-main-btn');
-    btn.innerHTML='<span style="width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span> جارٍ التحليل...';
-    btn.disabled=true;
-    setTimeout(()=>{btn.innerHTML='🔬 تحليل البيانات';btn.disabled=false;},2000);
-  }
-  // Run all renders
-  renderDash();
-  renderAnalysis();
-  renderReliability();
-  renderDescriptive();
-  renderTTest();
-  renderCorrelation();
-  renderAnova();
-  renderRegression();
-  renderRanking();
-  renderEconomic();
-  renderCompare();
-  renderLiveResponses(respondents);
-  renderIndividual();
-  // Show completion banner
-  const banner=document.getElementById('analysis-banner');
-  if(banner){
-    banner.style.display='flex';
-    document.getElementById('analysis-time').textContent='اكتمل التحليل في: '+new Date().toLocaleTimeString('ar-DZ');
-  }
-  if(!silent)showToast('✅ تم اكتمال التحليل الإحصائي والاقتصادي','ok');
-}
-
-function renderAnalysis(){
-  const comp=getComp(),n=comp.length; if(!n)return;
-  const catC={},educC={},expC={},aiC={};
-  comp.forEach(r=>{catC[r.category]=(catC[r.category]||0)+1;educC[r.education]=(educC[r.education]||0)+1;expC[r.experience]=(expC[r.experience]||0)+1;aiC[r.aiUsage]=(aiC[r.aiUsage]||0)+1});
-  doughnut('a-cat',CAT_L,CAT_L.map(l=>catC[l]||0),['#3b6ff0','#059669','#d97706']);
-  doughnut('a-educ',EDUC_L,EDUC_L.map(l=>educC[l]||0),['#3b6ff0','#7c3aed','#059669','#e11d48']);
-  doughnut('a-exp',EXP_L,EXP_L.map(l=>expC[l]||0),['#059669','#34d399','#0891b2','#3b6ff0']);
-  doughnut('a-ai',AI_L,AI_L.map(l=>aiC[l]||0),['#dc2626','#f97316','#059669','#3b6ff0']);
-  // Axes charts
-  const axesContainer=document.getElementById('at-axes-container');
-  if(axesContainer){
-    axesContainer.innerHTML=[1,2,3].map(ax=>`<div class="card"><div class="card-title">المحور ${ax}: ${AX_NAMES[ax-1]}</div><div class="chart-wrap" style="height:280px"><canvas id="a-ax${ax}"></canvas></div></div>`).join('');
-    [1,2,3].forEach(ax=>{
-      const qs=QUESTIONS.filter(q=>q.axis===ax);
-      bar(`a-ax${ax}`,qs.map(q=>`س${q.id}`),qs.map(q=>getQM(q.id)),AX_COL[ax-1],[1,5]);
-    });
-  }
-  // Radar
-  const axM=[1,2,3].map(ax=>getAxM(ax));
-  const rc=document.getElementById('a-radar'); if(rc){
-    if(charts['a-radar'])charts['a-radar'].destroy();
-    charts['a-radar']=new Chart(rc,{type:'radar',data:{labels:AX_NAMES,datasets:[{label:'المتوسطات',data:axM,backgroundColor:'rgba(59,111,240,.12)',borderColor:'#3b6ff0',borderWidth:2.5,pointBackgroundColor:'#3b6ff0',pointRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'var(--text2)',font:{family:'Tajawal'}}}},scales:{r:{min:1,max:5,ticks:{color:'#9ca3af',backdropColor:'transparent'},grid:{color:'rgba(0,0,0,.08)'},pointLabels:{color:'var(--text2)',font:{size:12,family:'Tajawal'}}}}}});
-  }
-  // Q table
-  const qMeans=QUESTIONS.map(q=>({id:q.id,m:getQM(q.id)})).sort((a,b)=>b.m-a.m);
-  const rank=Object.fromEntries(qMeans.map((x,i)=>[x.id,i+1]));
-  document.getElementById('q-main-tbody').innerHTML=QUESTIONS.map(q=>{
-    const vals=getQVals(q.id,comp),m=getQM(q.id),s=std(vals,m);
-    const dist=[5,4,3,2,1].map(w=>vals.filter(v=>v===w).length);
-    const pcts=dist.map(c=>n?Math.round(c/n*100):0);
-    const ip=interp(m);
-    return`<tr><td><span style="display:inline-block;min-width:22px;height:22px;border-radius:5px;background:var(--bg4);text-align:center;font-size:10px;font-weight:700;line-height:22px;margin-left:6px">${q.id}</span>${q.text}</td>
-      ${dist.map((c,i)=>`<td style="color:${LIK_C[i]};font-weight:700">${c}<span style="font-size:9px;opacity:.6">(${pcts[i]}%)</span></td>`).join('')}
-      <td><span class="chip-sm" style="background:${ip.b};color:${ip.c};font-weight:800">${m.toFixed(2)}</span></td>
-      <td>${s.toFixed(2)}</td>
-      <td><span style="background:var(--bg4);border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">${rank[q.id]}</span></td>
-      <td>${chip(m)}</td></tr>`;
-  }).join('');
-}
-
-function renderReliability(){
-  const comp=getComp(),n=comp.length; if(n<2){document.getElementById('alpha-content').innerHTML='<div class="empty"><h3>يلزم مستجيبان على الأقل</h3></div>';return}
-  const alphaAll=cronbach(QUESTIONS);
-  const alphaAx=[1,2,3].map(ax=>cronbach(QUESTIONS.filter(q=>q.axis===ax)));
-  const ac=a=>a>=.9?'#059669':a>=.7?'#10b981':a>=.6?'#d97706':'#dc2626';
-  const al=a=>a>=.9?'ممتاز (Excellent)':a>=.7?'جيد (Good)':a>=.6?'مقبول (Acceptable)':'ضعيف (Poor)';
-  document.getElementById('alpha-content').innerHTML=`
-    <div class="alpha-gauge">
-      <div class="gauge-circle" style="border-color:${ac(alphaAll)}">
-        <div class="gauge-val" style="color:${ac(alphaAll)}">${alphaAll.toFixed(3)}</div>
-        <div class="gauge-sub">α الكلي</div>
-      </div>
-      <div class="alpha-bars">
-        ${alphaAx.map((a,i)=>`<div class="alpha-bar-row">
-          <div class="alpha-bar-name">المحور ${i+1}: ${AX_NAMES[i]}</div>
-          <div class="alpha-bar-track"><div class="alpha-bar-fill" style="width:${Math.min(100,a*100)}%;background:${ac(a)}"></div></div>
-          <div class="alpha-bar-val" style="color:${ac(a)}">${a.toFixed(3)}</div>
-          <span class="badge ${a>=.7?'b-green':'b-amber'}">${al(a)}</span>
-        </div>`).join('')}
-      </div>
-    </div>
-    <div class="obs-box" style="margin-top:1rem">
-      <div class="obs-label">📝 تفسير النتيجة</div>
-      معامل ألفا كرونباخ الكلي بلغ <strong>${alphaAll.toFixed(3)}</strong>، وهو يقع ضمن المستوى <strong>${al(alphaAll)}</strong> ${alphaAll>=.7?'مما يدل على أن الاستبيان يتمتع بثبات داخلي كافٍ ونتائجه موثوقة إحصائياً وصالحة للتعميم.':'ويُنصح بمراجعة بعض الفقرات لتحسين الثبات.'}<br>
-      معيار قبول معامل الثبات: <strong>Nunnally (1978)</strong> يشترط α ≥ 0.70 للبحوث الاجتماعية.
-    </div>`;
-  document.getElementById('item-delete-body').innerHTML=QUESTIONS.map(q=>{
-    const rest=QUESTIONS.filter(x=>x.id!==q.id);
-    const aIfDel=cronbach(rest);
-    const vals=getQVals(q.id,comp);
-    const totals=comp.map(r=>QUESTIONS.reduce((s,qq)=>s+(r.answers[qq.id]||0),0));
-    const corrIT=pearson(vals,totals);
-    const mIfDel=mean(comp.map(r=>rest.reduce((s,qq)=>s+(r.answers[qq.id]||0),0)));
-    const vIfDel=std(comp.map(r=>rest.reduce((s,qq)=>s+(r.answers[qq.id]||0),0)),mIfDel);
-    const better=aIfDel>alphaAll;
-    return`<tr>
-      <td><span style="background:var(--bg4);border-radius:5px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:6px">${q.id}</span>${q.text}</td>
-      <td>${mIfDel.toFixed(2)}</td><td>${(vIfDel*vIfDel).toFixed(2)}</td>
-      <td style="font-weight:700;color:${corrIT>=.3?'var(--green)':'var(--red)'}">${corrIT.toFixed(3)}</td>
-      <td style="font-weight:700;color:${ac(aIfDel)}">${aIfDel.toFixed(3)}</td>
-      <td><span class="badge ${better?'b-red':'b-green'}">${better?'يضعف الثبات ⚠':'يعزز الثبات ✓'}</span></td>
-    </tr>`;
-  }).join('');
-}
-
-function renderDescriptive(){
-  const comp=getComp(),n=comp.length; if(!n)return;
-  document.getElementById('desc-body').innerHTML=QUESTIONS.map(q=>{
-    const vals=getQVals(q.id,comp);
-    const m=mean(vals),s=std(vals,m),sem=s/Math.sqrt(n);
-    const med=median(vals),sk=skewness(vals),ku=kurtosis(vals);
-    const ip=interp(m);
-    return`<tr>
-      <td><span style="background:var(--bg4);border-radius:5px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:6px">${q.id}</span>${q.text}</td>
-      <td>${n}</td><td>${Math.min(...vals)}</td><td>${Math.max(...vals)}</td>
-      <td><strong style="color:${ip.c}">${m.toFixed(3)}</strong></td>
-      <td>${med.toFixed(2)}</td><td>${s.toFixed(3)}</td><td>${sem.toFixed(3)}</td>
-      <td style="color:${Math.abs(sk)<1?'var(--green)':'var(--amber)'}">${sk.toFixed(3)}</td>
-      <td style="color:${Math.abs(ku)<2?'var(--green)':'var(--amber)'}">${ku.toFixed(3)}</td>
-      <td>${chip(m)}</td>
-    </tr>`;
-  }).join('');
-}
-
-function renderTTest(){
-  const comp=getComp(),n=comp.length; if(!n)return;
-  const axRows=[1,2,3].map(ax=>{
-    const qs=QUESTIONS.filter(q=>q.axis===ax);
-    const axVals=comp.map(r=>qs.reduce((s,q)=>s+(r.answers[q.id]||0),0)/qs.length);
-    const tt=ttest(axVals,3);
-    const sig=tt.p<.001?'p < .001':tt.p<.01?'p < .01':tt.p<.05?'p < .05':'غير دال (p > .05)';
-    const dSig=tt.p<.05;
-    return`<tr>
-      <td><strong>المحور ${ax}: ${AX_NAMES[ax-1]}</strong></td>
-      <td>${n}</td>
-      <td><strong style="color:${interp(tt.m).c}">${tt.m.toFixed(3)}</strong></td>
-      <td>${tt.s.toFixed(3)}</td><td>${tt.sem.toFixed(3)}</td>
-      <td style="font-weight:700;font-family:'JetBrains Mono',monospace">${tt.t.toFixed(3)}</td>
-      <td>${tt.df}</td>
-      <td style="color:${dSig?'var(--green)':'var(--amber)'};font-weight:700">${sig}</td>
-      <td style="color:${tt.m>3?'var(--green)':'var(--red)'};font-weight:700">${(tt.m-3>0?'+':'')+(tt.m-3).toFixed(3)}</td>
-      <td style="font-size:11px">[${tt.ci[0].toFixed(2)}, ${tt.ci[1].toFixed(2)}]</td>
-      <td><span class="badge ${dSig?'b-green':'b-amber'}">${dSig?'دال إحصائياً ✓':'غير دال'}</span></td>
-    </tr>`;
-  });
-  document.getElementById('ttest-body').innerHTML=axRows.join('');
-  document.getElementById('ttest-q-body').innerHTML=QUESTIONS.map(q=>{
-    const vals=getQVals(q.id,comp),tt=ttest(vals,3);
-    const sig=tt.p<.001?'< .001':tt.p<.01?'< .01':tt.p<.05?'< .05':'> .05';
-    const dSig=tt.p<.05;
-    return`<tr>
-      <td><span style="background:var(--bg4);border-radius:5px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:6px">${q.id}</span>${q.text}</td>
-      <td style="color:${interp(tt.m).c};font-weight:700">${tt.m.toFixed(2)}</td>
-      <td>${tt.s.toFixed(2)}</td>
-      <td style="font-weight:700;font-family:'JetBrains Mono',monospace">${tt.t.toFixed(3)}</td>
-      <td style="color:${dSig?'var(--green)':'var(--amber)'}">${sig}</td>
-      <td style="color:${tt.m>3?'var(--green)':'var(--red)'}">${(tt.m>3?'+':'')+(tt.m-3).toFixed(2)}</td>
-      <td><span class="badge ${dSig?'b-green':'b-amber'}">${dSig?'دال ✓':'غير دال'}</span></td>
-    </tr>`;
-  }).join('');
-  const obs=document.getElementById('ttest-obs');
-  obs.style.display='block';
-  document.getElementById('ttest-obs-text').innerHTML=[1,2,3].map(ax=>{
-    const qs=QUESTIONS.filter(q=>q.axis===ax);
-    const axVals=comp.map(r=>qs.reduce((s,q)=>s+(r.answers[q.id]||0),0)/qs.length);
-    const tt=ttest(axVals,3);
-    const dir=tt.m>3?'موافقة (أعلى من المحايد)':'رفض (أقل من المحايد)';
-    return`• <strong>المحور ${ax} (${AX_NAMES[ax-1]}):</strong> متوسط ${tt.m.toFixed(2)} — ${tt.p<.05?`يوجد فرق دال إحصائياً عن القيمة المحايدة 3 (t=${tt.t.toFixed(2)}, p${tt.p<.001?' < .001':' < .05'}), مما يدل على ${dir}.`:'لا يوجد فرق دال إحصائياً عن القيمة المحايدة (p > .05).'}`;
-  }).join('<br>');
-}
-
-function renderCorrelation(){
-  const comp=getComp(); if(comp.length<3)return;
-  const axVals=[1,2,3].map(ax=>comp.map(r=>QUESTIONS.filter(q=>q.axis===ax).reduce((s,q)=>s+(r.answers[q.id]||0),0)));
-  const matrix=[[0,0,0],[0,0,0],[0,0,0]];
-  for(let i=0;i<3;i++)for(let j=0;j<3;j++) matrix[i][j]=i===j?1:pearson(axVals[i],axVals[j]);
-  const corrCol=r=>Math.abs(r)>=.7?'#059669':Math.abs(r)>=.4?'#d97706':'#dc2626';
-  const corrBg=r=>Math.abs(r)>=.7?'rgba(5,150,105,.1)':Math.abs(r)>=.4?'rgba(217,119,6,.1)':'rgba(220,38,38,.1)';
-  let matHtml=`<table style="border-collapse:separate;border-spacing:4px"><thead><tr><th></th>${AX_NAMES.map(n=>`<th style="font-size:11px;padding:6px 10px">${n}</th>`).join('')}</tr></thead><tbody>`;
-  matrix.forEach((row,i)=>{
-    matHtml+=`<tr><td style="font-size:11px;font-weight:700;padding:4px 8px;white-space:nowrap">${AX_NAMES[i]}</td>`;
-    row.forEach((r,j)=>{
-      if(i===j) matHtml+=`<td><div class="corr-cell" style="background:var(--bg4);color:var(--text3)"><div>1.000</div><div class="corr-lbl">—</div></div></td>`;
-      else {
-        const stars=Math.abs(r)>0.3?'**':'*';
-        matHtml+=`<td><div class="corr-cell" style="background:${corrBg(r)};color:${corrCol(r)}"><div>${r.toFixed(3)}</div><div class="corr-lbl">${stars}</div></div></td>`;
-      }
-    });
-    matHtml+=`</tr>`;
-  });
-  matHtml+=`</tbody></table>`;
-  document.getElementById('corr-matrix-container').innerHTML=matHtml;
-  const obs=document.getElementById('corr-obs');obs.style.display='block';
-  const pairs=[[0,1],[0,2],[1,2]];
-  document.getElementById('corr-obs-text').innerHTML=pairs.map(([i,j])=>{
-    const r=matrix[i][j];
-    const str=Math.abs(r)>=.7?'قوية':Math.abs(r)>=.4?'متوسطة':'ضعيفة';
-    const dir=r>0?'طردية':'عكسية';
-    return`• ارتباط <strong>${dir} ${str}</strong> بين <strong>${AX_NAMES[i]}</strong> و<strong>${AX_NAMES[j]}</strong> (r = ${r.toFixed(3)})`;
-  }).join('<br>');
-  const sc=document.getElementById('corr-scatter');
-  if(sc){if(charts['corr-scatter'])charts['corr-scatter'].destroy();
-  charts['corr-scatter']=new Chart(sc,{type:'scatter',data:{datasets:[{label:'المحور 1 × المحور 2',data:axVals[0].map((v,i)=>({x:v,y:axVals[1][i]})),backgroundColor:'rgba(59,111,240,.55)',borderColor:'#3b6ff0',pointRadius:7,pointHoverRadius:9}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'var(--text2)',font:{family:'Tajawal'}}}},scales:{x:{title:{display:true,text:'المحور الأول',color:'var(--text3)'},ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.06)'}},y:{title:{display:true,text:'المحور الثاني',color:'var(--text3)'},ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.06)'}}}}}); }
-}
-
-function renderAnova(){
-  const comp=getComp(); if(comp.length<4)return;
-  const catGroups=CAT_L.map(cat=>({name:cat,vals:comp.filter(r=>r.category===cat).map(r=>mean(QUESTIONS.map(q=>r.answers[q.id]||0)))})).filter(g=>g.vals.length>0);
-  const expGroups=EXP_L.map(exp=>({name:exp,vals:comp.filter(r=>r.experience===exp).map(r=>mean(QUESTIONS.map(q=>r.answers[q.id]||0)))})).filter(g=>g.vals.length>0);
-  const renderAnovaTable=(groups,bodyId)=>{
-    if(groups.length<2){document.getElementById(bodyId).innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3)">يلزم مجموعتان على الأقل</td></tr>';return;}
-    const an=anova(groups);
-    const sig=an.p<.001?'p < .001':an.p<.01?'p < .01':an.p<.05?'p < .05':'غير دال';
-    const etaLabel=an.eta2<.06?'صغير':an.eta2<.14?'متوسط':'كبير';
-    document.getElementById(bodyId).innerHTML=`
-      <tr><td><strong>بين المجموعات (Between)</strong></td><td>${an.SSB.toFixed(3)}</td><td>${an.dfB}</td><td>${an.MSB.toFixed(3)}</td><td style="font-weight:700;font-family:'JetBrains Mono',monospace">${an.F.toFixed(3)}</td><td style="color:${an.p<.05?'var(--green)':'var(--amber)'};font-weight:700">${sig}</td><td style="color:${an.p<.05?'var(--green)':'var(--text3)'}"><strong>${an.eta2.toFixed(3)}</strong> (${etaLabel})</td><td><span class="badge ${an.p<.05?'b-green':'b-amber'}">${an.p<.05?'دال ✓':'غير دال'}</span></td></tr>
-      <tr><td>داخل المجموعات (Within)</td><td>${an.SSW.toFixed(3)}</td><td>${an.dfW}</td><td>${an.MSW.toFixed(3)}</td><td colspan="4"></td></tr>
-      <tr><td><strong>الكلي</strong></td><td>${(an.SSB+an.SSW).toFixed(3)}</td><td>${an.dfB+an.dfW}</td><td colspan="5"></td></tr>`;
-  };
-  renderAnovaTable(catGroups,'anova-cat-body');
-  renderAnovaTable(expGroups,'anova-exp-body');
-  document.getElementById('anova-cat-means').innerHTML=catGroups.map(g=>{
-    const m=mean(g.vals);const ip=interp(m);
-    return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:12px">
-      <div style="min-width:130px;color:var(--text2)">${g.name}</div>
-      <div style="flex:1;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden"><div style="height:100%;width:${(m-1)/4*100}%;background:${ip.c};border-radius:4px;transition:width 1s"></div></div>
-      <div style="font-weight:700;color:${ip.c};min-width:36px">${m.toFixed(2)}</div>
-      <span class="badge b-green" style="font-size:10px">n=${g.vals.length}</span>
-    </div>`;
-  }).join('');
-  const ac1=document.getElementById('anova-c1');
-  if(ac1){if(charts['anova-c1'])charts['anova-c1'].destroy();charts['anova-c1']=new Chart(ac1,{type:'bar',data:{labels:catGroups.map(g=>g.name),datasets:[{data:catGroups.map(g=>mean(g.vals)),backgroundColor:['rgba(59,111,240,.7)','rgba(5,150,105,.7)','rgba(217,119,6,.7)'],borderColor:['#3b6ff0','#059669','#d97706'],borderWidth:2,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:1,max:5,ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.06)'}},x:{ticks:{color:'var(--text2)',font:{family:'Tajawal',size:11}},grid:{display:false}}}}});}
-  const ac2=document.getElementById('anova-c2');
-  if(ac2){if(charts['anova-c2'])charts['anova-c2'].destroy();charts['anova-c2']=new Chart(ac2,{type:'bar',data:{labels:expGroups.map(g=>g.name),datasets:[{data:expGroups.map(g=>mean(g.vals)),backgroundColor:'rgba(8,145,178,.7)',borderColor:'#0891b2',borderWidth:2,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:1,max:5,ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.06)'}},x:{ticks:{color:'var(--text2)',font:{family:'Tajawal',size:11}},grid:{display:false}}}}});}
-}
-
-function renderRegression(){
-  const comp=getComp(); if(comp.length<4)return;
-  const ax1=comp.map(r=>QUESTIONS.filter(q=>q.axis===1).reduce((s,q)=>s+(r.answers[q.id]||0),0)/10);
-  const ax2=comp.map(r=>QUESTIONS.filter(q=>q.axis===2).reduce((s,q)=>s+(r.answers[q.id]||0),0)/11);
-  const ax3=comp.map(r=>QUESTIONS.filter(q=>q.axis===3).reduce((s,q)=>s+(r.answers[q.id]||0),0)/12);
-  const reg1=linReg(ax1,ax3);
-  const reg2=linReg(ax2,ax3);
-  const mx1=mean(ax1),mx2=mean(ax2),mx3=mean(ax3);
-  const b1=pearson(ax1,ax3)*(std(ax3,mx3)/std(ax1,mx1)||1);
-  const b2=pearson(ax2,ax3)*(std(ax3,mx3)/std(ax2,mx2)||1);
-  const R2=Math.min(.99,reg1.r2*.5+reg2.r2*.5);
-  document.getElementById('reg-body').innerHTML=`
-    <tr><td><strong>الثابت (Constant)</strong></td><td>${(mx3-b1*mx1-b2*mx2).toFixed(3)}</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-    <tr><td>أدوات الذكاء الاصطناعي (المحور 1)</td><td>${b1.toFixed(3)}</td><td style="font-weight:700">${pearson(ax1,ax3).toFixed(3)}</td>
-    <td style="font-family:'JetBrains Mono',monospace">${(pearson(ax1,ax3)*Math.sqrt(comp.length-2)/Math.sqrt(1-pearson(ax1,ax3)**2||.001)).toFixed(3)}</td>
-    <td style="color:${Math.abs(pearson(ax1,ax3))>.3?'var(--green)':'var(--amber)'}">< .05</td><td>1.${(1+pearson(ax1,ax2)**2*10|0).toFixed(0)}00</td>
-    <td><span class="badge b-green">دال ✓</span></td></tr>
-    <tr><td>جودة التدقيق (المحور 2)</td><td>${b2.toFixed(3)}</td><td style="font-weight:700">${pearson(ax2,ax3).toFixed(3)}</td>
-    <td style="font-family:'JetBrains Mono',monospace">${(pearson(ax2,ax3)*Math.sqrt(comp.length-2)/Math.sqrt(1-pearson(ax2,ax3)**2||.001)).toFixed(3)}</td>
-    <td style="color:${Math.abs(pearson(ax2,ax3))>.3?'var(--green)':'var(--amber)'}">< .05</td><td>1.${(1+pearson(ax1,ax2)**2*10|0).toFixed(0)}00</td>
-    <td><span class="badge b-green">دال ✓</span></td></tr>`;
-  document.getElementById('reg-summary').innerHTML=`
-    <div class="kpi" style="flex:1;min-width:100px;padding:1rem"><div class="kpi-val" style="font-size:22px;color:var(--accent)">${R2.toFixed(3)}</div><div class="kpi-lbl">R² معامل التحديد</div></div>
-    <div class="kpi" style="flex:1;min-width:100px;padding:1rem"><div class="kpi-val" style="font-size:22px;color:var(--green)">${Math.sqrt(R2).toFixed(3)}</div><div class="kpi-lbl">R معامل الارتباط الكلي</div></div>
-    <div class="kpi" style="flex:1;min-width:100px;padding:1rem"><div class="kpi-val" style="font-size:22px;color:var(--amber)">${(R2*100).toFixed(1)}%</div><div class="kpi-lbl">نسبة التباين المفسَّر</div></div>`;
-  const rs=document.getElementById('reg-scatter');
-  if(rs){if(charts['reg-scatter'])charts['reg-scatter'].destroy();
-  const minX=Math.min(...ax1),maxX=Math.max(...ax1);
-  charts['reg-scatter']=new Chart(rs,{type:'scatter',data:{datasets:[{label:'البيانات الفعلية',data:ax1.map((v,i)=>({x:v,y:ax3[i]})),backgroundColor:'rgba(59,111,240,.55)',borderColor:'#3b6ff0',pointRadius:6},{label:'خط الانحدار',data:[{x:minX,y:reg1.a+reg1.b*minX},{x:maxX,y:reg1.a+reg1.b*maxX}],type:'line',borderColor:'#dc2626',borderWidth:2,borderDash:[5,5],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'var(--text2)',font:{family:'Tajawal'}}}},scales:{x:{title:{display:true,text:'المحور الأول',color:'var(--text3)'},ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.06)'}},y:{title:{display:true,text:'المحور الثالث',color:'var(--text3)'},ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.06)'}}}}}); }
-}
-
-function renderRanking(){
-  const comp=getComp(); if(!comp.length)return;
-  const qMeans=QUESTIONS.map(q=>({q,m:getQM(q.id)})).sort((a,b)=>b.m-a.m);
-  const renderRankList=(items,containerId)=>{
-    document.getElementById(containerId).innerHTML=items.map((x,i)=>{
-      const ip=interp(x.m);
-      return`<div class="rank-item">
-        <div class="rank-num" style="background:${i<3?ip.b:'var(--bg4)'};color:${i<3?ip.c:'var(--text3)'}">${i+1}</div>
-        <div class="rank-bar">
-          <div class="rank-text">س${x.q.id}: ${x.q.text}</div>
-          <div class="rank-track"><div class="rank-fill" style="width:${(x.m-1)/4*100}%;background:${ip.c}"></div></div>
-        </div>
-        <div class="rank-val" style="color:${ip.c}">${x.m.toFixed(2)}</div>
-      </div>`;
-    }).join('');
-  };
-  renderRankList(qMeans.slice(0,10),'top10-list');
-  renderRankList([...qMeans].reverse().slice(0,10),'bot10-list');
-  const dims={};
-  QUESTIONS.forEach(q=>{if(!dims[q.dim])dims[q.dim]=[];dims[q.dim].push(q)});
-  const dimSorted=Object.entries(dims).map(([d,qs])=>({d,m:mean(qs.map(q=>getQM(q.id))),n:qs.length})).sort((a,b)=>b.m-a.m);
-  document.getElementById('dim-ranking').innerHTML=dimSorted.map((x,i)=>{
-    const ip=interp(x.m);
-    return`<div class="rank-item">
-      <div class="rank-num" style="background:${i<3?ip.b:'var(--bg4)'};color:${i<3?ip.c:'var(--text3)'}">${i+1}</div>
-      <div class="rank-bar">
-        <div class="rank-text">${x.d} <span style="font-size:10px;color:var(--text3)">(${x.n} فقرة)</span></div>
-        <div class="rank-track"><div class="rank-fill" style="width:${(x.m-1)/4*100}%;background:${ip.c}"></div></div>
-      </div>
-      <div class="rank-val" style="color:${ip.c}">${x.m.toFixed(2)}</div>
-    </div>`;
-  }).join('');
-  const axM=[1,2,3].map(ax=>getAxM(ax));
-  bar('rank-chart',AX_NAMES,axM,AX_COL,[1,5]);
-}
-
-function renderLiveResponses(arr){
-  const el=document.getElementById('live-responses');
-  if(!arr.length){el.innerHTML='<div class="empty"><h3>لا توجد استجابات بعد</h3><p>سيظهر المستجيبون هنا فور إرسالهم الاستبيان</p></div>';return}
-  const sorted=[...arr].sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));
-  el.innerHTML=`
-    <div style="margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between">
-      <span style="font-size:12px;color:var(--text3)">${arr.length} مستجيب — يتحدث تلقائياً</span>
-    </div>
-    <div class="live-list">${sorted.map((r,i)=>{
-    const catCol={'أستاذ جامعي / أكاديمي':'#3b6ff0','محاسب معتمد':'#059669','مدقق حسابات':'#d97706'};
-    const col=catCol[r.category]||'var(--text3)';
-    const t=r.submittedAt?new Date(r.submittedAt).toLocaleString('ar-DZ'):'—';
-    const m=r.answers?mean(Object.values(r.answers).filter(v=>v)):0;
-    const ip=m?interp(m):{l:'—',c:'var(--text3)'};
-    return`<div class="live-item">
-      <div class="live-num" style="background:${col}22;color:${col}">${i+1}</div>
-      <div class="live-meta"><strong style="color:${col}">${r.category||'—'}</strong>${r.education||'—'} | ${r.experience||'—'} | ${r.aiUsage||'—'}</div>
-      <div style="text-align:left">
-        <div style="font-size:13px;font-weight:800;color:${ip.c}">${m?m.toFixed(2):'—'}</div>
-        <div class="live-time">${t}</div>
-      </div>
-      <button class="del-btn" onclick="confirmDeleteOne('${r._key||''}', ${i+1})" title="حذف هذا الاستبيان">🗑</button>
-    </div>`;
-  }).join('')}</div>`;
-}
-
-function renderIndividual(){
-  const comp=getComp();
-  document.getElementById('ind-grid').innerHTML=comp.map((r,i)=>{
-    const m=r.answers?mean(Object.values(r.answers)):0;
-    const ip=interp(m);
-    const catCol={'أستاذ جامعي / أكاديمي':'#3b6ff0','محاسب معتمد':'#059669','مدقق حسابات':'#d97706'};
-    const col=catCol[r.category]||'var(--text3)';
-    return`<div style="background:var(--bg2);border:1.5px solid ${col}33;border-radius:var(--radius);padding:1.25rem;transition:all .2s;cursor:default" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        <div style="width:32px;height:32px;border-radius:50%;background:${col}22;border:2px solid ${col};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:${col}">${i+1}</div>
-        <div><div style="font-size:13px;font-weight:700">${r.category||'—'}</div><div style="font-size:10px;color:var(--text3)">${r.education||'—'}</div></div>
-      </div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">${r.experience||'—'} | ${r.aiUsage||'—'}</div>
-      <div style="display:flex;align-items:baseline;gap:6px">
-        <div style="font-family:'Cairo',sans-serif;font-size:22px;font-weight:900;color:${ip.c}">${m.toFixed(2)}</div>
-        <span class="badge" style="background:${ip.b};color:${ip.c}">${ip.l}</span>
-      </div>
-      <div style="height:4px;background:var(--bg4);border-radius:2px;margin-top:8px;overflow:hidden"><div style="height:100%;width:${(m-1)/4*100}%;background:${ip.c};border-radius:2px;transition:width 1s"></div></div>
-    </div>`;
-  }).join('');
-}
-
-// ═══════════════════════════════════
-//  DELETE FUNCTIONS
-// ═══════════════════════════════════
-function confirmDeleteAll(){
-  const n=respondents.length;
-  if(!n){showToast('لا توجد بيانات للحذف','err');return}
-  deleteTargetKey='ALL';
-  document.getElementById('del-count').textContent=`${n} استبيان (جميع البيانات)`;
-  document.getElementById('delete-modal').classList.add('show');
-}
-
-function confirmDeleteOne(key, num){
-  if(!key){showToast('لا يمكن حذف هذا السجل — لا يوجد مفتاح Firebase','err');return;}
-  deleteTargetKey=key;
-  document.getElementById('del-count').textContent=`الاستبيان رقم ${num}`;
-  document.getElementById('delete-modal').classList.add('show');
-}
-
-async function executeDeleteAll(){
-  document.getElementById('delete-modal').classList.remove('show');
-  const fb=window.__fbdb;
-  if(deleteTargetKey==='ALL'){
-    if(fb){
-      try{
-        await fb.remove(fb.ref(fb.db,'submissions'));
-        await fb.set(fb.ref(fb.db,'meta/count'),0);
-        showToast('✅ تم حذف جميع البيانات من Firebase','ok');
-      }catch(e){
-        console.error(e);
-        showToast('خطأ في حذف بيانات Firebase: '+e.message,'err');
-      }
-    } else {
-      respondents=[];
-      localStorage.removeItem('offline_submissions');
-      refreshAll();
-      renderLiveResponses([]);
-      showToast('✅ تم حذف جميع البيانات المحلية','ok');
-    }
-  } else {
-    // Delete single
-    if(fb){
-      try{
-        await fb.remove(fb.ref(fb.db,'submissions/'+deleteTargetKey));
-        showToast('✅ تم حذف الاستبيان','ok');
-      }catch(e){
-        showToast('خطأ في الحذف: '+e.message,'err');
-      }
-    } else {
-      respondents=respondents.filter(r=>r._key!==deleteTargetKey);
-      localStorage.setItem('offline_submissions',JSON.stringify(respondents));
-      refreshAll();
-      renderLiveResponses(respondents);
-      showToast('✅ تم حذف الاستبيان محلياً','ok');
-    }
-  }
-  deleteTargetKey=null;
-}
-
-// ═══════════════════════════════════
-//  AI ANALYSIS
-// ═══════════════════════════════════
-function showApiKeyModal(){ document.getElementById('api-modal').classList.add('show'); const k=localStorage.getItem('claude_key'); if(k)document.getElementById('api-key-input').value=k; }
-function saveApiKey(){ localStorage.setItem('claude_key',document.getElementById('api-key-input').value); document.getElementById('api-modal').classList.remove('show'); showToast('تم حفظ مفتاح API ✓','ok'); }
-
-async function aiAnalyze(type){
-  const key=localStorage.getItem('claude_key');
-  if(!key){ showApiKeyModal(); return; }
-  const comp=getComp(),n=comp.length;
-  if(!n){ showToast('لا توجد بيانات كافية','err'); return; }
-  const boxId=type+'-ai-box', textId=type+'-ai-text';
-  const box=document.getElementById(boxId), txt=document.getElementById(textId);
-  if(!box||!txt)return;
-  box.style.display='block';
-  txt.innerHTML='<div class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>';
-  const axM=[1,2,3].map(ax=>getAxM(ax));
-  const econ=calcEconIndicators();
-  const prompts={
-    reliability:`أنت خبير إحصائي. بناءً على البيانات التالية من استبيان حول تأثير الذكاء الاصطناعي على التدقيق المحاسبي (ن=${n} مستجيب):\n- ألفا كرونباخ الكلي: ${cronbach(QUESTIONS).toFixed(3)}\n- المحور 1: ${cronbach(QUESTIONS.filter(q=>q.axis===1)).toFixed(3)}\n- المحور 2: ${cronbach(QUESTIONS.filter(q=>q.axis===2)).toFixed(3)}\n- المحور 3: ${cronbach(QUESTIONS.filter(q=>q.axis===3)).toFixed(3)}\nاكتب تفسيراً أكاديمياً عربياً موجزاً (6-8 جمل) يصف ثبات الأداة ومدى صلاحيتها للبحث العلمي، مع الإشارة إلى معيار Nunnally 1978.`,
-    descriptive:`خبير إحصائي. استبيان الذكاء الاصطناعي والتدقيق (ن=${n}). متوسطات المحاور: م1=${axM[0].toFixed(2)}, م2=${axM[1].toFixed(2)}, م3=${axM[2].toFixed(2)}. المتوسط العام: ${mean(axM).toFixed(2)}. اكتب تفسيراً وصفياً أكاديمياً عربياً (6-8 جمل) لهذه النتائج مناسباً لمذكرة تخرج.`,
-    ttest:`خبير إحصائي. نتائج اختبار t لمتوسط واحد (القيمة المرجعية=3): ${[1,2,3].map(ax=>{const qs=QUESTIONS.filter(q=>q.axis===ax);const v=comp.map(r=>qs.reduce((s,q)=>s+(r.answers[q.id]||0),0)/qs.length);const tt=ttest(v,3);return `المحور${ax}: t=${tt.t.toFixed(2)}, p=${tt.p.toFixed(3)}, M=${tt.m.toFixed(2)}`}).join(' | ')}. اكتب تفسيراً إحصائياً أكاديمياً عربياً (6-8 جمل) لنتائج اختبار الدلالة الإحصائية مناسباً لمذكرة تخرج.`,
-    correlation:`خبير إحصائي. مصفوفة ارتباط بيرسون: ${[1,2,3].map(i=>[1,2,3].filter(j=>j>i).map(j=>{const a=comp.map(r=>QUESTIONS.filter(q=>q.axis===i).reduce((s,q)=>s+(r.answers[q.id]||0),0));const b=comp.map(r=>QUESTIONS.filter(q=>q.axis===j).reduce((s,q)=>s+(r.answers[q.id]||0),0));return `r(${i},${j})=${pearson(a,b).toFixed(3)}`}).join(', ')).flat().join(' | ')}. اكتب تفسيراً أكاديمياً عربياً (6-8 جمل) مناسباً لمذكرة تخرج.`,
-    anova:`خبير إحصائي. نتائج تحليل التباين (ANOVA) بين الفئات المهنية لاستبيان الذكاء الاصطناعي (ن=${n}). اكتب تفسيراً أكاديمياً عربياً (6-8 جمل) لما إذا كانت هناك فروق ذات دلالة إحصائية بين فئات المهنيين مناسباً لمذكرة تخرج.`,
-    regression:`خبير إحصائي. نموذج انحدار خطي متعدد: المتغير التابع مهنية التدقيق (المحور 3)، المتغيران المستقلان: أدوات الذكاء الاصطناعي (β=${pearson(comp.map(r=>QUESTIONS.filter(q=>q.axis===1).reduce((s,q)=>s+(r.answers[q.id]||0),0)/10),comp.map(r=>QUESTIONS.filter(q=>q.axis===3).reduce((s,q)=>s+(r.answers[q.id]||0),0)/12)).toFixed(3)}) وجودة التدقيق (β=${pearson(comp.map(r=>QUESTIONS.filter(q=>q.axis===2).reduce((s,q)=>s+(r.answers[q.id]||0),0)/11),comp.map(r=>QUESTIONS.filter(q=>q.axis===3).reduce((s,q)=>s+(r.answers[q.id]||0),0)/12)).toFixed(3)}). اكتب تفسيراً أكاديمياً عربياً (6-8 جمل) مناسباً لمذكرة تخرج.`,
-    economic:`أنت خبير في اقتصاديات التكنولوجيا والمحاسبة. استناداً إلى نتائج استبيان تأثير الذكاء الاصطناعي على التدقيق المحاسبي (ن=${n} مستجيب، محاور ثلاثة):\n- مؤشر الكفاءة التشغيلية: ${econ?.efficiencyPct||'—'}%\n- العائد المتوقع على الاستثمار: ${econ?.roiPct||'—'}%\n- خفض مخاطر التدقيق: ${econ?.riskRedPct||'—'}%\n- معدل الاستعداد للتبني: ${econ?.adoptPct||'—'}%\nاكتب تحليلاً اقتصادياً أكاديمياً عربياً (8-10 جمل) يتناول العائد الاقتصادي لتبني الذكاء الاصطناعي في مهنة التدقيق المحاسبي في الجزائر، مناسباً لمذكرة تخرج.`,
-    compare:`أنت خبير في التحليل الإحصائي والاقتصادي. قارن بين:\nالتحليل الإحصائي: المتوسطات (م1=${axM[0].toFixed(2)}, م2=${axM[1].toFixed(2)}, م3=${axM[2].toFixed(2)}) وألفا=${cronbach(QUESTIONS).toFixed(3)}\nالتحليل الاقتصادي: كفاءة ${econ?.efficiencyPct||'—'}%, ROI ${econ?.roiPct||'—'}%, خفض مخاطر ${econ?.riskRedPct||'—'}%\nاكتب مقارنة تكاملية أكاديمية عربية (8-10 جمل) تجمع بين الدلالة الإحصائية والأثر الاقتصادي، مناسبة لمذكرة تخرج في التدقيق المحاسبي.`
-  };
-  try {
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,messages:[{role:'user',content:prompts[type]}]})
-    });
-    const data=await resp.json();
-    if(data.error){txt.innerHTML=`<span style="color:var(--red)">خطأ: ${data.error.message}</span>`;return;}
-    const content=data.content[0].text;
-    txt.innerHTML='';
-    let i=0;
-    const typeWriter=()=>{
-      if(i<content.length){ txt.innerHTML=content.slice(0,i+1)+'<span class="ai-cursor"></span>'; i++; setTimeout(typeWriter,18); }
-      else txt.innerHTML=content;
-    };
-    typeWriter();
-  } catch(e){ txt.innerHTML=`<span style="color:var(--red)">تعذر الاتصال بـ Claude API. تأكد من صحة المفتاح.</span>`; }
-}
-
-// ═══════════════════════════════════
-//  CHARTS
-// ═══════════════════════════════════
-function destroyCharts(){ Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}}); charts={}; }
-function doughnut(id,labels,data,colors){
-  const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
-  charts[id]=new Chart(el,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'var(--bg2)',borderWidth:3,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'var(--text2)',font:{size:11,family:'Tajawal'},boxWidth:11,padding:8}}}}});
-}
-function bar(id,labels,data,color,range){
-  const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
-  const colors=Array.isArray(color)?color:data.map(()=>color);
-  charts[id]=new Chart(el,{type:'bar',data:{labels,datasets:[{data,backgroundColor:colors.map(c=>c+'bb'),borderColor:colors,borderWidth:2,borderRadius:7,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:range[0],max:range[1],ticks:{color:'var(--text3)',font:{family:'Tajawal'}},grid:{color:'rgba(0,0,0,.05)'}},x:{ticks:{color:'var(--text2)',font:{size:11,family:'Tajawal'}},grid:{display:false}}}}});
-}
-
-// ═══════════════════════════════════
-//  NAVIGATION
-// ═══════════════════════════════════
-function showPage(name){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sb-item').forEach(s=>s.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  document.getElementById('nav-'+name).classList.add('active');
-  const pageRenders={
-    analysis:renderAnalysis, reliability:renderReliability,
-    descriptive:renderDescriptive, ttest:renderTTest,
-    correlation:renderCorrelation, anova:renderAnova,
-    regression:renderRegression, ranking:renderRanking,
-    economic:renderEconomic, compare:renderCompare,
-    individual:renderIndividual
-  };
-  if(pageRenders[name]&&getComp().length) pageRenders[name]();
-  window.scrollTo(0,0);
-}
-function stab(name,btn,prefix){
-  document.querySelectorAll(`.tc[id^="${prefix}-"]`).forEach(t=>t.classList.remove('active'));
-  btn.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  document.getElementById(`${prefix}-${name}`).classList.add('active');
-  btn.classList.add('active');
-}
-
-// ═══════════════════════════════════
+// ═══════════════════════
 //  THEME
-// ═══════════════════════════════════
+// ═══════════════════════
 function initTheme(){
-  const h=new Date().getHours();
-  const stored=localStorage.getItem('admin_theme');
-  const theme=stored||(h<6||h>=20?'dark':'light');
+  const h = new Date().getHours();
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const stored = localStorage.getItem('theme');
+  const theme = stored || (h < 6 || h >= 20 || prefersDark ? 'dark' : 'light');
   setTheme(theme);
 }
 function setTheme(t){
-  document.documentElement.setAttribute('data-theme',t);
-  document.getElementById('theme-btn').textContent=t==='dark'?'☀️':'🌙';
-  localStorage.setItem('admin_theme',t);
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('theme-btn').textContent = t === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('theme', t);
 }
-function toggleTheme(){setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  setTheme(cur === 'dark' ? 'light' : 'dark');
+}
 
-// ═══════════════════════════════════
-//  IMPORT / EXPORT
-// ═══════════════════════════════════
-function openImport(){document.getElementById('import-modal').classList.add('show')}
-function handleDrop(e){e.preventDefault();document.getElementById('dz').style.borderColor='';const f=e.dataTransfer.files[0];if(f)readImportFile(f)}
-function handleImportFile(e){const f=e.target.files[0];if(f)readImportFile(f)}
-function readImportFile(f){
-  const r=new FileReader();
-  r.onload=e=>{
-    try{
-      let data;
-      if(f.name.endsWith('.json')){
-        const j=JSON.parse(e.target.result);
-        data=Array.isArray(j)?j:j.respondents||[];
-      } else {
-        data=parseCSV(e.target.result);
-      }
-      pendingImport=data;
-      document.getElementById('import-msg').innerHTML=`<span style="color:var(--green)">✓ تم قراءة ${data.length} سجل</span>`;
-      document.getElementById('import-msg').style.display='block';
-      document.getElementById('import-ok').style.display='inline-flex';
-    }catch(err){
-      document.getElementById('import-msg').innerHTML=`<span style="color:var(--red)">خطأ: ${err.message}</span>`;
-      document.getElementById('import-msg').style.display='block';
-    }
-  };
-  r.readAsText(f,'UTF-8');
+// ═══════════════════════
+//  BUILD FORM
+// ═══════════════════════
+function buildForm(){
+  const c = document.getElementById('sections-container');
+  // Step 0: Personal Info
+  const infoHtml = `
+  <div class="section-card" data-step="0">
+    <div class="section-head">
+      <div class="section-icon s1">👤</div>
+      <div class="section-meta"><h2>المعلومات الشخصية والمهنية</h2><p>يرجى اختيار الإجابة الأنسب لكل حقل</p></div>
+    </div>
+    ${buildChips('category','الفئة المهنية',CAT_L)}
+    ${buildChips('education','المؤهل العلمي',EDUC_L)}
+    ${buildChips('experience','سنوات الخبرة',EXP_L)}
+    ${buildChips('aiUsage','مدى استخدامك لأدوات الذكاء الاصطناعي',AI_L)}
+  </div>`;
+
+  // Steps 1-3: Axes
+  const axLabels = ['المحور الأول: أدوات الذكاء الاصطناعي','المحور الثاني: جودة التدقيق','المحور الثالث: مهنية التدقيق'];
+  const axIcons = ['🤖','📊','👔'];
+  const axBadge = ['s2','s3','s4'];
+  const axes = [1,2,3].map(ax => {
+    const qs = QUESTIONS.filter(q => q.axis === ax);
+    const dims = [...new Set(qs.map(q => q.dim))];
+    let html = `<div class="section-card" data-step="${ax}">
+      <div class="section-head">
+        <div class="section-icon ${axBadge[ax-1]}">${axIcons[ax-1]}</div>
+        <div class="section-meta"><h2>${axLabels[ax-1]}</h2><p>${qs.length} عبارة — اختر ما يناسب رأيك</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;text-align:center;margin-bottom:1rem;padding:0 38px">
+        ${LIK_L.map((l,i)=>`<div style="font-size:10px;color:var(--text3);font-weight:600;padding:4px 2px">${l}</div>`).join('')}
+      </div>`;
+    dims.forEach(dim => {
+      html += `<div class="dim-title">${dim}</div>`;
+      qs.filter(q=>q.dim===dim).forEach(q => {
+        html += buildQItem(q);
+      });
+    });
+    html += `</div>`;
+    return html;
+  }).join('');
+
+  c.innerHTML = infoHtml + axes;
+  attachListeners();
+  showStep(0);
+
+  // Build step dots
+  const dots = document.getElementById('step-dots');
+  dots.innerHTML = STEPS.map((s,i) => `<div class="step-dot ${i===0?'active':''}" data-step="${i}" onclick="goStep(${i})" title="${s.label}"></div>`).join('');
 }
-function parseCSV(text){
-  const lines=text.split('\n').filter(l=>l.trim());
-  return lines.slice(1).map(line=>{
-    const v=line.split(',').map(x=>x.replace(/"/g,'').trim());
-    const r={category:v[1],education:v[2],experience:v[3],aiUsage:v[4],answers:{}};
-    QUESTIONS.forEach((q,i)=>{const val=parseInt(v[5+i]);if(val>=1&&val<=5)r.answers[q.id]=val});
-    return r;
-  }).filter(r=>r.category);
+
+function buildChips(field, label, options){
+  const opts = options.map(opt =>
+    `<label class="chip" data-field="${field}" data-val="${opt}"><input type="radio" name="${field}" value="${opt}"><span class="chip-dot"></span>${opt}</label>`
+  ).join('');
+  return `<div class="field-group"><div class="field-label"><span class="req">*</span>${label}</div><div class="chips">${opts}</div></div>`;
 }
-function confirmImport(){
-  if(!pendingImport)return;
-  respondents=[...respondents,...pendingImport];
-  refreshAll();
-  runFullAnalysis(true);
-  document.getElementById('import-modal').classList.remove('show');
-  showToast(`✓ تم استيراد ${pendingImport.length} سجل`,'ok');
-  pendingImport=null;
+
+function buildQItem(q){
+  const opts = [5,4,3,2,1].map((w,i) =>
+    `<label class="likert-opt ${LIK_CLS[i]}" data-qid="${q.id}" data-val="${w}">
+      <input type="radio" name="q${q.id}" value="${w}">
+      <div class="likert-circle">${w}</div>
+      <div class="likert-lbl">${LIK_L[i]}</div>
+    </label>`
+  ).join('');
+  return `<div class="q-item" id="qi-${q.id}">
+    <div class="q-top">
+      <div class="q-badge">${q.id}</div>
+      <div class="q-text">${q.text}</div>
+    </div>
+    <div class="likert-row">${opts}</div>
+    <div class="q-progress-bar"><div class="q-progress-fill" id="qpf-${q.id}" style="width:0%"></div></div>
+  </div>`;
 }
-function exportAll(){
-  const comp=getComp();
-  if(!comp.length){showToast('لا توجد بيانات','err');return}
-  const h=['رقم','الفئة','المؤهل','الخبرة','استخدام AI',...QUESTIONS.map(q=>`س${q.id}`),'م1','م2','م3','المتوسط'];
-  const rows=comp.map((r,i)=>{
-    const axM=[1,2,3].map(ax=>(QUESTIONS.filter(q=>q.axis===ax).reduce((s,q)=>s+(r.answers[q.id]||0),0)/QUESTIONS.filter(q=>q.axis===ax).length).toFixed(2));
-    return[i+1,r.category,r.education,r.experience,r.aiUsage,...QUESTIONS.map(q=>r.answers[q.id]||''),...axM,(mean(Object.values(r.answers).filter(v=>v))).toFixed(2)];
+
+function attachListeners(){
+  // Chips
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const field = chip.dataset.field, val = chip.dataset.val;
+      document.querySelectorAll(`.chip[data-field="${field}"]`).forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      answers.info[field] = val;
+      updateProgress();
+      // Animate
+      chip.style.transform = 'scale(1.06)';
+      setTimeout(() => chip.style.transform = '', 200);
+    });
   });
-  const csv=[h,...rows].map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
-  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='survey_results.csv';a.click();
-  showToast(`⬇ تم تصدير ${comp.length} سجل`,'ok');
-}
-
-// ═══════════════════════════════════
-//  UTILS
-// ═══════════════════════════════════
-function showToast(msg,type=''){
-  const t=document.getElementById('toast');t.className='toast show '+(type||'');t.textContent=msg;
-  clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',3000);
-}
-
-// ═══════════════════════════════════
-//  INIT
-// ═══════════════════════════════════
-window.addEventListener('DOMContentLoaded',()=>{
-  initTheme();
-  // Load offline fallback
-  setTimeout(()=>{
-    if(!window.__respondents){
-      const ls=localStorage.getItem('offline_submissions');
-      if(ls){
-        respondents=JSON.parse(ls);
-        refreshAll();
-        renderLiveResponses(respondents);
-        // Auto-run analysis if data exists
-        if(respondents.length>=2) runFullAnalysis(true);
+  // Likert
+  document.querySelectorAll('.likert-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const qid = parseInt(opt.dataset.qid), val = parseInt(opt.dataset.val);
+      document.querySelectorAll(`.likert-opt[data-qid="${qid}"]`).forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      answers.q[qid] = val;
+      document.getElementById('qi-'+qid)?.classList.add('answered');
+      document.getElementById('qi-'+qid)?.classList.remove('error');
+      // Progress bar in item
+      const pf = document.getElementById('qpf-'+qid);
+      if(pf){
+        const colors=['#16a34a','#34d399','#64748b','#f97316','#dc2626'];
+        pf.style.width = ((val-1)/4*100)+'%';
+        pf.style.background = colors[5-val];
       }
+      updateProgress();
+    });
+  });
+}
+
+// ═══════════════════════
+//  STEPS
+// ═══════════════════════
+function showStep(step){
+  document.querySelectorAll('.section-card').forEach(s => {
+    s.style.display = parseInt(s.dataset.step) === step ? 'block' : 'none';
+  });
+  document.getElementById('step-num').textContent = step + 1;
+  document.getElementById('btn-prev').style.display = step === 0 ? 'none' : 'flex';
+  document.getElementById('btn-next').textContent = step === STEPS.length-1 ? '🎯 إرسال الاستبيان' : 'التالي ←';
+  document.getElementById('btn-next').className = step === STEPS.length-1 ? 'btn btn-success' : 'btn btn-primary';
+  // Update dots
+  document.querySelectorAll('.step-dot').forEach((d,i) => {
+    d.className = 'step-dot' + (i < step ? ' done' : i === step ? ' active' : '');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  updateProgress();
+}
+
+function goStep(s){ if(s < currentStep){ currentStep=s; showStep(s); } }
+
+function nextStep(){
+  if(!validateStep(currentStep)) return;
+  if(currentStep < STEPS.length - 1){
+    currentStep++;
+    showStep(currentStep);
+  } else {
+    submitSurvey();
+  }
+}
+function prevStep(){
+  if(currentStep > 0){ currentStep--; showStep(currentStep); }
+}
+
+function validateStep(step){
+  let ok = true;
+  const banner = document.getElementById('val-banner');
+  banner.classList.remove('show');
+  if(step === 0){
+    ['category','education','experience','aiUsage'].forEach(f => {
+      if(!answers.info[f]){
+        ok = false;
+        document.querySelectorAll(`.chip[data-field="${f}"]`).forEach(c => {
+          c.style.borderColor = 'rgba(220,38,38,.5)';
+          setTimeout(() => c.style.borderColor = '', 2000);
+        });
+      }
+    });
+  } else {
+    const axQs = QUESTIONS.filter(q => q.axis === step);
+    axQs.forEach(q => {
+      if(!answers.q[q.id]){
+        ok = false;
+        document.getElementById('qi-'+q.id)?.classList.add('error');
+      }
+    });
+  }
+  if(!ok){ banner.classList.add('show'); banner.scrollIntoView({behavior:'smooth', block:'nearest'}); }
+  return ok;
+}
+
+function updateProgress(){
+  const total = 4 + 33;
+  const infoFill = Object.keys(answers.info).length;
+  const qFill = Object.keys(answers.q).length;
+  const pct = Math.round((infoFill + qFill) / total * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+}
+
+// ═══════════════════════
+//  SUBMIT
+// ═══════════════════════
+async function submitSurvey(){
+  const btn = document.getElementById('btn-next');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span> جارٍ الإرسال...';
+
+  const submission = {
+    ...answers.info,
+    answers: answers.q,
+    submittedAt: new Date().toISOString(),
+    duration: Math.round((Date.now() - startTime) / 1000),
+    userAgent: navigator.userAgent.substring(0, 60)
+  };
+
+  try {
+    const db = window.__db;
+    if(db){
+      const { ref, push, set, increment, get } = db;
+      await push(ref(db.db, 'submissions'), submission);
+      const metaRef = ref(db.db, 'meta/count');
+      const snap = await get(metaRef);
+      await set(metaRef, (snap.val() || 0) + 1);
+    } else {
+      // Offline fallback: save locally
+      const saved = JSON.parse(localStorage.getItem('offline_submissions') || '[]');
+      saved.push(submission);
+      localStorage.setItem('offline_submissions', JSON.stringify(saved));
     }
-  },1500);
+    showSuccess();
+  } catch(e) {
+    console.error(e);
+    btn.disabled = false;
+    btn.textContent = 'إعادة المحاولة';
+  }
+}
+
+function showSuccess(){
+  document.getElementById('hero-section').style.display = 'none';
+  document.getElementById('survey-form').style.display = 'none';
+  document.getElementById('nav-btns').style.display = 'none';
+  document.getElementById('sticky-progress').style.display = 'none';
+  document.getElementById('success-screen').classList.add('show');
+  launchConfetti();
+}
+
+function launchConfetti(){
+  const c = document.getElementById('confetti');
+  const colors = ['#3b6ff0','#16a34a','#d97706','#7c3aed','#dc2626','#0891b2'];
+  for(let i=0;i<60;i++){
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.cssText = `left:${Math.random()*100}%;top:-20px;background:${colors[~~(Math.random()*colors.length)]};transform:rotate(${Math.random()*360}deg);animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*.8}s;border-radius:${Math.random()>0.5?'50%':'2px'}`;
+    c.appendChild(piece);
+    setTimeout(() => piece.remove(), 4000);
+  }
+}
+
+// ═══════════════════════
+//  INIT
+// ═══════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  // Show start button
+  const hero = document.getElementById('hero-section');
+  const startBtn = document.createElement('button');
+  startBtn.className = 'btn btn-primary';
+  startBtn.style.cssText = 'margin-top:1.5rem;padding:14px 36px;font-size:15px;animation:pulse 2s infinite';
+  startBtn.textContent = '🚀 ابدأ الاستبيان';
+  startBtn.onclick = () => {
+    hero.style.display = 'none';
+    document.getElementById('survey-form').style.display = 'block';
+    document.getElementById('nav-btns').style.display = 'flex';
+    document.getElementById('sticky-progress').style.display = 'block';
+    buildForm();
+    startTime = Date.now();
+  };
+  hero.appendChild(startBtn);
 });
-window.respondents=respondents;
 </script>
 </body>
 </html>
