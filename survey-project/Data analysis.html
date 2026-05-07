@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>استبيان الذكاء الاصطناعي والتدقيق المحاسبي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// ── REPLACE WITH YOUR FIREBASE CONFIG ──
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+let app, db, dbEnabled = false;
+try {
+  if (!firebaseConfig.apiKey.includes('YOUR')) {
+    app = initializeApp(firebaseConfig);
+    db = getDatabase(app);
+    dbEnabled = true;
+  }
+} catch(e) { console.warn('Firebase not configured, running in local mode'); }
+
+window.__firebase = { db, dbEnabled, ref, set, onValue, get };
+</script>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161921;--bg3:#1e2230;--bg4:#252a3a;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf0;--text2:#9fa3b0;--text3:#636878;
+  --accent:#4f8ef7;--green:#22c979;--amber:#f59e0b;--red:#ef4444;
+  --purple:#a78bfa;--coral:#fb7185;--teal:#0ea5e9;
+  --radius:12px;--radius2:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(79,142,247,.06) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(34,201,121,.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(79,142,247,.4)}50%{box-shadow:0 0 0 8px rgba(79,142,247,0)}}
+@keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes popIn{0%{transform:scale(.8);opacity:0}80%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+@keyframes countUp{from{opacity:0}to{opacity:1}}
+.fade-in{animation:fadeIn .35s ease both}
+.slide-in{animation:slideIn .3s ease both}
+.pop-in{animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both}
+
+/* ─── HEADER ─── */
+.header{position:sticky;top:0;z-index:200;background:rgba(15,17,23,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.header-title{font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap}
+.header-title span{color:var(--accent)}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+.progress-pill{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.progress-bar-mini{width:70px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:2px;transition:width .5s ease}
+.db-dot{width:8px;height:8px;border-radius:50%;background:var(--red);transition:background .3s}
+.db-dot.connected{background:var(--green);animation:pulse 2s infinite}
+.db-status{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px}
+
+/* ─── BUTTONS ─── */
+.btn{padding:7px 16px;border-radius:var(--radius2);border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#3a7ef0;transform:translateY(-1px);box-shadow:0 4px 12px rgba(79,142,247,.3)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-success{background:var(--green);color:#0a1a12;font-weight:700}
+.btn-success:hover{background:#1db86d;transform:translateY(-1px)}
+.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.btn-danger:hover{background:rgba(239,68,68,.08)}
+.btn-amber{background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.btn-amber:hover{background:rgba(245,158,11,.25)}
+.btn-icon{padding:7px;border-radius:var(--radius2);background:transparent;border:1px solid var(--border);cursor:pointer;color:var(--text2);transition:.15s;display:flex;align-items:center;justify-content:center}
+.btn-icon:hover{background:var(--bg3);color:var(--text)}
+
+/* ─── LAYOUT ─── */
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 60px);position:relative;z-index:1}
+
+/* ─── SIDEBAR ─── */
+.sidebar{background:var(--bg2);border-left:1px solid var(--border);padding:1.25rem 0;overflow-y:auto;position:sticky;top:60px;height:calc(100vh - 60px)}
+.sidebar-section{margin-bottom:1.5rem}
+.sidebar-label{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--text3);padding:0 1.25rem;margin-bottom:6px;text-transform:uppercase}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 1.25rem;cursor:pointer;transition:all .15s;border-right:3px solid transparent;font-size:13px;color:var(--text2)}
+.sidebar-item:hover{background:var(--bg3);color:var(--text)}
+.sidebar-item.active{background:rgba(79,142,247,.08);color:var(--accent);border-right-color:var(--accent)}
+.sidebar-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--bg4);border:2px solid var(--border2);transition:.3s}
+.sidebar-item.done .dot{background:var(--green);border-color:var(--green)}
+.sidebar-item .badge{margin-right:auto;background:var(--bg4);border-radius:10px;padding:1px 7px;font-size:11px;color:var(--text3)}
+.resp-list{padding:0 .5rem;max-height:340px;overflow-y:auto}
+.resp-btn{display:flex;align-items:center;gap:8px;width:100%;padding:7px .75rem;border-radius:var(--radius2);background:transparent;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:12px;color:var(--text2);transition:all .15s;text-align:right}
+.resp-btn:hover{background:var(--bg3);color:var(--text)}
+.resp-btn.active{background:rgba(79,142,247,.1);color:var(--accent)}
+.resp-btn .r-num{width:24px;height:24px;border-radius:50%;background:var(--bg4);border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:.3s;font-weight:700}
+.resp-btn.done .r-num{background:rgba(34,201,121,.15);border-color:var(--green);color:var(--green)}
+.resp-btn.active .r-num{background:rgba(79,142,247,.2);border-color:var(--accent);color:var(--accent)}
+.resp-btn.partial .r-num{background:rgba(245,158,11,.15);border-color:var(--amber);color:var(--amber)}
+.add-btn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 1.25rem;border:none;background:transparent;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:13px;color:var(--accent);transition:.15s;margin-top:4px}
+.add-btn:hover{color:#7ab3ff}
+.add-btn .plus{width:22px;height:22px;border-radius:50%;border:1.5px dashed var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px}
+
+/* ─── MAIN ─── */
+.main{padding:2rem;overflow-y:auto}
+.page{display:none}
+.page.active{display:block}
+
+/* ─── FORM ─── */
+.form-title{font-family:'Cairo',sans-serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px}
+.form-subtitle{font-size:14px;color:var(--text2);margin-bottom:1.5rem}
+.respondent-tag{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;margin-bottom:1.25rem;transition:all .3s}
+.section-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;transition:border-color .2s}
+.section-card:hover{border-color:var(--border2)}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem}
+.section-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.s1{background:rgba(79,142,247,.15);color:var(--accent)}
+.s2{background:rgba(34,201,121,.15);color:var(--green)}
+.s3{background:rgba(245,158,11,.15);color:var(--amber)}
+.s4{background:rgba(167,139,250,.15);color:var(--purple)}
+.section-title{font-size:15px;font-weight:600;color:var(--text)}
+.dim-label{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--text3);text-transform:uppercase;margin:1.25rem 0 .75rem;padding-bottom:6px;border-bottom:1px solid var(--border)}
+
+/* ─── RADIO ─── */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.field-group>label{display:block;font-size:12px;color:var(--text2);margin-bottom:8px;font-weight:500}
+.radio-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.radio-opt{display:flex;align-items:center;gap:8px;padding:9px 11px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius2);cursor:pointer;transition:all .2s;font-size:12px;color:var(--text2);user-select:none}
+.radio-opt:hover{border-color:var(--border2);color:var(--text);background:var(--bg4);transform:translateY(-1px)}
+.radio-opt.selected{background:rgba(79,142,247,.1);border-color:var(--accent);color:var(--text)}
+.radio-circle{width:15px;height:15px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.2s}
+.radio-opt.selected .radio-circle{border-color:var(--accent);background:var(--accent)}
+.radio-opt.selected .radio-circle::after{content:'';width:5px;height:5px;border-radius:50%;background:#fff}
+
+/* ─── LIKERT TABLE ─── */
+.likert-wrapper{overflow-x:auto}
+.likert-table{width:100%;border-collapse:collapse}
+.likert-table th{font-size:10px;color:var(--text3);padding:8px 5px;text-align:center;white-space:nowrap;font-weight:700;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.likert-table th.q-col{text-align:right;width:45%}
+.likert-table td{padding:5px;border-bottom:1px solid rgba(255,255,255,.04)}
+.likert-table tr:last-child td{border-bottom:none}
+.likert-table tr{transition:background .15s}
+.likert-table tr:hover td{background:rgba(255,255,255,.015)}
+.q-cell{display:flex;align-items:flex-start;gap:8px;padding:4px 0}
+.q-num-badge{min-width:24px;height:24px;border-radius:6px;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--text3);flex-shrink:0}
+.q-text-cell{font-size:12.5px;color:var(--text2);line-height:1.5}
+.likert-radio{display:flex;justify-content:center}
+.likert-radio input[type=radio]{display:none}
+.likert-radio label{width:34px;height:34px;border-radius:50%;border:2px solid var(--border);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text3);transition:all .2s;font-weight:600}
+.likert-radio label:hover{border-color:var(--border2);color:var(--text2);transform:scale(1.1)}
+.likert-radio input:checked+label{color:#fff;font-weight:700;transform:scale(1.15);animation:popIn .3s}
+.l5 input:checked+label{background:var(--green);border-color:var(--green);box-shadow:0 0 14px rgba(34,201,121,.35)}
+.l4 input:checked+label{background:#34d399;border-color:#34d399;box-shadow:0 0 14px rgba(52,211,153,.3)}
+.l3 input:checked+label{background:#636878;border-color:#636878}
+.l2 input:checked+label{background:#f97316;border-color:#f97316;box-shadow:0 0 14px rgba(249,115,22,.3)}
+.l1 input:checked+label{background:var(--red);border-color:var(--red);box-shadow:0 0 14px rgba(239,68,68,.3)}
+
+/* Progress bar per-question */
+.q-progress{height:2px;background:var(--bg4);margin-top:4px;border-radius:1px;overflow:hidden}
+.q-progress-fill{height:100%;border-radius:1px;transition:width .4s ease,background .4s}
+
+/* ─── FORM ACTIONS ─── */
+.form-actions{display:flex;gap:10px;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap}
+.val-missing{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:var(--radius2);padding:10px 14px;font-size:13px;color:var(--amber);margin-top:1rem;display:none}
+.val-missing.show{display:block;animation:fadeIn .3s}
+
+/* ─── ANALYSIS ─── */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:2rem}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;transition:all .25s;cursor:default;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 60%,rgba(255,255,255,.02));pointer-events:none}
+.kpi-card:hover{transform:translateY(-3px);border-color:var(--border2);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.kpi-val{font-size:30px;font-weight:800;font-family:'Cairo',sans-serif;line-height:1}
+.kpi-lbl{font-size:10px;color:var(--text3);margin-top:5px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.kpi-sub{font-size:11px;color:var(--text2);margin-top:3px}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;transition:border-color .2s}
+.chart-card:hover{border-color:var(--border2)}
+.chart-card.full{grid-column:1/-1}
+.chart-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:6px}
+.chart-wrap{position:relative}
+
+/* ─── Q-TABLE ─── */
+.q-analysis-table{width:100%;border-collapse:collapse}
+.q-analysis-table th{font-size:10px;color:var(--text3);padding:10px 12px;text-align:center;border-bottom:1px solid var(--border);font-weight:700;letter-spacing:.5px;position:sticky;top:0;background:var(--bg2);z-index:1}
+.q-analysis-table th:first-child{text-align:right}
+.q-analysis-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;text-align:center}
+.q-analysis-table td:first-child{text-align:right;font-size:11.5px;color:var(--text2);max-width:280px}
+.q-analysis-table tr{transition:background .1s}
+.q-analysis-table tr:hover td{background:rgba(255,255,255,.02)}
+.mean-chip{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.interp-chip{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+
+/* ─── SPSS SECTION ─── */
+.spss-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
+.spss-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;transition:all .2s}
+.spss-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.spss-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.spss-val{font-size:24px;font-weight:800;font-family:'Cairo',sans-serif}
+.spss-desc{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5}
+.spss-table{width:100%;border-collapse:collapse;font-size:12px}
+.spss-table th{padding:8px 10px;text-align:center;border-bottom:1px solid var(--border);color:var(--text3);font-size:10px;font-weight:700;letter-spacing:.5px}
+.spss-table th:first-child{text-align:right}
+.spss-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);text-align:center}
+.spss-table td:first-child{text-align:right;font-size:12px}
+.spss-table tr:last-child td{border-bottom:none}
+.alpha-circle{width:80px;height:80px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;flex-direction:column;border:3px solid;position:relative}
+.reliability-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.corr-cell{width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin:0 auto}
+.rank-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.rank-item:last-child{border-bottom:none}
+.rank-num{width:24px;height:24px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+
+/* ─── INDIVIDUAL ─── */
+.ind-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:1.5rem}
+.ind-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.ind-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:transparent;transition:.3s}
+.ind-card:hover{transform:translateY(-3px);border-color:var(--border2);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.ind-card:hover::after{background:var(--accent)}
+.ind-card.incomplete{opacity:.45;cursor:default}
+.ind-card.incomplete:hover{transform:none;box-shadow:none}
+.ind-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px}
+.ind-meta{font-size:11px;color:var(--text3);margin-bottom:3px}
+.ind-meta span{color:var(--text2)}
+.ind-score{display:flex;align-items:baseline;gap:8px;margin-top:10px}
+.ind-score .score-num{font-size:22px;font-weight:800;font-family:'Cairo',sans-serif}
+.ind-badge{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius2);background:var(--bg3);border:1px solid var(--border);color:var(--text2);cursor:pointer;font-size:13px;margin-bottom:1.5rem;transition:.15s;font-family:'Tajawal',sans-serif}
+.back-btn:hover{background:var(--bg4);color:var(--text)}
+.axis-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
+.axis-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.axis-name{font-size:11px;color:var(--text3);margin-bottom:8px;font-weight:600;letter-spacing:.5px}
+.axis-score{font-size:28px;font-weight:800;font-family:'Cairo',sans-serif;margin-bottom:4px}
+.axis-interp{font-size:11px}
+
+/* ─── TABS ─── */
+.tabs{display:flex;gap:4px;background:var(--bg3);border-radius:var(--radius2);padding:4px;margin-bottom:1.5rem;width:fit-content;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text3);transition:.2s;border:none;background:transparent;font-family:'Tajawal',sans-serif}
+.tab.active{background:var(--bg4);color:var(--text)}
+.tab:hover:not(.active){color:var(--text2)}
+.tab-content{display:none}
+.tab-content.active{display:block;animation:fadeIn .3s}
+
+/* ─── MODAL ─── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex;animation:fadeIn .2s}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:2rem;max-width:520px;width:90%;max-height:80vh;overflow-y:auto;animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
+.modal h3{font-family:'Cairo',sans-serif;font-size:18px;font-weight:700;margin-bottom:1rem;color:var(--text)}
+.modal p{font-size:13px;color:var(--text2);margin-bottom:1rem;line-height:1.7}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)}
+.drop-zone{border:2px dashed var(--border2);border-radius:var(--radius);padding:2rem;text-align:center;cursor:pointer;transition:.2s;color:var(--text3);font-size:13px}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);color:var(--accent);background:rgba(79,142,247,.04)}
+.drop-zone svg{margin-bottom:8px;opacity:.6}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:12px 22px;font-size:13px;color:var(--text);z-index:600;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s;opacity:0;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success{border-color:rgba(34,201,121,.4)}
+.toast.error{border-color:rgba(239,68,68,.4)}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--text3)}
+.empty-state h3{font-size:16px;font-weight:600;color:var(--text2);margin-bottom:8px}
+.empty-state p{font-size:13px}
+
+/* ─── SPINNER ─── */
+.spinner{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+
+/* ─── SAVE INDICATOR ─── */
+#save-indicator{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px;white-space:nowrap;transition:color .3s}
+#save-indicator svg{flex-shrink:0}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border2)}
+
+/* ─── TOOLTIP ─── */
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--text2);white-space:nowrap;z-index:100;pointer-events:none}
+
+/* ─── SECTION PROGRESS BAR ─── */
+.form-progress{height:3px;background:var(--bg4);border-radius:2px;margin-bottom:1.5rem;overflow:hidden}
+.form-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:2px;transition:width .5s ease}
+
+/* ─── HIGHLIGHT ─── */
+.highlight-row{background:rgba(79,142,247,.06)!important}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="header">
+  <div class="header-title">استبيان <span>الذكاء الاصطناعي</span> والتدقيق المحاسبي</div>
+  <div class="header-right">
+    <div class="db-status">
+      <div class="db-dot" id="db-dot"></div>
+      <span id="db-label">محلي</span>
+    </div>
+    <div class="progress-pill">
+      <span id="hdr-count">0/25</span>
+      <div class="progress-bar-mini"><div class="progress-bar-fill" id="hdr-bar" style="width:0%"></div></div>
+    </div>
+    <span id="save-indicator">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      لم يُحفظ
+    </span>
+    <button class="btn btn-ghost" onclick="manualSave()" data-tip="حفظ محلي فوري">💾</button>
+    <button class="btn btn-ghost" onclick="openImport()">📥 استيراد</button>
+    <button class="btn btn-ghost" onclick="showPage('analysis')">📊 تحليل</button>
+    <button class="btn btn-success" onclick="exportCSV()">⬇ CSV</button>
+    <button class="btn btn-ghost" onclick="exportJSON()" data-tip="تصدير JSON">⬇ JSON</button>
+    <button class="btn btn-icon btn-danger" onclick="confirmClear()" data-tip="مسح الكل">🗑</button>
+  </div>
+</div>
+
+<div class="layout">
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">التنقل</div>
+    <div class="sidebar-item active" id="nav-entry" onclick="showPage('entry')"><span class="dot"></span> إدخال البيانات</div>
+    <div class="sidebar-item" id="nav-analysis" onclick="showPage('analysis')"><span class="dot"></span> التحليل الإحصائي <span class="badge" id="nav-badge">0</span></div>
+    <div class="sidebar-item" id="nav-spss" onclick="showPage('spss')"><span class="dot"></span> تحليل SPSS <span class="badge" style="background:rgba(167,139,250,.15);color:var(--purple)">جديد</span></div>
+    <div class="sidebar-item" id="nav-individual" onclick="showPage('individual')"><span class="dot"></span> البيانات الفردية</div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">المستجيبون</div>
+    <div class="resp-list" id="resp-list"></div>
+    <button class="add-btn" onclick="addRespondent()"><span class="plus">+</span> إضافة مستجيب</button>
+  </div>
+  <div class="sidebar-section" style="padding:0 1rem">
+    <div style="background:var(--bg3);border-radius:var(--radius2);padding:10px 12px;font-size:11px;color:var(--text3);line-height:1.7">
+      <div style="font-weight:700;color:var(--text2);margin-bottom:4px">🔄 مزامنة Firebase</div>
+      <div id="sync-status">غير مفعّل — أضف إعدادات Firebase</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<main class="main">
+
+<!-- ─── ENTRY PAGE ─── -->
+<div class="page active" id="page-entry">
+  <div class="form-title">إدخال بيانات المستجيب</div>
+  <div class="form-subtitle">اختر مستجيباً أو أضف جديداً من القائمة الجانبية</div>
+  <div class="form-progress"><div class="form-progress-fill" id="form-progress-fill" style="width:0%"></div></div>
+  <div id="entry-form"></div>
+</div>
+
+<!-- ─── ANALYSIS PAGE ─── -->
+<div class="page" id="page-analysis">
+  <div class="form-title">التحليل الإحصائي الشامل</div>
+  <div class="form-subtitle" id="analysis-subtitle">نتائج جميع المستجيبين</div>
+  <div id="analysis-content"></div>
+</div>
+
+<!-- ─── SPSS PAGE ─── -->
+<div class="page" id="page-spss">
+  <div class="form-title">تحليل SPSS المتقدم</div>
+  <div class="form-subtitle">تحليلات إحصائية معمقة لمذكرة التخرج</div>
+  <div id="spss-content"></div>
+</div>
+
+<!-- ─── INDIVIDUAL PAGE ─── -->
+<div class="page" id="page-individual">
+  <div class="form-title" style="margin-bottom:1.5rem">البيانات الفردية لكل مستجيب</div>
+  <div id="individual-content"></div>
+</div>
+
+</main>
+</div>
+
+<!-- ═══ IMPORT MODAL ═══ -->
+<div class="modal-overlay" id="import-modal">
+  <div class="modal">
+    <h3>📥 استيراد البيانات</h3>
+    <p>يمكنك استيراد بيانات من ملف JSON سبق تصديره، أو من ملف CSV.</p>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondrop="handleDrop(event)" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <div>اسحب ملف هنا أو انقر للاختيار</div>
+      <div style="font-size:11px;margin-top:4px">JSON أو CSV</div>
+    </div>
+    <input type="file" id="file-input" accept=".json,.csv" style="display:none" onchange="handleFileImport(event)">
+    <div id="import-preview" style="margin-top:1rem;display:none">
+      <div style="background:rgba(34,201,121,.08);border:1px solid rgba(34,201,121,.2);border-radius:var(--radius2);padding:10px 14px;font-size:13px;color:var(--green)" id="import-msg"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('import-modal')">إغلاق</button>
+      <button class="btn btn-primary" id="import-confirm-btn" style="display:none" onclick="confirmImport()">✓ استيراد البيانات</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════
+const QUESTIONS = [
+  {id:1,text:"تساهم أدوات الذكاء الاصطناعي في أتمتة المهام الروتينية في التدقيق",axis:1,dim:"الأتمتة وتحليل البيانات"},
+  {id:2,text:"تساعد هذه الأدوات في تحليل البيانات المالية بكفاءة",axis:1,dim:"الأتمتة وتحليل البيانات"},
+  {id:3,text:"تقلل الأدوات الذكية من الوقت اللازم لإنجاز مهام التدقيق",axis:1,dim:"الأتمتة وتحليل البيانات"},
+  {id:4,text:"تساعد أدوات الذكاء الاصطناعي في اكتشاف الأخطاء المحاسبية بدقة",axis:1,dim:"الكشف والتحليل المتقدم"},
+  {id:5,text:"تساهم هذه الأدوات في الكشف عن أنماط الاحتيال المعقدة",axis:1,dim:"الكشف والتحليل المتقدم"},
+  {id:6,text:"تدعم أدوات الذكاء الاصطناعي تحليل المخاطر بطريقة أكثر عمقاً",axis:1,dim:"الكشف والتحليل المتقدم"},
+  {id:7,text:"أدوات الذكاء الاصطناعي تفتقر إلى القدرة على فهم السياق القانوني والمهني",axis:1,dim:"حدود الاستخدام"},
+  {id:8,text:"تعتمد دقة نتائج هذه الأدوات على جودة البيانات المدخلة",axis:1,dim:"حدود الاستخدام"},
+  {id:9,text:"قد تحتوي مخرجات الذكاء الاصطناعي على أخطاء غير ظاهرة للمدقق",axis:1,dim:"حدود الاستخدام"},
+  {id:10,text:"يثير استخدام الذكاء الاصطناعي السحابي مخاوف تتعلق بسرية بيانات العملاء",axis:1,dim:"حدود الاستخدام"},
+  {id:11,text:"يساهم الذكاء الاصطناعي في تحسين جودة أدلة الإثبات التدقيقية",axis:2,dim:"كفاية وملاءمة الأدلة"},
+  {id:12,text:"يساعد في الحصول على أدلة تدقيق أكثر ملائمة لاتخاذ القرار",axis:2,dim:"كفاية وملاءمة الأدلة"},
+  {id:13,text:"يعزز الذكاء الاصطناعي من موثوقية نتائج التدقيق",axis:2,dim:"كفاية وملاءمة الأدلة"},
+  {id:14,text:"يزيد الذكاء الاصطناعي من نطاق التغطية مقارنة بأسلوب العينات التقليدي",axis:2,dim:"نطاق وعمق التدقيق"},
+  {id:15,text:"يساهم في توسيع عمق الاختبارات التدقيقية",axis:2,dim:"نطاق وعمق التدقيق"},
+  {id:16,text:"يساعد في فحص عدد أكبر من العمليات المالية",axis:2,dim:"نطاق وعمق التدقيق"},
+  {id:17,text:"يساعد الذكاء الاصطناعي في تعزيز استنتاجات الحكم المهني للمدقق",axis:2,dim:"دعم اتخاذ القرار"},
+  {id:18,text:"يساعد في تحديد مناطق الخطر الجوهرية بشكل أدق",axis:2,dim:"دعم اتخاذ القرار"},
+  {id:19,text:"يساهم في تحسين تقييم المخاطر وفق معايير التدقيق",axis:2,dim:"دعم اتخاذ القرار"},
+  {id:20,text:"تتطلب مخرجات الذكاء الاصطناعي مراجعة بشرية مستمرة",axis:2,dim:"القيود"},
+  {id:21,text:"لا يمكن الاعتماد على الذكاء الاصطناعي بشكل كامل في اتخاذ قرارات تدقيقية",axis:2,dim:"القيود"},
+  {id:22,text:"يساهم الذكاء الاصطناعي في تحسين كفاءة المدقق",axis:3,dim:"الكفاءة المهنية"},
+  {id:23,text:"يعزز قدرة المدقق على التحليل الاستشرافي للمخاطر",axis:3,dim:"الكفاءة المهنية"},
+  {id:24,text:"يقلل من احتمالية عدم اكتشاف الأخطاء الجوهرية",axis:3,dim:"الكفاءة المهنية"},
+  {id:25,text:"يدعم التكامل بين خبرة المدقق وقدرات الذكاء الاصطناعي جودة العمل",axis:3,dim:"الحكم المهني والاستقلالية"},
+  {id:26,text:"قد يؤدي الاعتماد المفرط على الذكاء الاصطناعي إلى إضعاف الحكم المهني",axis:3,dim:"الحكم المهني والاستقلالية"},
+  {id:27,text:"يبقى المدقق مسؤولاً عن الرأي النهائي رغم استخدام الذكاء الاصطناعي",axis:3,dim:"الحكم المهني والاستقلالية"},
+  {id:28,text:"تواجه المؤسسات صعوبات تقنية في تطبيق أدوات الذكاء الاصطناعي",axis:3,dim:"التحديات المهنية"},
+  {id:29,text:"يمثل نقص التدريب الرقمي عائقاً أمام استخدام هذه الأدوات",axis:3,dim:"التحديات المهنية"},
+  {id:30,text:"يحد تعقيد بعض الأنظمة من استخدامها العملي",axis:3,dim:"التحديات المهنية"},
+  {id:31,text:"سيصبح الذكاء الاصطناعي جزءاً من مهنة التدقيق مستقبلاً",axis:3,dim:"مستقبل المهنة"},
+  {id:32,text:"ستتطلب المهنة مهارات رقمية وتحليلية متقدمة",axis:3,dim:"مستقبل المهنة"},
+  {id:33,text:"سيعتمد التدقيق على نموذج تكاملي بين الإنسان والتكنولوجيا",axis:3,dim:"مستقبل المهنة"}
+];
+const CAT_L  =["أستاذ جامعي / أكاديمي","محاسب معتمد","مدقق حسابات"];
+const EDUC_L =["ليسانس","ماستر","دكتوراه","شهادة مهنية متخصصة"];
+const EXP_L  =["1-5 سنوات","6-10 سنوات","11-15 سنة","أكثر من 15 سنة"];
+const AI_L   =["لا أستخدمها","استخدام محدود","استخدام متوسط","استخدام مكثف"];
+const LIK_L  =["أوافق بشدة","أوافق","محايد","لا أوافق","لا أوافق بشدة"];
+const LIK_W  =[5,4,3,2,1];
+const LIK_C  =["#22c979","#34d399","#636878","#f97316","#ef4444"];
+const AX_NAMES=["أدوات الذكاء الاصطناعي","جودة التدقيق","مهنية التدقيق"];
+const AX_COL  =["#4f8ef7","#22c979","#f59e0b"];
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let respondents=[], currentRid=null, chartInstances={};
+let pendingImportData=null;
+const STORAGE_KEY='survey_ai_v2';
+
+function newR(id){return{id,answers:{},category:'',education:'',experience:'',aiUsage:'',createdAt:Date.now()}}
+function isComplete(r){return r.category&&r.education&&r.experience&&r.aiUsage&&QUESTIONS.every(q=>r.answers[q.id]!==undefined)}
+function isPartial(r){return !isComplete(r)&&(r.category||r.education||Object.keys(r.answers).length>0)}
+
+// ═══════════════════════════════════════════
+//  STORAGE
+// ═══════════════════════════════════════════
+function saveLS(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({respondents,currentRid,savedAt:new Date().toISOString()}))}
+  catch(e){console.warn(e)}
+}
+function loadLS(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return false;
+    const d=JSON.parse(raw);
+    if(d.respondents&&Array.isArray(d.respondents)){respondents=d.respondents;currentRid=d.currentRid||1;return d.savedAt}
+  }catch(e){}
+  return false;
+}
+function updateSaveInd(txt,col){
+  const el=document.getElementById('save-indicator');
+  if(el){el.lastChild.textContent=' '+txt;el.style.color=col||'var(--text3)'}
+}
+function manualSave(){
+  saveCurrentForm();saveLS();
+  updateSaveInd('حُفظ '+fmtTime(),'var(--green)');
+  showToast('تم الحفظ ✓','success');
+}
+
+// ═══════════════════════════════════════════
+//  FIREBASE
+// ═══════════════════════════════════════════
+const FB={db:null,enabled:false,ref:null,set:null,onValue:null,get:null};
+
+function initFirebase(){
+  const f=window.__firebase;
+  if(!f||!f.dbEnabled)return;
+  FB.db=f.db;FB.enabled=true;FB.ref=f.ref;FB.set=f.set;FB.onValue=f.onValue;FB.get=f.get;
+  document.getElementById('db-dot').classList.add('connected');
+  document.getElementById('db-label').textContent='متصل';
+  document.getElementById('sync-status').textContent='متصل بـ Firebase — البيانات تُشارَك تلقائياً';
+  listenFirebase();
+}
+
+function listenFirebase(){
+  if(!FB.enabled)return;
+  FB.onValue(FB.ref(FB.db,'survey/respondents'),(snap)=>{
+    const data=snap.val();
+    if(data){
+      const arr=Object.values(data);
+      // Merge: remote wins for completed respondents
+      arr.forEach(remote=>{
+        const local=respondents.find(r=>r.id===remote.id);
+        if(!local){respondents.push(remote)}
+        else if(isComplete(remote)&&!isComplete(local)){Object.assign(local,remote)}
+      });
+      renderSidebar();
+      updateSaveInd('مزامنة Firebase ✓','var(--green)');
+      showToast('تم استلام بيانات محدّثة من Firebase','success');
+    }
+  });
+}
+
+function pushFirebase(){
+  if(!FB.enabled)return;
+  const obj={};
+  respondents.forEach(r=>{obj[r.id]=r});
+  FB.set(FB.ref(FB.db,'survey/respondents'),obj).then(()=>{
+    updateSaveInd('Firebase ✓ '+fmtTime(),'var(--green)');
+  }).catch(e=>console.warn('Firebase write failed',e));
+}
+
+// ═══════════════════════════════════════════
+//  SIDEBAR
+// ═══════════════════════════════════════════
+function renderSidebar(){
+  const list=document.getElementById('resp-list');
+  list.innerHTML=respondents.map(r=>{
+    const done=isComplete(r),part=isPartial(r),act=r.id===currentRid;
+    const catShort={'أستاذ جامعي / أكاديمي':'أستاذ','محاسب معتمد':'محاسب','مدقق حسابات':'مدقق'};
+    const meta=r.category?catShort[r.category]||r.category:'غير محدد';
+    const cls=`resp-btn ${act?'active':''} ${done?'done':''} ${part&&!done?'partial':''}`;
+    return `<button class="${cls}" onclick="selectR(${r.id})">
+      <span class="r-num">${r.id}</span>
+      <span style="flex:1;text-align:right;line-height:1.4">
+        <span style="display:block">مستجيب ${r.id}</span>
+        <span style="font-size:10px;color:var(--text3)">${meta}</span>
+      </span>
+      ${done?'<span style="color:var(--green);font-size:14px">✓</span>':part?'<span style="color:var(--amber);font-size:14px">◑</span>':''}
+    </button>`;
+  }).join('');
+  const done=respondents.filter(isComplete).length;
+  const total=respondents.length;
+  document.getElementById('hdr-count').textContent=`${done}/${total}`;
+  document.getElementById('hdr-bar').style.width=`${(done/total)*100}%`;
+  document.getElementById('nav-badge').textContent=done;
+}
+
+function addRespondent(){
+  const id=respondents.length+1;
+  respondents.push(newR(id));
+  currentRid=id;renderSidebar();renderForm();showPage('entry');
+  showToast(`تمت إضافة مستجيب ${id}`,'success');
+  saveLS();
+}
+
+function selectR(id){saveCurrentForm();currentRid=id;renderSidebar();renderForm();showPage('entry')}
+
+// ═══════════════════════════════════════════
+//  FORM
+// ═══════════════════════════════════════════
+function renderForm(){
+  const r=respondents.find(x=>x.id===currentRid);
+  if(!r)return;
+  // Progress
+  const done=Object.keys(r.answers).length;
+  const total=QUESTIONS.length+4;
+  const meta=[r.category,r.education,r.experience,r.aiUsage].filter(Boolean).length;
+  const pct=Math.round((done+meta)/total*100);
+  document.getElementById('form-progress-fill').style.width=pct+'%';
+
+  const catColor={'أستاذ جامعي / أكاديمي':'var(--accent)','محاسب معتمد':'var(--green)','مدقق حسابات':'var(--amber)'};
+  const col=catColor[r.category]||'var(--text3)';
+  const c=document.getElementById('entry-form');
+  c.innerHTML=`
+    <div class="respondent-tag fade-in" style="background:${col}18;border-color:${col}40;color:${col}">
+      👤 مستجيب رقم ${r.id} ${r.category?'— '+r.category:''}
+      <span style="margin-right:auto;font-size:10px;opacity:.7">${pct}% مكتمل</span>
+    </div>
+    <div class="section-card fade-in">
+      <div class="section-header"><span class="section-badge s1">القسم الأول</span><span class="section-title">المعلومات الشخصية والمهنية</span></div>
+      <div class="info-grid">
+        ${buildRG('category','الفئة المهنية',CAT_L,r.category)}
+        ${buildRG('education','المؤهل العلمي',EDUC_L,r.education)}
+        ${buildRG('experience','سنوات الخبرة',EXP_L,r.experience)}
+        ${buildRG('aiUsage','مستوى استخدام الذكاء الاصطناعي',AI_L,r.aiUsage)}
+      </div>
+    </div>
+    ${buildAxis(1,'المحور الأول: أدوات الذكاء الاصطناعي','s2',r)}
+    ${buildAxis(2,'المحور الثاني: جودة التدقيق','s3',r)}
+    ${buildAxis(3,'المحور الثالث: مهنية التدقيق','s4',r)}
+    <div id="val-msg" class="val-missing">⚠ يرجى الإجابة على جميع الأسئلة والحقول قبل الحفظ</div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveAndNext()">حفظ والانتقال للتالي ←</button>
+      <button class="btn btn-ghost" onclick="saveCurrentForm();showToast('تم الحفظ','success')">حفظ فقط</button>
+      ${r.id>1?`<button class="btn btn-ghost" onclick="selectR(${r.id-1})">→ السابق</button>`:''}
+      <button class="btn btn-danger" onclick="clearR(${r.id})" style="margin-right:auto">🗑 مسح</button>
+    </div>`;
+  attachRL();
+}
+
+function buildRG(field,label,opts,sel){
+  const o=opts.map(opt=>`<label class="radio-opt ${sel===opt?'selected':''}" data-field="${field}" data-val="${opt}">
+    <span class="radio-circle"></span>${opt}</label>`).join('');
+  return `<div class="field-group"><label>${label}</label><div class="radio-grid">${o}</div></div>`;
+}
+
+function buildAxis(ax,title,bc,r){
+  const qs=QUESTIONS.filter(q=>q.axis===ax);
+  const dims=[...new Set(qs.map(q=>q.dim))];
+  let h=`<div class="section-card fade-in">
+    <div class="section-header"><span class="section-badge ${bc}">المحور ${ax===1?'الأول':ax===2?'الثاني':'الثالث'}</span><span class="section-title">${title}</span></div>
+    <div class="likert-wrapper"><table class="likert-table">
+    <thead><tr><th class="q-col">العبارة</th>
+    ${LIK_L.map((l,i)=>`<th>${l}<br><small style="color:var(--text3)">${LIK_W[i]}</small></th>`).join('')}
+    </tr></thead><tbody>`;
+  dims.forEach(dim=>{
+    h+=`<tr><td colspan="6" style="padding:12px 0 2px"><div class="dim-label">${dim}</div></td></tr>`;
+    qs.filter(q=>q.dim===dim).forEach(q=>{
+      const val=r.answers[q.id];
+      const pct=val?((val-1)/4*100):0;
+      const fillCol=val?LIK_C[5-val]:'transparent';
+      h+=`<tr>
+        <td><div class="q-cell"><span class="q-num-badge">${q.id}</span>
+          <div><div class="q-text-cell">${q.text}</div>
+          <div class="q-progress"><div class="q-progress-fill" style="width:${pct}%;background:${fillCol}"></div></div>
+          </div></div></td>
+        ${[5,4,3,2,1].map((w,i)=>{
+          const lc=['l5','l4','l3','l2','l1'][i];
+          const ck=r.answers[q.id]===w?'checked':'';
+          return `<td><div class="likert-radio ${lc}"><input type="radio" name="q${q.id}" id="q${q.id}w${w}" value="${w}" ${ck} onchange="onLikertChange(${q.id},${w})"><label for="q${q.id}w${w}">${w}</label></div></td>`;
+        }).join('')}
+      </tr>`;
+    });
+  });
+  h+=`</tbody></table></div></div>`;
+  return h;
+}
+
+function onLikertChange(qid,val){
+  const r=respondents.find(x=>x.id===currentRid);
+  if(!r)return;
+  r.answers[qid]=val;
+  // Update progress bar in row
+  const pct=((val-1)/4*100);
+  const fillCol=LIK_C[5-val];
+  const row=document.querySelector(`input[name="q${qid}"]`)?.closest('tr');
+  if(row){const pb=row.querySelector('.q-progress-fill');if(pb){pb.style.width=pct+'%';pb.style.background=fillCol}}
+  // Update overall progress
+  const done=Object.keys(r.answers).length;
+  const meta=[r.category,r.education,r.experience,r.aiUsage].filter(Boolean).length;
+  const pctForm=Math.round((done+meta)/(QUESTIONS.length+4)*100);
+  document.getElementById('form-progress-fill').style.width=pctForm+'%';
+  const tag=document.querySelector('.respondent-tag span:last-child');
+  if(tag)tag.textContent=pctForm+'% مكتمل';
+  saveLS();renderSidebar();
+}
+
+function attachRL(){
+  document.querySelectorAll('.radio-opt').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const field=el.dataset.field,val=el.dataset.val;
+      document.querySelectorAll(`.radio-opt[data-field="${field}"]`).forEach(x=>x.classList.remove('selected'));
+      el.classList.add('selected');
+      const r=respondents.find(x=>x.id===currentRid);
+      if(r){r[field]=val;saveLS();renderSidebar();}
+      // Animate
+      el.style.transform='scale(1.05)';setTimeout(()=>el.style.transform='',200);
+    });
+  });
+}
+
+function saveCurrentForm(){
+  const r=respondents.find(x=>x.id===currentRid);
+  if(!r)return;
+  document.querySelectorAll('.radio-opt.selected').forEach(el=>{r[el.dataset.field]=el.dataset.val});
+  QUESTIONS.forEach(q=>{const ck=document.querySelector(`input[name="q${q.id}"]:checked`);if(ck)r.answers[q.id]=parseInt(ck.value)});
+  renderSidebar();saveLS();
+  updateSaveInd('حُفظ '+fmtTime(),'var(--green)');
+}
+
+function saveAndNext(){
+  saveCurrentForm();
+  const r=respondents.find(x=>x.id===currentRid);
+  if(!isComplete(r)){document.getElementById('val-msg').classList.add('show');document.getElementById('val-msg').scrollIntoView({behavior:'smooth'});return}
+  pushFirebase();
+  showToast(`✓ تم حفظ مستجيب ${currentRid}`,'success');
+  const next=respondents.find(x=>x.id>currentRid);
+  if(next){currentRid=next.id;renderSidebar();renderForm()}
+  else{showPage('analysis')}
+}
+
+function clearR(id){
+  if(!confirm(`مسح بيانات المستجيب ${id}؟`))return;
+  const i=respondents.findIndex(x=>x.id===id);
+  respondents[i]=newR(id);renderSidebar();renderForm();saveLS();showToast('تم المسح');
+}
+
+function confirmClear(){
+  if(!confirm('مسح جميع البيانات نهائياً؟ لا يمكن التراجع.'))return;
+  localStorage.removeItem(STORAGE_KEY);respondents=[];currentRid=null;initApp(true);showToast('تم مسح الكل');
+}
+
+// ═══════════════════════════════════════════
+//  STATISTICS HELPERS
+// ═══════════════════════════════════════════
+function getQMean(qid){
+  const v=respondents.filter(r=>isComplete(r)&&r.answers[qid]!==undefined).map(r=>r.answers[qid]);
+  return v.length?v.reduce((a,b)=>a+b,0)/v.length:0;
+}
+function getQStd(qid,mean){
+  const v=respondents.filter(r=>isComplete(r)&&r.answers[qid]!==undefined).map(r=>r.answers[qid]);
+  return v.length?Math.sqrt(v.reduce((s,x)=>s+Math.pow(x-mean,2),0)/v.length):0;
+}
+function getQDist(qid){
+  const d=[0,0,0,0,0];
+  respondents.filter(isComplete).forEach(r=>{const v=r.answers[qid];if(v)d[5-v]++});
+  return d;
+}
+function getAxMean(ax){
+  const qs=QUESTIONS.filter(q=>q.axis===ax);
+  const m=qs.map(q=>getQMean(q.id));
+  return m.reduce((a,b)=>a+b,0)/m.length;
+}
+function calcMean(r){
+  const v=Object.values(r.answers).filter(x=>x!==undefined);
+  return v.length?v.reduce((a,b)=>a+b,0)/v.length:0;
+}
+function interpMean(m){
+  if(m>=4.2)return{label:"موافقة عالية جداً",color:"#22c979",bg:"rgba(34,201,121,.12)"};
+  if(m>=3.4)return{label:"موافقة عالية",color:"#34d399",bg:"rgba(52,211,153,.12)"};
+  if(m>=2.6)return{label:"محايد",color:"#9fa3b0",bg:"rgba(159,163,176,.12)"};
+  if(m>=1.8)return{label:"موافقة منخفضة",color:"#f97316",bg:"rgba(249,115,22,.12)"};
+  return{label:"موافقة منخفضة جداً",color:"#ef4444",bg:"rgba(239,68,68,.12)"};
+}
+
+// Cronbach's Alpha
+function cronbachAlpha(qs){
+  const comp=respondents.filter(isComplete);
+  if(comp.length<2)return 0;
+  const k=qs.length;
+  const variances=qs.map(q=>{
+    const v=comp.map(r=>r.answers[q.id]||0);
+    const m=v.reduce((a,b)=>a+b,0)/v.length;
+    return v.reduce((s,x)=>s+Math.pow(x-m,2),0)/v.length;
+  });
+  const totals=comp.map(r=>qs.reduce((s,q)=>s+(r.answers[q.id]||0),0));
+  const totM=totals.reduce((a,b)=>a+b,0)/totals.length;
+  const totVar=totals.reduce((s,x)=>s+Math.pow(x-totM,2),0)/totals.length;
+  const sumVar=variances.reduce((a,b)=>a+b,0);
+  if(totVar===0)return 1;
+  return(k/(k-1))*(1-sumVar/totVar);
+}
+
+// Pearson correlation
+function pearson(xArr,yArr){
+  const n=xArr.length;if(!n)return 0;
+  const mx=xArr.reduce((a,b)=>a+b,0)/n,my=yArr.reduce((a,b)=>a+b,0)/n;
+  const num=xArr.reduce((s,x,i)=>s+(x-mx)*(yArr[i]-my),0);
+  const dx=Math.sqrt(xArr.reduce((s,x)=>s+Math.pow(x-mx,2),0));
+  const dy=Math.sqrt(yArr.reduce((s,y)=>s+Math.pow(y-my,2),0));
+  return dx&&dy?num/(dx*dy):0;
+}
+
+// t-test (one sample, mu=3)
+function tTest(vals,mu=3){
+  const n=vals.length;if(n<2)return{t:0,p:0};
+  const m=vals.reduce((a,b)=>a+b,0)/n;
+  const std=Math.sqrt(vals.reduce((s,x)=>s+Math.pow(x-m,2),0)/(n-1));
+  const t=(m-mu)/(std/Math.sqrt(n));
+  // Approximate p-value (two-tailed) using t-distribution approximation
+  const df=n-1;
+  const p=approxTProb(Math.abs(t),df)*2;
+  return{t,p,m,std};
+}
+
+function approxTProb(t,df){
+  // Wilson-Hilferty approximation
+  const x=df/(df+t*t);
+  const a=df/2,b=0.5;
+  return incompleteBeta(x,a,b)/2;
+}
+
+function incompleteBeta(x,a,b){
+  // Simple numerical approximation
+  if(x<=0)return 0;if(x>=1)return 1;
+  let sum=0,term=1;
+  for(let i=0;i<100;i++){
+    if(i>0)term*=(i-b)*x/i;
+    sum+=term/(a+i);
+    if(Math.abs(term/(a+i))<1e-10)break;
+  }
+  return Math.min(1,Math.max(0,Math.pow(x,a)*Math.pow(1-x,b)*sum));
+}
+
+// ═══════════════════════════════════════════
+//  ANALYSIS PAGE
+// ═══════════════════════════════════════════
+function renderAnalysis(){
+  saveCurrentForm();
+  const comp=respondents.filter(isComplete),n=comp.length;
+  const el=document.getElementById('analysis-content');
+  if(n===0){el.innerHTML='<div class="empty-state"><h3>لا توجد بيانات مكتملة</h3><p>أكمل إدخال بيانات المستجيبين أولاً</p></div>';return}
+  document.getElementById('analysis-subtitle').textContent=`تحليل ${n} مستجيب مكتمل`;
+
+  const axM=[1,2,3].map(ax=>getAxMean(ax));
+  const gm=axM.reduce((a,b)=>a+b,0)/3;
+  const gi=interpMean(gm);
+
+  const catC={},educC={},expC={},aiC={};
+  comp.forEach(r=>{catC[r.category]=(catC[r.category]||0)+1;educC[r.education]=(educC[r.education]||0)+1;expC[r.experience]=(expC[r.experience]||0)+1;aiC[r.aiUsage]=(aiC[r.aiUsage]||0)+1});
+
+  el.innerHTML=`
+  <div class="kpi-grid fade-in">
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--accent)">${n}</div><div class="kpi-lbl">مستجيب مكتمل</div></div>
+    ${axM.map((m,i)=>{const ip=interpMean(m);return`<div class="kpi-card"><div class="kpi-val" style="color:${ip.color}">${m.toFixed(2)}</div><div class="kpi-lbl">متوسط المحور ${i+1}</div><div class="kpi-sub">${ip.label}</div></div>`}).join('')}
+    <div class="kpi-card"><div class="kpi-val" style="color:${gi.color}">${gm.toFixed(2)}</div><div class="kpi-lbl">المتوسط العام</div><div class="kpi-sub">${gi.label}</div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('demog',this,'atab')">التوزيع الديموغرافي</button>
+    <button class="tab" onclick="switchTab('axes',this,'atab')">تحليل المحاور</button>
+    <button class="tab" onclick="switchTab('questions',this,'atab')">جدول الأسئلة</button>
+  </div>
+  <div class="tab-content active" id="atab-demog">
+    <div class="charts-grid">
+      <div class="chart-card"><div class="chart-title">👔 الفئة المهنية</div><div class="chart-wrap" style="height:220px"><canvas id="ch-cat"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">🎓 المؤهل العلمي</div><div class="chart-wrap" style="height:220px"><canvas id="ch-educ"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">📅 سنوات الخبرة</div><div class="chart-wrap" style="height:220px"><canvas id="ch-exp"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">🤖 استخدام الذكاء الاصطناعي</div><div class="chart-wrap" style="height:220px"><canvas id="ch-ai"></canvas></div></div>
+    </div>
+  </div>
+  <div class="tab-content" id="atab-axes">
+    <div class="charts-grid">
+      <div class="chart-card full"><div class="chart-title">📊 متوسطات المحاور الثلاثة</div><div class="chart-wrap" style="height:260px"><canvas id="ch-axes"></canvas></div></div>
+    </div>
+    <div class="charts-grid">
+      ${[1,2,3].map(ax=>`<div class="chart-card"><div class="chart-title">المحور ${ax===1?'الأول':ax===2?'الثاني':'الثالث'}: ${AX_NAMES[ax-1]}</div><div class="chart-wrap" style="height:280px"><canvas id="ch-ax${ax}"></canvas></div></div>`).join('')}
+    </div>
+    <div class="chart-card full">
+      <div class="chart-title">🕸 مخطط الرادار — المحاور</div>
+      <div class="chart-wrap" style="height:300px"><canvas id="ch-radar"></canvas></div>
+    </div>
+  </div>
+  <div class="tab-content" id="atab-questions">
+    <div class="section-card" style="overflow-x:auto">
+      <table class="q-analysis-table">
+        <thead><tr><th>العبارة</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>المتوسط</th><th>الانحراف</th><th>الترتيب</th><th>التفسير</th></tr></thead>
+        <tbody>${buildQTable(n)}</tbody>
+      </table>
+    </div>
+  </div>`;
+
+  setTimeout(()=>{
+    destroyCharts();
+    renderDoughnut('ch-cat',CAT_L,CAT_L.map(l=>catC[l]||0),['#4f8ef7','#22c979','#f59e0b']);
+    renderDoughnut('ch-educ',EDUC_L,EDUC_L.map(l=>educC[l]||0),['#4f8ef7','#a78bfa','#22c979','#fb7185']);
+    renderDoughnut('ch-exp',EXP_L,EXP_L.map(l=>expC[l]||0),['#22c979','#34d399','#0ea5e9','#4f8ef7']);
+    renderDoughnut('ch-ai',AI_L,AI_L.map(l=>aiC[l]||0),['#ef4444','#f97316','#22c979','#4f8ef7']);
+    renderBar('ch-axes',AX_NAMES,axM,AX_COL,[1,5]);
+    [1,2,3].forEach(ax=>{
+      const qs=QUESTIONS.filter(q=>q.axis===ax);
+      renderBar(`ch-ax${ax}`,qs.map(q=>`س${q.id}`),qs.map(q=>getQMean(q.id)),AX_COL[ax-1],[1,5]);
+    });
+    renderRadar();
+  },80);
+}
+
+function buildQTable(n){
+  const means=QUESTIONS.map(q=>({id:q.id,m:getQMean(q.id)}));
+  const sorted=[...means].sort((a,b)=>b.m-a.m);
+  const rank=Object.fromEntries(sorted.map((x,i)=>[x.id,i+1]));
+  return QUESTIONS.map(q=>{
+    const dist=getQDist(q.id),m=getQMean(q.id),s=getQStd(q.id,m),ip=interpMean(m);
+    const pcts=dist.map(c=>n?Math.round(c/n*100):0);
+    return`<tr>
+      <td><span class="q-num-badge" style="display:inline-block;margin-left:6px">${q.id}</span>${q.text}</td>
+      ${dist.map((c,i)=>`<td style="color:${LIK_C[i]};font-weight:700">${c}<span style="font-size:9px;color:var(--text3);font-weight:400">(${pcts[i]}%)</span></td>`).join('')}
+      <td><span class="mean-chip" style="background:${ip.bg};color:${ip.color}">${m.toFixed(2)}</span></td>
+      <td style="color:var(--text2)">${s.toFixed(2)}</td>
+      <td><span class="rank-num" style="background:var(--bg4);color:var(--text2)">${rank[q.id]}</span></td>
+      <td><span class="interp-chip" style="background:${ip.bg};color:${ip.color}">${ip.label}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+//  SPSS PAGE
+// ═══════════════════════════════════════════
+function renderSPSS(){
+  const comp=respondents.filter(isComplete),n=comp.length;
+  const el=document.getElementById('spss-content');
+  if(n<5){el.innerHTML='<div class="empty-state"><h3>يلزم 5 مستجيبين على الأقل للتحليل الإحصائي</h3><p>أكمل إدخال بيانات المستجيبين</p></div>';return}
+
+  // Cronbach's Alpha per axis and overall
+  const alphaAll=cronbachAlpha(QUESTIONS);
+  const alphaAx=[1,2,3].map(ax=>cronbachAlpha(QUESTIONS.filter(q=>q.axis===ax)));
+
+  // Means & Std per axis
+  const axStats=[1,2,3].map(ax=>{
+    const qs=QUESTIONS.filter(q=>q.axis===ax);
+    const vals=comp.map(r=>qs.reduce((s,q)=>s+(r.answers[q.id]||0),0)/qs.length);
+    const m=vals.reduce((a,b)=>a+b,0)/vals.length;
+    const s=Math.sqrt(vals.reduce((acc,v)=>acc+Math.pow(v-m,2),0)/vals.length);
+    const t=tTest(vals,3);
+    return{m,s,t,vals};
+  });
+
+  // Inter-axis correlations
+  const corrMatrix=[[1,2,3].map(ax=>1),[1,2,3].map(ax=>0),[1,2,3].map(ax=>0)];
+  for(let i=0;i<3;i++){for(let j=0;j<3;j++){
+    if(i===j){corrMatrix[i][j]=1;continue}
+    const xi=comp.map(r=>QUESTIONS.filter(q=>q.axis===i+1).reduce((s,q)=>s+(r.answers[q.id]||0),0));
+    const xj=comp.map(r=>QUESTIONS.filter(q=>q.axis===j+1).reduce((s,q)=>s+(r.answers[q.id]||0),0));
+    corrMatrix[i][j]=pearson(xi,xj);
+  }}
+
+  // Ranked questions
+  const qMeans=QUESTIONS.map(q=>{const m=getQMean(q.id);return{q,m,s:getQStd(q.id,m)}}).sort((a,b)=>b.m-a.m);
+
+  // Group analysis by category
+  const catGroups={};
+  comp.forEach(r=>{if(!catGroups[r.category])catGroups[r.category]=[];catGroups[r.category].push(r)});
+
+  const alphaColor=(a)=>a>=.9?'#22c979':a>=.7?'#34d399':a>=.6?'#f59e0b':'#ef4444';
+  const alphaLabel=(a)=>a>=.9?'ممتاز':a>=.7?'جيد':a>=.6?'مقبول':'ضعيف';
+
+  el.innerHTML=`
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('reliability',this,'stab')">ثبات الأداة</button>
+    <button class="tab" onclick="switchTab('descriptive',this,'stab')">إحصاء وصفي</button>
+    <button class="tab" onclick="switchTab('ttest',this,'stab')">اختبار T</button>
+    <button class="tab" onclick="switchTab('correlation',this,'stab')">الارتباط</button>
+    <button class="tab" onclick="switchTab('groups',this,'stab')">تحليل الفئات</button>
+    <button class="tab" onclick="switchTab('ranking',this,'stab')">ترتيب الأبعاد</button>
+  </div>
+
+  <!-- ── RELIABILITY ── -->
+  <div class="tab-content active" id="stab-reliability">
+    <div class="section-card">
+      <div class="section-header"><span class="section-badge s1">ثبات الأداة</span><span class="section-title">معامل ألفا كرونباخ — Cronbach's Alpha (α)</span></div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:1.5rem;line-height:1.8">يُعدّ معامل ألفا كرونباخ أحد أشهر مقاييس الثبات الداخلي للاستبيان. القيمة المقبولة هي <strong style="color:var(--accent)">α ≥ 0.70</strong></p>
+      <div class="spss-grid">
+        <div class="spss-card" style="grid-column:1/-1">
+          <div style="display:flex;align-items:center;gap:2rem;flex-wrap:wrap">
+            <div style="text-align:center">
+              <div class="alpha-circle" style="border-color:${alphaColor(alphaAll)};width:100px;height:100px">
+                <div style="font-size:26px;font-weight:800;color:${alphaColor(alphaAll)};font-family:'Cairo',sans-serif">${alphaAll.toFixed(3)}</div>
+                <div style="font-size:10px;color:var(--text3)">α الكلي</div>
+              </div>
+              <div class="ind-badge" style="background:${alphaColor(alphaAll)}22;color:${alphaColor(alphaAll)};margin-top:6px">${alphaLabel(alphaAll)}</div>
+            </div>
+            <div style="flex:1;min-width:250px">
+              ${[1,2,3].map((ax,i)=>`
+              <div class="reliability-row">
+                <div class="spss-val" style="font-size:18px;color:${alphaColor(alphaAx[i])};min-width:60px">${alphaAx[i].toFixed(3)}</div>
+                <div style="flex:1">
+                  <div style="font-size:12px;color:var(--text);font-weight:600">المحور ${ax===1?'الأول':ax===2?'الثاني':'الثالث'}: ${AX_NAMES[i]}</div>
+                  <div style="background:var(--bg4);border-radius:3px;height:6px;margin-top:4px;overflow:hidden">
+                    <div style="height:100%;width:${Math.min(100,alphaAx[i]*100)}%;background:${alphaColor(alphaAx[i])};border-radius:3px;transition:width .8s ease"></div>
+                  </div>
+                </div>
+                <span class="ind-badge" style="background:${alphaColor(alphaAx[i])}22;color:${alphaColor(alphaAx[i])}">${alphaLabel(alphaAx[i])}</span>
+              </div>`).join('')}
+            </div>
+          </div>
+          <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">
+            <strong>التفسير:</strong> معامل ألفا الكلي بلغ <strong style="color:${alphaColor(alphaAll)}">${alphaAll.toFixed(3)}</strong>، 
+            وهذا يدل على أن الاستبيان يتمتع بمستوى ثبات <strong>${alphaLabel(alphaAll)}</strong>، 
+            مما يجعل نتائجه <strong>${alphaAll>=.7?'موثوقة وصالحة للتعميم':'تحتاج لمراجعة الفقرات'}</strong>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DESCRIPTIVE ── -->
+  <div class="tab-content" id="stab-descriptive">
+    <div class="section-card">
+      <div class="section-header"><span class="section-badge s2">إحصاء وصفي</span><span class="section-title">Descriptive Statistics — المتوسطات والانحرافات المعيارية</span></div>
+      <div style="overflow-x:auto">
+        <table class="spss-table" style="width:100%">
+          <thead><tr><th>العبارة</th><th>N</th><th>الحد الأدنى</th><th>الحد الأقصى</th><th>المتوسط (M)</th><th>الانحراف (SD)</th><th>الخطأ المعياري</th><th>التفسير</th></tr></thead>
+          <tbody>
+            ${QUESTIONS.map(q=>{
+              const vals=comp.map(r=>r.answers[q.id]||0);
+              const m=getQMean(q.id),s=getQStd(q.id,m);
+              const se=s/Math.sqrt(n);
+              const ip=interpMean(m);
+              return`<tr>
+                <td><span class="q-num-badge" style="display:inline-block;margin-left:6px">${q.id}</span>${q.text}</td>
+                <td>${n}</td>
+                <td>${Math.min(...vals)}</td>
+                <td>${Math.max(...vals)}</td>
+                <td><strong style="color:${ip.color}">${m.toFixed(2)}</strong></td>
+                <td>${s.toFixed(3)}</td>
+                <td>${se.toFixed(3)}</td>
+                <td><span class="interp-chip" style="background:${ip.bg};color:${ip.color}">${ip.label}</span></td>
+              </tr>`;
+            }).join('')}
+            <tr style="background:rgba(255,255,255,.02);font-weight:700">
+              <td><strong>المجموع الكلي</strong></td>
+              <td>${n}</td><td>—</td><td>—</td>
+              <td><strong style="color:${interpMean(QUESTIONS.reduce((s,q)=>s+getQMean(q.id),0)/QUESTIONS.length).color}">${(QUESTIONS.reduce((s,q)=>s+getQMean(q.id),0)/QUESTIONS.length).toFixed(2)}</strong></td>
+              <td>—</td><td>—</td><td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── T-TEST ── -->
+  <div class="tab-content" id="stab-ttest">
+    <div class="section-card">
+      <div class="section-header"><span class="section-badge s3">اختبار T</span><span class="section-title">One-Sample T-Test — القيمة المرجعية: 3 (محايد)</span></div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:1.5rem;line-height:1.8">يختبر ما إذا كان متوسط كل محور يختلف إحصائياً عن القيمة المحايدة 3 — القيمة الاحتمالية المقبولة: <strong style="color:var(--accent)">p &lt; 0.05</strong></p>
+      <div style="overflow-x:auto">
+        <table class="spss-table">
+          <thead><tr><th>المحور</th><th>N</th><th>المتوسط</th><th>SD</th><th>SEM</th><th>قيمة T</th><th>df</th><th>Sig (p)</th><th>الفرق عن 3</th><th>الدلالة</th></tr></thead>
+          <tbody>
+            ${axStats.map((st,i)=>{
+              const sig=st.t.p<.001?'p < .001':st.t.p<.01?'p < .01':st.t.p<.05?'p < .05':'غير دال';
+              const sigCol=st.t.p<.05?'var(--green)':'var(--amber)';
+              return`<tr>
+                <td><strong>المحور ${i+1}: ${AX_NAMES[i]}</strong></td>
+                <td>${n}</td>
+                <td><strong style="color:${interpMean(st.m).color}">${st.m.toFixed(3)}</strong></td>
+                <td>${st.s.toFixed(3)}</td>
+                <td>${(st.s/Math.sqrt(n)).toFixed(3)}</td>
+                <td><strong>${st.t.t.toFixed(3)}</strong></td>
+                <td>${n-1}</td>
+                <td style="color:${sigCol};font-weight:700">${sig}</td>
+                <td style="color:${st.m>3?'var(--green)':'var(--red)'};font-weight:700">${(st.m-3>0?'+':'')+(st.m-3).toFixed(3)}</td>
+                <td><span class="interp-chip" style="background:${sigCol}22;color:${sigCol}">${st.t.p<.05?'دال إحصائياً ✓':'غير دال'}</span></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.8">
+        <strong style="color:var(--text)">تفسير النتائج:</strong><br>
+        ${axStats.map((st,i)=>`• <strong>المحور ${i+1} (${AX_NAMES[i]})</strong>: متوسط ${st.m.toFixed(2)} ${st.t.p<.05?`يختلف إحصائياً عن القيمة المحايدة (p ${st.t.p<.001?'< .001':st.t.p<.01?'< .01':'< .05'})، مما يدل على ${st.m>3?'موافقة':'رفض'} واضح.`:'لا يختلف إحصائياً عن القيمة المحايدة.'}`).join('<br>')}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CORRELATION ── -->
+  <div class="tab-content" id="stab-correlation">
+    <div class="section-card">
+      <div class="section-header"><span class="section-badge s4">الارتباط</span><span class="section-title">Pearson Correlation Matrix — مصفوفة الارتباط بين المحاور</span></div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:1.5rem">يقيس معامل بيرسون قوة واتجاه العلاقة الخطية: قوي (r≥0.7) — متوسط (0.4≤r&lt;0.7) — ضعيف (r&lt;0.4)</p>
+      <div style="overflow-x:auto">
+        <table class="spss-table">
+          <thead><tr><th>المحور</th>${AX_NAMES.map(n=>`<th>${n}</th>`).join('')}</tr></thead>
+          <tbody>
+            ${AX_NAMES.map((name,i)=>`<tr>
+              <td><strong>${name}</strong></td>
+              ${corrMatrix[i].map((r,j)=>{
+                if(i===j)return`<td><strong>1.000</strong></td>`;
+                const col=Math.abs(r)>=.7?'var(--green)':Math.abs(r)>=.4?'var(--amber)':'var(--red)';
+                const bg=Math.abs(r)>=.7?'rgba(34,201,121,.12)':Math.abs(r)>=.4?'rgba(245,158,11,.12)':'rgba(239,68,68,.12)';
+                return`<td><span class="corr-cell" style="background:${bg};color:${col};width:60px">${r.toFixed(3)}</span></td>`;
+              }).join('')}
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:1rem">
+        <div class="chart-card" style="margin-top:1rem">
+          <div class="chart-title">📈 الارتباط بين المحاور — مخطط مبعثر</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="ch-corr"></canvas></div>
+        </div>
+      </div>
+      <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.8">
+        <strong style="color:var(--text)">قراءة مصفوفة الارتباط:</strong><br>
+        ${[0,1,2].map(i=>[0,1,2].filter(j=>j>i).map(j=>{
+          const r=corrMatrix[i][j];
+          const str=Math.abs(r)>=.7?'قوية':Math.abs(r)>=.4?'متوسطة':'ضعيفة';
+          const dir=r>0?'إيجابية':'سلبية';
+          return`• ارتباط ${dir} ${str} بين <strong>${AX_NAMES[i]}</strong> و<strong>${AX_NAMES[j]}</strong> (r = ${r.toFixed(3)})`;
+        }).join('<br>')).join('<br>')}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── GROUPS ── -->
+  <div class="tab-content" id="stab-groups">
+    <div class="section-card">
+      <div class="section-header"><span class="section-badge s1">تحليل الفئات</span><span class="section-title">تحليل الاستجابات حسب الفئة المهنية</span></div>
+      <div class="charts-grid">
+        ${Object.entries(catGroups).map(([cat,members])=>{
+          const catCol={'أستاذ جامعي / أكاديمي':'var(--accent)','محاسب معتمد':'var(--green)','مدقق حسابات':'var(--amber)'}[cat]||'var(--text2)';
+          const gm=members.reduce((s,r)=>s+calcMean(r),0)/members.length;
+          const axM=[1,2,3].map(ax=>{const qs=QUESTIONS.filter(q=>q.axis===ax);return members.reduce((s,r)=>s+qs.reduce((ss,q)=>ss+(r.answers[q.id]||0),0)/qs.length,0)/members.length});
+          return`<div class="spss-card">
+            <div class="spss-title" style="color:${catCol}">👤 ${cat}</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:12px">عدد المستجيبين: <strong style="color:var(--text2)">${members.length}</strong> | المتوسط العام: <strong style="color:${catCol}">${gm.toFixed(2)}</strong></div>
+            ${axM.map((m,i)=>{const ip=interpMean(m);return`<div style="margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text2)">المحور ${i+1}</span><strong style="color:${ip.color}">${m.toFixed(2)}</strong></div>
+              <div style="background:var(--bg4);border-radius:3px;height:6px;overflow:hidden"><div style="height:100%;width:${((m-1)/4*100)}%;background:${ip.color};border-radius:3px;transition:width .8s"></div></div>
+            </div>`}).join('')}
+          </div>`;
+        }).join('')}
+      </div>
+      ${Object.keys(catGroups).length>0?`
+      <div class="chart-card" style="margin-top:1rem">
+        <div class="chart-title">📊 مقارنة الفئات المهنية عبر المحاور</div>
+        <div class="chart-wrap" style="height:280px"><canvas id="ch-groups"></canvas></div>
+      </div>`:''}
+    </div>
+  </div>
+
+  <!-- ── RANKING ── -->
+  <div class="tab-content" id="stab-ranking">
+    <div class="section-card">
+      <div class="section-header"><span class="section-badge s2">ترتيب الأبعاد</span><span class="section-title">ترتيب العبارات والأبعاد تنازلياً</span></div>
+      <div class="spss-grid" style="grid-template-columns:1fr 1fr">
+        <div>
+          <p style="font-size:12px;color:var(--text2);margin-bottom:1rem;font-weight:600">أعلى 10 عبارات موافقة</p>
+          ${qMeans.slice(0,10).map((x,i)=>{
+            const ip=interpMean(x.m);
+            return`<div class="rank-item">
+              <div class="rank-num" style="background:${i<3?ip.bg:'var(--bg4)'};color:${i<3?ip.color:'var(--text3)'}">${i+1}</div>
+              <div style="flex:1"><div style="font-size:11.5px;color:var(--text2);line-height:1.4">${x.q.text}</div></div>
+              <div class="mean-chip" style="background:${ip.bg};color:${ip.color};font-size:11px">${x.m.toFixed(2)}</div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div>
+          <p style="font-size:12px;color:var(--text2);margin-bottom:1rem;font-weight:600">ترتيب الأبعاد (Dimensions)</p>
+          ${buildDimRanking()}
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  // Charts after DOM
+  setTimeout(()=>{
+    // Correlation scatter
+    renderCorrScatter();
+    // Groups chart
+    if(document.getElementById('ch-groups'))renderGroupsChart(catGroups);
+  },100);
+}
+
+function buildDimRanking(){
+  const dims={};
+  QUESTIONS.forEach(q=>{if(!dims[q.dim])dims[q.dim]=[];dims[q.dim].push(q)});
+  const sorted=Object.entries(dims).map(([dim,qs])=>{
+    const m=qs.reduce((s,q)=>s+getQMean(q.id),0)/qs.length;
+    return{dim,m,qs};
+  }).sort((a,b)=>b.m-a.m);
+  return sorted.map((d,i)=>{
+    const ip=interpMean(d.m);
+    return`<div class="rank-item">
+      <div class="rank-num" style="background:${i<3?ip.bg:'var(--bg4)'};color:${i<3?ip.color:'var(--text3)'}">${i+1}</div>
+      <div style="flex:1"><div style="font-size:11.5px;color:var(--text2)">${d.dim}</div>
+      <div style="font-size:10px;color:var(--text3)">${d.qs.length} عبارة</div></div>
+      <div class="mean-chip" style="background:${ip.bg};color:${ip.color};font-size:11px">${d.m.toFixed(2)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderCorrScatter(){
+  const el=document.getElementById('ch-corr');if(!el)return;
+  const comp=respondents.filter(isComplete);
+  const x1=comp.map(r=>QUESTIONS.filter(q=>q.axis===1).reduce((s,q)=>s+(r.answers[q.id]||0),0)/10);
+  const x2=comp.map(r=>QUESTIONS.filter(q=>q.axis===2).reduce((s,q)=>s+(r.answers[q.id]||0),0)/11);
+  chartInstances['ch-corr']=new Chart(el,{
+    type:'scatter',
+    data:{datasets:[{label:'المحور1 vs المحور2',data:x1.map((v,i)=>({x:v,y:x2[i]})),backgroundColor:'rgba(79,142,247,.6)',borderColor:'#4f8ef7',pointRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{min:1,max:5,title:{display:true,text:'المحور الأول',color:'#636878'},ticks:{color:'#636878'},grid:{color:'rgba(255,255,255,.05)'}},y:{min:1,max:5,title:{display:true,text:'المحور الثاني',color:'#636878'},ticks:{color:'#636878'},grid:{color:'rgba(255,255,255,.05)'}}}}
+  });
+}
+
+function renderGroupsChart(catGroups){
+  const el=document.getElementById('ch-groups');if(!el)return;
+  const cats=Object.keys(catGroups);
+  const catCol={'أستاذ جامعي / أكاديمي':'#4f8ef7','محاسب معتمد':'#22c979','مدقق حسابات':'#f59e0b'};
+  chartInstances['ch-groups']=new Chart(el,{
+    type:'bar',
+    data:{
+      labels:AX_NAMES,
+      datasets:cats.map(cat=>({
+        label:cat,
+        data:[1,2,3].map(ax=>{const qs=QUESTIONS.filter(q=>q.axis===ax);return catGroups[cat].reduce((s,r)=>s+qs.reduce((ss,q)=>ss+(r.answers[q.id]||0),0)/qs.length,0)/catGroups[cat].length}),
+        backgroundColor:(catCol[cat]||'#888')+'99',
+        borderColor:catCol[cat]||'#888',
+        borderWidth:2,borderRadius:5
+      }))
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9fa3b0',font:{family:'Tajawal'}}}},scales:{y:{min:1,max:5,ticks:{color:'#636878'},grid:{color:'rgba(255,255,255,.05)'}},x:{ticks:{color:'#9fa3b0',font:{family:'Tajawal'}},grid:{display:false}}}}
+  });
+}
+
+// ═══════════════════════════════════════════
+//  INDIVIDUAL PAGE
+// ═══════════════════════════════════════════
+function renderIndividual(){
+  saveCurrentForm();
+  const el=document.getElementById('individual-content');
+  if(!respondents.some(isComplete)){el.innerHTML='<div class="empty-state"><h3>لا يوجد مستجيبون مكتملون</h3></div>';return}
+  const catColor={'أستاذ جامعي / أكاديمي':'var(--accent)','محاسب معتمد':'var(--green)','مدقق حسابات':'var(--amber)'};
+  const catShort={'أستاذ جامعي / أكاديمي':'أستاذ','محاسب معتمد':'محاسب','مدقق حسابات':'مدقق'};
+  const cards=respondents.map(r=>{
+    if(!isComplete(r))return`<div class="ind-card incomplete"><div class="ind-name">مستجيب ${r.id}</div><div class="ind-meta">${isPartial(r)?'مكتمل جزئياً':'لم يُكتمل'}</div></div>`;
+    const m=calcMean(r),ip=interpMean(m),col=catColor[r.category]||'var(--text2)';
+    return`<div class="ind-card" onclick="showIndDetail(${r.id})" style="border-color:${col}30">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div class="ind-name">مستجيب ${r.id}</div>
+        <span class="ind-badge" style="background:${col}22;color:${col}">${catShort[r.category]||r.category}</span>
+      </div>
+      <div class="ind-meta">📚 ${r.education}</div>
+      <div class="ind-meta">📅 ${r.experience}</div>
+      <div class="ind-meta">🤖 <span>${r.aiUsage}</span></div>
+      <div class="ind-score"><div class="score-num" style="color:${ip.color}">${m.toFixed(2)}</div>
+        <span class="ind-badge" style="background:${ip.bg};color:${ip.color}">${ip.label}</span>
+      </div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div id="ind-grid-view"><div class="ind-grid fade-in">${cards}</div></div><div id="ind-detail-view" style="display:none"></div>`;
+}
+
+function showIndDetail(rid){
+  const r=respondents.find(x=>x.id===rid);
+  if(!r||!isComplete(r))return;
+  const catColor={'أستاذ جامعي / أكاديمي':'var(--accent)','محاسب معتمد':'var(--green)','مدقق حسابات':'var(--amber)'};
+  const col=catColor[r.category]||'var(--text2)';
+  const axM=[1,2,3].map(ax=>{const qs=QUESTIONS.filter(q=>q.axis===ax);return qs.reduce((s,q)=>s+(r.answers[q.id]||0),0)/qs.length});
+  const gm=calcMean(r),gi=interpMean(gm);
+  const qRows=QUESTIONS.map(q=>{
+    const v=r.answers[q.id],lbl=LIK_L[5-v]||'',cl=LIK_C[5-v]||'';
+    return`<tr><td><span class="q-num-badge" style="display:inline-block;margin-left:6px">${q.id}</span>${q.text}</td>
+      <td style="text-align:center;font-weight:800;color:${cl};font-size:17px">${v}</td>
+      <td style="text-align:center"><span class="interp-chip" style="background:${cl}22;color:${cl}">${lbl}</span></td></tr>`;
+  }).join('');
+  document.getElementById('ind-grid-view').style.display='none';
+  const d=document.getElementById('ind-detail-view');
+  d.style.display='block';
+  d.innerHTML=`
+    <button class="back-btn fade-in" onclick="document.getElementById('ind-grid-view').style.display='';document.getElementById('ind-detail-view').style.display='none'">← العودة</button>
+    <div class="fade-in" style="display:flex;align-items:center;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap">
+      <div style="width:60px;height:60px;border-radius:50%;background:${col}22;border:2px solid ${col};display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:${col};font-family:'Cairo',sans-serif">${r.id}</div>
+      <div><div class="form-title" style="font-size:18px">مستجيب رقم ${r.id}</div>
+        <div style="font-size:13px;color:var(--text2)">${r.category} · ${r.education} · ${r.experience}</div>
+        <div style="font-size:12px;color:var(--text3)">استخدام ذكاء اصطناعي: ${r.aiUsage}</div>
+      </div>
+      <div style="margin-right:auto;text-align:center">
+        <div style="font-size:40px;font-weight:800;font-family:'Cairo',sans-serif;color:${gi.color}">${gm.toFixed(2)}</div>
+        <div class="ind-badge" style="background:${gi.bg};color:${gi.color}">${gi.label}</div>
+      </div>
+    </div>
+    <div class="axis-summary-grid fade-in">
+      ${axM.map((m,i)=>{const ip=interpMean(m);return`<div class="axis-card">
+        <div class="axis-name">المحور ${i+1}: ${AX_NAMES[i]}</div>
+        <div class="axis-score" style="color:${ip.color}">${m.toFixed(2)}</div>
+        <div class="axis-interp" style="color:${ip.color}">${ip.label}</div>
+        <div style="height:4px;background:var(--bg4);border-radius:2px;margin-top:8px;overflow:hidden">
+          <div style="height:100%;width:${(m-1)/4*100}%;background:${ip.color};border-radius:2px;transition:width .8s"></div>
+        </div>
+      </div>`}).join('')}
+    </div>
+    <div class="charts-grid fade-in">
+      <div class="section-card" style="overflow-x:auto;grid-column:span 1">
+        <table class="q-analysis-table"><thead><tr><th>العبارة</th><th>القيمة</th><th>التفسير</th></tr></thead>
+        <tbody>${qRows}</tbody></table>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">توزيع إجابات المستجيب</div>
+        <div class="chart-wrap" style="height:250px"><canvas id="ch-ind"></canvas></div>
+      </div>
+    </div>`;
+  setTimeout(()=>{
+    const dist=[0,0,0,0,0];
+    QUESTIONS.forEach(q=>{const v=r.answers[q.id];if(v)dist[5-v]++});
+    const el=document.getElementById('ch-ind');if(!el)return;
+    new Chart(el,{type:'bar',data:{labels:LIK_L,datasets:[{data:dist,backgroundColor:LIK_C.map(c=>c+'bb'),borderColor:LIK_C,borderWidth:2,borderRadius:6}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#636878'},grid:{color:'rgba(255,255,255,.05)'}},x:{ticks:{color:'#9fa3b0',font:{size:10,family:'Tajawal'}},grid:{display:false}}}}});
+  },80);
+}
+
+// ═══════════════════════════════════════════
+//  CHART HELPERS
+// ═══════════════════════════════════════════
+function destroyCharts(){Object.values(chartInstances).forEach(c=>{try{c.destroy()}catch(e){}});chartInstances={}}
+
+function renderDoughnut(id,labels,data,colors){
+  const el=document.getElementById(id);if(!el)return;
+  chartInstances[id]=new Chart(el,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0f1117',borderWidth:2,hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#9fa3b0',font:{size:11,family:'Tajawal'},boxWidth:11,padding:8}}}}});
+}
+
+function renderBar(id,labels,data,color,range){
+  const el=document.getElementById(id);if(!el)return;
+  const colors=Array.isArray(color)?color:data.map(()=>color);
+  chartInstances[id]=new Chart(el,{type:'bar',data:{labels,datasets:[{data,backgroundColor:colors.map(c=>c+'aa'),borderColor:colors,borderWidth:2,borderRadius:7}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{min:range[0],max:range[1],ticks:{color:'#636878',font:{family:'Tajawal'}},grid:{color:'rgba(255,255,255,.05)'}},x:{ticks:{color:'#9fa3b0',font:{size:10,family:'Tajawal'}},grid:{display:false}}}}});
+}
+
+function renderRadar(){
+  const el=document.getElementById('ch-radar');if(!el)return;
+  const axM=[1,2,3].map(ax=>getAxMean(ax));
+  chartInstances['ch-radar']=new Chart(el,{type:'radar',
+    data:{labels:AX_NAMES,datasets:[{label:'المتوسطات',data:axM,backgroundColor:'rgba(79,142,247,.15)',borderColor:'#4f8ef7',borderWidth:2,pointBackgroundColor:'#4f8ef7',pointRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9fa3b0',font:{family:'Tajawal'}}}},
+      scales:{r:{min:1,max:5,ticks:{color:'#636878',backdropColor:'transparent'},grid:{color:'rgba(255,255,255,.08)'},pointLabels:{color:'#9fa3b0',font:{size:12,family:'Tajawal'}}}}}});
+}
+
+// ═══════════════════════════════════════════
+//  IMPORT / EXPORT
+// ═══════════════════════════════════════════
+function openImport(){document.getElementById('import-modal').classList.add('show')}
+function closeModal(id){document.getElementById(id).classList.remove('show');pendingImportData=null;document.getElementById('import-preview').style.display='none';document.getElementById('import-confirm-btn').style.display='none'}
+
+function handleDrop(e){
+  e.preventDefault();document.getElementById('drop-zone').classList.remove('drag-over');
+  const file=e.dataTransfer.files[0];if(file)readFile(file);
+}
+function handleFileImport(e){const file=e.target.files[0];if(file)readFile(file)}
+
+function readFile(file){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      if(file.name.endsWith('.json')){
+        const data=JSON.parse(e.target.result);
+        if(data.respondents&&Array.isArray(data.respondents)){
+          pendingImportData=data.respondents;
+          const done=data.respondents.filter(r=>QUESTIONS.every(q=>r.answers&&r.answers[q.id]!==undefined)).length;
+          document.getElementById('import-msg').textContent=`تم قراءة ${data.respondents.length} مستجيب، منهم ${done} مكتمل`;
+          document.getElementById('import-preview').style.display='block';
+          document.getElementById('import-confirm-btn').style.display='inline-flex';
+        }else{throw new Error('تنسيق JSON غير صحيح')}
+      }else if(file.name.endsWith('.csv')){
+        importCSV(e.target.result);
+      }
+    }catch(err){
+      document.getElementById('import-msg').textContent='خطأ: '+err.message;
+      document.getElementById('import-msg').style.color='var(--red)';
+      document.getElementById('import-preview').style.display='block';
+    }
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
+function importCSV(text){
+  const lines=text.split('\n').filter(l=>l.trim());
+  const headers=lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
+  const imported=[];
+  for(let i=1;i<lines.length;i++){
+    const vals=lines[i].split(',').map(v=>v.replace(/"/g,'').trim());
+    if(!vals[0])continue;
+    const r=newR(parseInt(vals[0])||imported.length+1);
+    r.category=vals[1]||'';r.education=vals[2]||'';r.experience=vals[3]||'';r.aiUsage=vals[4]||'';
+    QUESTIONS.forEach((q,qi)=>{const v=parseInt(vals[5+qi]);if(v>=1&&v<=5)r.answers[q.id]=v});
+    imported.push(r);
+  }
+  pendingImportData=imported;
+  const done=imported.filter(r=>QUESTIONS.every(q=>r.answers[q.id]!==undefined)).length;
+  document.getElementById('import-msg').textContent=`تم قراءة ${imported.length} مستجيب من CSV، منهم ${done} مكتمل`;
+  document.getElementById('import-preview').style.display='block';
+  document.getElementById('import-confirm-btn').style.display='inline-flex';
+}
+
+function confirmImport(){
+  if(!pendingImportData)return;
+  pendingImportData.forEach(imp=>{
+    const existing=respondents.find(r=>r.id===imp.id);
+    if(existing){Object.assign(existing,imp)}
+    else{respondents.push(imp)}
+  });
+  while(respondents.length<25)respondents.push(newR(respondents.length+1));
+  saveLS();pushFirebase();renderSidebar();renderForm();
+  closeModal('import-modal');
+  showToast(`✓ تم استيراد ${pendingImportData.length} مستجيب`,'success');
+  pendingImportData=null;
+}
+
+function exportCSV(){
+  saveCurrentForm();
+  const comp=respondents.filter(isComplete);
+  if(!comp.length){showToast('لا توجد بيانات مكتملة','error');return}
+  const h=['رقم المستجيب','الفئة المهنية','المؤهل العلمي','سنوات الخبرة','استخدام الذكاء الاصطناعي',...QUESTIONS.map(q=>`س${q.id}`),'متوسط المحور1','متوسط المحور2','متوسط المحور3','المتوسط العام'];
+  const rows=comp.map(r=>{
+    const axM=[1,2,3].map(ax=>{const qs=QUESTIONS.filter(q=>q.axis===ax);return(qs.reduce((s,q)=>s+(r.answers[q.id]||0),0)/qs.length).toFixed(2)});
+    return[r.id,r.category,r.education,r.experience,r.aiUsage,...QUESTIONS.map(q=>r.answers[q.id]||''),...axM,calcMean(r).toFixed(2)];
+  });
+  const csv=[h,...rows].map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+  download('\uFEFF'+csv,'survey_results.csv','text/csv;charset=utf-8');
+  showToast(`⬇ تم تصدير ${comp.length} مستجيب`,'success');
+}
+
+function exportJSON(){
+  saveCurrentForm();
+  const data=JSON.stringify({respondents,exportedAt:new Date().toISOString(),version:'2'},null,2);
+  download(data,'survey_data.json','application/json');
+  showToast('⬇ تم تصدير JSON','success');
+}
+
+function download(content,filename,type){
+  const blob=new Blob([content],{type});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+}
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+function showPage(name){
+  saveCurrentForm();
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('[id^="nav-"]').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='analysis')renderAnalysis();
+  if(name==='spss')renderSPSS();
+  if(name==='individual')renderIndividual();
+  window.scrollTo(0,0);
+}
+
+function switchTab(name,btn,prefix){
+  document.querySelectorAll(`.tab-content[id^="${prefix}-"]`).forEach(t=>t.classList.remove('active'));
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`${prefix}-${name}`).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ═══════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════
+function fmtTime(){return new Date().toLocaleTimeString('ar-DZ',{hour:'2-digit',minute:'2-digit'})}
+
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.innerHTML=msg;t.className='toast show '+(type||'');
+  clearTimeout(t._timer);t._timer=setTimeout(()=>t.className='toast',3000);
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+function initApp(forceNew){
+  destroyCharts();
+  if(!forceNew){
+    const saved=loadLS();
+    if(saved){
+      while(respondents.length<25)respondents.push(newR(respondents.length+1));
+      renderSidebar();renderForm();
+      updateSaveInd('استُعيد — '+fmtTime(),'var(--green)');
+      showToast('✓ تم استعادة بياناتك المحفوظة','success');
+      return;
+    }
+  }
+  respondents=[];for(let i=1;i<=25;i++)respondents.push(newR(i));
+  currentRid=1;renderSidebar();renderForm();
+}
+
+// Auto-save every 20s
+setInterval(()=>{saveCurrentForm();saveLS();updateSaveInd('حُفظ تلقائياً '+fmtTime(),'var(--green)')},20000);
+window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){saveCurrentForm();saveLS()}});
+window.addEventListener('beforeunload',()=>{saveCurrentForm();saveLS()});
+
+// Init Firebase after module loads
+window.addEventListener('load',()=>{
+  setTimeout(()=>{try{initFirebase()}catch(e){}},1000);
+  initApp();
+});
+</script>
+</body>
+</html>
