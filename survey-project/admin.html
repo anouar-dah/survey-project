@@ -470,18 +470,33 @@ tbody tr:last-child td{border-bottom:none}
 .validity-val{font-family:'Cairo',sans-serif;font-size:28px;font-weight:900}
 .validity-lbl{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
 
+/* ═══ AI CHAT PAGE ═══ */
+.quick-prompt-btn{
+  padding:6px 12px;border-radius:20px;border:1.5px solid var(--border2);
+  background:var(--bg2);color:var(--text2);cursor:pointer;
+  font-family:'Tajawal',sans-serif;font-size:11.5px;font-weight:600;
+  transition:all .2s;
+}
+.quick-prompt-btn:hover{background:rgba(59,111,240,.08);border-color:var(--accent);color:var(--accent)}
+.chat-msg{display:flex;gap:10px;animation:fadeUp .3s ease}
+.chat-msg.user{flex-direction:row-reverse}
+.chat-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.chat-avatar.ai{background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff}
+.chat-avatar.user{background:var(--bg4);color:var(--text2)}
+.chat-bubble{max-width:80%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.7}
+.chat-bubble.ai{background:var(--bg3);border:1px solid var(--border);border-top-right-radius:4px;color:var(--text2)}
+.chat-bubble.user{background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;border-bottom-left-radius:4px}
+.chat-copy-btn{font-size:10px;padding:2px 8px;border-radius:20px;border:none;background:rgba(59,111,240,.1);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;display:inline-block}
+.chat-copy-btn:hover{background:rgba(59,111,240,.2)}
+
+/* ═══ MERGE PAGE ═══ */
+.merge-status-ok{color:var(--green);font-weight:700}
+.merge-status-dup{color:var(--amber);font-weight:700}
+.merge-status-skip{color:var(--red);font-weight:700}
+
 /* ═══ DIMENSIONS PAGE ═══ */
-.dim-card{
-  background:var(--bg2);border:1.5px solid var(--border);
-  border-radius:var(--radius);margin-bottom:1.25rem;
-  box-shadow:var(--shadow);overflow:hidden;
-}
-.dim-head{
-  padding:1rem 1.5rem;
-  background:linear-gradient(135deg,rgba(59,111,240,.06),rgba(124,58,237,.03));
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
-}
+.dim-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:1.25rem;box-shadow:var(--shadow);overflow:hidden}
+.dim-head{padding:1rem 1.5rem;background:linear-gradient(135deg,rgba(59,111,240,.06),rgba(124,58,237,.03));border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .dim-name{font-size:14px;font-weight:700;color:var(--text)}
 .dim-axis-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;color:#fff}
 .dim-body{padding:1.25rem}
@@ -490,11 +505,7 @@ tbody tr:last-child td{border-bottom:none}
 .dim-stat .ds-val{font-family:'Cairo',sans-serif;font-size:18px;font-weight:800}
 .dim-stat .ds-lbl{font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
 .dim-q-list{display:flex;flex-direction:column;gap:5px}
-.dim-q-item{
-  display:flex;align-items:center;gap:10px;
-  padding:7px 10px;background:var(--bg3);border-radius:var(--r3);
-  border:1px solid var(--border);font-size:12px;
-}
+.dim-q-item{display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--bg3);border-radius:var(--r3);border:1px solid var(--border);font-size:12px}
 .dim-q-id{width:22px;height:22px;border-radius:5px;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--text3);flex-shrink:0}
 .dim-q-text{flex:1;color:var(--text2);line-height:1.5}
 .dim-q-bar{width:80px;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;flex-shrink:0}
@@ -588,6 +599,11 @@ tbody tr:last-child td{border-bottom:none}
   <div class="sb-section">
     <div class="sb-label">بيانات</div>
     <div class="sb-item" id="nav-individual" onclick="showPage('individual')"><span class="ic">👤</span>البيانات الفردية</div>
+    <div class="sb-item" id="nav-merge" onclick="showPage('merge')"><span class="ic">🔄</span>دمج البيانات<span class="new-badge">جديد</span></div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-label">الذكاء الاصطناعي</div>
+    <div class="sb-item" id="nav-aichat" onclick="showPage('aichat')"><span class="ic">💬</span>مساعد البحث AI<span class="new-badge">جديد</span></div>
   </div>
   <div class="sb-section" style="padding:0 .75rem">
     <div style="background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(59,111,240,.05));border:1px solid rgba(124,58,237,.15);border-radius:var(--r2);padding:12px;font-size:11px;color:var(--text2)">
@@ -1134,10 +1150,154 @@ tbody tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- ─── INDIVIDUAL ─── -->
-<div class="page" id="page-individual">
-  <div class="pg-hdr"><div class="pg-title">البيانات الفردية لكل مستجيب</div></div>
-  <div id="ind-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px"></div>
+<!-- ─── AI CHAT PAGE ─── -->
+<div class="page" id="page-aichat">
+  <div class="pg-hdr">
+    <div>
+      <div class="pg-title">🤖 مساعد البحث — AI Research Assistant</div>
+      <div class="pg-sub">اطرح أي سؤال حول بيانات دراستك واحصل على تفسير أكاديمي فوري</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div id="provider-status" style="font-size:11px;padding:5px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3)">غير متصل</div>
+      <button class="btn btn-ghost" onclick="showApiKeyModal()">⚙ إعداد API</button>
+      <button class="btn btn-ghost" onclick="clearChat()">🗑 مسح المحادثة</button>
+    </div>
+  </div>
+
+  <!-- Quick Prompts -->
+  <div style="margin-bottom:1.25rem">
+    <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase">أسئلة سريعة مقترحة:</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <button class="quick-prompt-btn" onclick="sendQuickPrompt(this.dataset.p)" data-p="اكتب تفسيراً أكاديمياً شاملاً لنتائج الاستبيان مناسباً للفصل الرابع من مذكرة تخرج">📝 تفسير شامل للنتائج</button>
+      <button class="quick-prompt-btn" onclick="sendQuickPrompt(this.dataset.p)" data-p="اكتب فقرة صدق وثبات الأداة مناسبة لمذكرة تخرج بناءً على المعطيات الإحصائية">🔒 صدق وثبات الأداة</button>
+      <button class="quick-prompt-btn" onclick="sendQuickPrompt(this.dataset.p)" data-p="اكتب تحليلاً للفرضيات بناءً على نتائج T-test و ANOVA وارتباط بيرسون">🔬 تحليل الفرضيات</button>
+      <button class="quick-prompt-btn" onclick="sendQuickPrompt(this.dataset.p)" data-p="اقترح توصيات علمية بناءً على نتائج الاستبيان حول الذكاء الاصطناعي في التدقيق المحاسبي">💡 توصيات الدراسة</button>
+      <button class="quick-prompt-btn" onclick="sendQuickPrompt(this.dataset.p)" data-p="اكتب ملخصاً تنفيذياً لنتائج الدراسة بالعربية مناسباً للمذكرة">📋 ملخص تنفيذي</button>
+      <button class="quick-prompt-btn" onclick="sendQuickPrompt(this.dataset.p)" data-p="قارن نتائج دراستي مع الدراسات السابقة في مجال الذكاء الاصطناعي والتدقيق المحاسبي">📚 مقارنة مع الأدبيات</button>
+      <button class="quick-prompt-btn" onclick="sendQuickPrompt(this.dataset.p)" data-p="اكتب تحليلاً للفروق الديموغرافية (الفئة المهنية، الخبرة، المؤهل) على ضوء نتائج ANOVA">👥 تحليل ديموغرافي</button>
+      <button class="quick-prompt-btn" onclick="sendQuickPrompt(this.dataset.p)" data-p="اكتب خاتمة فصل رابع شاملة لمذكرة تخرج بناءً على نتائج الاستبيان">🏁 خاتمة الفصل الرابع</button>
+    </div>
+  </div>
+
+  <!-- Chat Messages -->
+  <div id="chat-messages" style="
+    background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);
+    padding:1.25rem;min-height:420px;max-height:520px;overflow-y:auto;
+    display:flex;flex-direction:column;gap:12px;margin-bottom:1rem;
+  ">
+    <div id="chat-welcome" style="text-align:center;padding:2rem;color:var(--text3)">
+      <div style="font-size:36px;margin-bottom:12px">🤖</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px">مساعد البحث الأكاديمي</div>
+      <div style="font-size:12px;line-height:1.8">أنا مساعدك في تحليل وتفسير نتائج استبيان دراستك<br>
+      يمكنني كتابة فقرات أكاديمية، تفسير نتائج، اقتراح توصيات<br>
+      <strong>أضف مفتاح API أولاً ثم اطرح سؤالك</strong></div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div style="display:flex;gap:10px;align-items:flex-end">
+    <div style="flex:1;position:relative">
+      <textarea id="chat-input" placeholder="اكتب سؤالك هنا... مثلاً: اكتب تفسيراً أكاديمياً لنتائج المحور الأول" 
+        style="width:100%;padding:12px 16px;background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--r2);color:var(--text);font-family:'Tajawal',sans-serif;font-size:13px;resize:none;outline:none;height:64px;line-height:1.6;transition:border-color .2s"
+        onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){sendChat();return false}"
+        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''"></textarea>
+      <div style="font-size:10px;color:var(--text3);position:absolute;bottom:8px;left:12px">Ctrl+Enter للإرسال</div>
+    </div>
+    <button class="btn btn-analyze" onclick="sendChat()" id="chat-send-btn" style="height:64px;padding:0 20px;font-size:13px">
+      📤 إرسال
+    </button>
+  </div>
+  <div style="font-size:11px;color:var(--text3);margin-top:8px">
+    💡 <strong>نصيحة:</strong> المساعد يعرف تلقائياً بيانات استبيانك (عدد المستجيبين، المتوسطات، ألفا، T-test...) — لست بحاجة لكتابتها
+  </div>
+</div>
+
+<!-- ─── DATA MERGE PAGE ─── -->
+<div class="page" id="page-merge">
+  <div class="pg-hdr">
+    <div>
+      <div class="pg-title">🔄 دمج البيانات — Data Merge Center</div>
+      <div class="pg-sub">اجمع الاستبيانات الورقية القديمة مع الإلكترونية بدون تكرار أو فقدان</div>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem">
+    <div class="kpi"><div class="kpi-icon">🌐</div><div class="kpi-val" id="merge-firebase-count" style="color:var(--accent)">—</div><div class="kpi-lbl">Firebase (إلكتروني)</div></div>
+    <div class="kpi"><div class="kpi-icon">📁</div><div class="kpi-val" id="merge-local-count" style="color:var(--amber)">—</div><div class="kpi-lbl">محلي (مستورد)</div></div>
+    <div class="kpi"><div class="kpi-icon">✅</div><div class="kpi-val" id="merge-total-count" style="color:var(--green)">—</div><div class="kpi-lbl">الإجمالي بعد الدمج</div></div>
+    <div class="kpi"><div class="kpi-icon">🚫</div><div class="kpi-val" id="merge-dup-count" style="color:var(--red)">0</div><div class="kpi-lbl">مكررات تم تجاهلها</div></div>
+  </div>
+
+  <!-- Upload Zone -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">📂 رفع الاستبيانات المجمعة مسبقاً</div>
+    </div>
+    <div style="border:2px dashed var(--border2);border-radius:var(--r2);padding:2.5rem;text-align:center;cursor:pointer;transition:.2s;background:var(--bg3)"
+      id="merge-dz" onclick="document.getElementById('merge-fi').click()"
+      ondragover="event.preventDefault();this.style.borderColor='var(--accent)';this.style.background='rgba(59,111,240,.05)'"
+      ondragleave="this.style.borderColor='';this.style.background='var(--bg3)'"
+      ondrop="handleMergeDrop(event)">
+      <div style="font-size:36px;margin-bottom:10px">📤</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">اسحب ملف JSON أو Excel هنا</div>
+      <div style="font-size:12px;color:var(--text3)">يقبل: .json (من تصدير الموقع) أو .xlsx/.csv (الاستبيانات الورقية)</div>
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <span style="padding:3px 10px;border-radius:20px;font-size:11px;background:rgba(59,111,240,.1);color:var(--accent)">JSON</span>
+        <span style="padding:3px 10px;border-radius:20px;font-size:11px;background:rgba(5,150,105,.1);color:var(--green)">XLSX/XLS</span>
+        <span style="padding:3px 10px;border-radius:20px;font-size:11px;background:rgba(217,119,6,.1);color:var(--amber)">CSV</span>
+      </div>
+    </div>
+    <input type="file" id="merge-fi" style="display:none" accept=".json,.csv,.xlsx,.xls" onchange="handleMergeFile(event)">
+    <div id="merge-preview" style="display:none;margin-top:1.25rem">
+      <div id="merge-preview-info" style="font-size:13px;color:var(--text2);margin-bottom:1rem;padding:.75rem 1rem;background:var(--bg3);border-radius:var(--r2);border:1px solid var(--border)"></div>
+      <div class="tbl-wrap" style="max-height:300px;overflow-y:auto">
+        <table><thead><tr><th>#</th><th>الفئة</th><th>المؤهل</th><th>الخبرة</th><th>الحالة</th></tr></thead>
+        <tbody id="merge-preview-body"></tbody></table>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:1rem">
+        <button class="btn btn-success" onclick="executeMerge()">✅ دمج الآن</button>
+        <button class="btn btn-ghost" onclick="cancelMerge()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Merge Rules -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">📋 قواعد الدمج الذكي</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="padding:.875rem;background:rgba(5,150,105,.05);border:1px solid rgba(5,150,105,.2);border-radius:var(--r2)">
+        <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px">✅ يُقبل ويُضاف</div>
+        <div style="font-size:11.5px;color:var(--text2);line-height:1.8">
+          • سجلات جديدة لا تتكرر مع الموجودة<br>
+          • بيانات مكتملة الإجابات (33 سؤال)<br>
+          • سجلات بمصدر مختلف (Firebase/JSON/Excel)<br>
+          • سجلات بإجابات مختلفة عن المكررات
+        </div>
+      </div>
+      <div style="padding:.875rem;background:rgba(220,38,38,.05);border:1px solid rgba(220,38,38,.2);border-radius:var(--r2)">
+        <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px">🚫 يُتجاهل (مكرر)</div>
+        <div style="font-size:11.5px;color:var(--text2);line-height:1.8">
+          • سجلات بنفس الإجابات الـ33 بالضبط<br>
+          • سجلات بنفس الفئة والخبرة والإجابات معاً<br>
+          • سجلات مرفوعة مسبقاً (بنفس _key Firebase)<br>
+          • سجلات ناقصة الإجابات (أقل من 10 أسئلة)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Local DB management -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">💾 إدارة قاعدة البيانات المحلية</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" onclick="backupLocalData()">💾 نسخ احتياطي</button>
+        <button class="btn btn-danger" onclick="clearLocalData()">🗑 مسح المحلي فقط</button>
+      </div>
+    </div>
+    <div id="merge-db-status" style="font-size:12.5px;color:var(--text2);line-height:1.9"></div>
+  </div>
 </div>
 
 </main>
@@ -1159,15 +1319,34 @@ tbody tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- API KEY MODAL -->
+<!-- API KEY MODAL - Multi Provider -->
 <div id="api-modal" class="modal-overlay">
-  <div class="modal-box">
-    <h3>🤖 إعداد Claude API</h3>
-    <p>أدخل مفتاح API الخاص بك من <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a><br>المفتاح يُحفظ محلياً في متصفحك فقط ولا يُرسل لأي جهة.</p>
-    <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border2);border-radius:var(--r2);background:var(--bg3);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;margin-bottom:12px">
+  <div class="modal-box" style="max-width:520px">
+    <h3>🤖 إعداد مزودي الذكاء الاصطناعي</h3>
+    <p>أدخل مفاتيح API لمزود واحد أو أكثر. تُحفظ محلياً في متصفحك فقط.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:1rem">
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--text3);display:block;margin-bottom:4px">🟣 Claude (Anthropic) — الافتراضي</label>
+        <input type="password" id="api-key-claude" placeholder="sk-ant-api03-..." style="width:100%;padding:9px 12px;border:1.5px solid var(--border2);border-radius:var(--r2);background:var(--bg3);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none">
+        <div style="font-size:10px;color:var(--text3);margin-top:3px">من: <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a></div>
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--text3);display:block;margin-bottom:4px">🟢 OpenAI (GPT-4)</label>
+        <input type="password" id="api-key-openai" placeholder="sk-..." style="width:100%;padding:9px 12px;border:1.5px solid var(--border2);border-radius:var(--r2);background:var(--bg3);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none">
+        <div style="font-size:10px;color:var(--text3);margin-top:3px">من: <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--accent)">platform.openai.com</a></div>
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--text3);display:block;margin-bottom:4px">🔵 مزود مخصص (Custom)</label>
+        <input type="text" id="api-key-custom-url" placeholder="https://api.example.com/v1/chat/completions" style="width:100%;padding:9px 12px;border:1.5px solid var(--border2);border-radius:var(--r2);background:var(--bg3);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;outline:none;margin-bottom:5px">
+        <input type="password" id="api-key-custom" placeholder="API Key..." style="width:100%;padding:9px 12px;border:1.5px solid var(--border2);border-radius:var(--r2);background:var(--bg3);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none">
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:1rem;padding:8px;background:var(--bg3);border-radius:var(--r3)">
+      المزود النشط: <span id="active-provider-label" style="font-weight:700;color:var(--accent)">غير محدد</span> — سيُستخدم أول مفتاح صالح تلقائياً
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="document.getElementById('api-modal').classList.remove('show')">إلغاء</button>
-      <button class="btn btn-primary" onclick="saveApiKey()">💾 حفظ المفتاح</button>
+      <button class="btn btn-primary" onclick="saveAllApiKeys()">💾 حفظ المفاتيح</button>
     </div>
   </div>
 </div>
@@ -2060,10 +2239,349 @@ async function executeDeleteAll(){
 }
 
 // ═══════════════════════════════════
-//  AI ANALYSIS
+//  AI MULTI-PROVIDER
 // ═══════════════════════════════════
-function showApiKeyModal(){ document.getElementById('api-modal').classList.add('show'); const k=localStorage.getItem('claude_key'); if(k)document.getElementById('api-key-input').value=k; }
-function saveApiKey(){ localStorage.setItem('claude_key',document.getElementById('api-key-input').value); document.getElementById('api-modal').classList.remove('show'); showToast('تم حفظ مفتاح API ✓','ok'); }
+function showApiKeyModal(){
+  document.getElementById('api-modal').classList.add('show');
+  document.getElementById('api-key-claude').value=localStorage.getItem('api_claude')||'';
+  document.getElementById('api-key-openai').value=localStorage.getItem('api_openai')||'';
+  document.getElementById('api-key-custom-url').value=localStorage.getItem('api_custom_url')||'';
+  document.getElementById('api-key-custom').value=localStorage.getItem('api_custom')||'';
+  updateProviderStatus();
+}
+function saveAllApiKeys(){
+  localStorage.setItem('api_claude',document.getElementById('api-key-claude').value);
+  localStorage.setItem('api_openai',document.getElementById('api-key-openai').value);
+  localStorage.setItem('api_custom_url',document.getElementById('api-key-custom-url').value);
+  localStorage.setItem('api_custom',document.getElementById('api-key-custom').value);
+  // Legacy support
+  if(document.getElementById('api-key-claude').value)
+    localStorage.setItem('claude_key',document.getElementById('api-key-claude').value);
+  document.getElementById('api-modal').classList.remove('show');
+  updateProviderStatus();
+  showToast('✅ تم حفظ مفاتيح API','ok');
+}
+function saveApiKey(){ saveAllApiKeys(); }
+function getActiveProvider(){
+  if(localStorage.getItem('api_claude')) return {type:'claude',key:localStorage.getItem('api_claude')};
+  if(localStorage.getItem('api_openai')) return {type:'openai',key:localStorage.getItem('api_openai')};
+  if(localStorage.getItem('api_custom')&&localStorage.getItem('api_custom_url')) return {type:'custom',key:localStorage.getItem('api_custom'),url:localStorage.getItem('api_custom_url')};
+  // legacy
+  if(localStorage.getItem('claude_key')) return {type:'claude',key:localStorage.getItem('claude_key')};
+  return null;
+}
+function updateProviderStatus(){
+  const p=getActiveProvider();
+  const lbl=document.getElementById('active-provider-label');
+  const ps=document.getElementById('provider-status');
+  if(p){
+    const names={claude:'🟣 Claude',openai:'🟢 OpenAI',custom:'🔵 مخصص'};
+    if(lbl)lbl.textContent=names[p.type]||p.type;
+    if(ps){ps.textContent='متصل: '+(names[p.type]||p.type);ps.style.color='var(--green)';}
+  } else {
+    if(lbl)lbl.textContent='غير محدد';
+    if(ps){ps.textContent='غير متصل';ps.style.color='var(--text3)';}
+  }
+}
+
+async function callAI(prompt, systemPrompt='أنت مساعد بحثي أكاديمي متخصص في الإحصاء والتدقيق المحاسبي. تكتب بالعربية الفصحى بأسلوب أكاديمي مناسب لرسائل الماستر.'){
+  const provider=getActiveProvider();
+  if(!provider) throw new Error('لم يُحدد مزود API — أضف مفتاح أولاً');
+  if(provider.type==='claude'){
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':provider.key,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,system:systemPrompt,messages:[{role:'user',content:prompt}]})
+    });
+    const d=await resp.json();
+    if(d.error)throw new Error(d.error.message);
+    return d.content.map(c=>c.text||'').join('');
+  }
+  if(provider.type==='openai'){
+    const resp=await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+provider.key},
+      body:JSON.stringify({model:'gpt-4o',max_tokens:1500,messages:[{role:'system',content:systemPrompt},{role:'user',content:prompt}]})
+    });
+    const d=await resp.json();
+    if(d.error)throw new Error(d.error.message);
+    return d.choices[0].message.content;
+  }
+  if(provider.type==='custom'){
+    const resp=await fetch(provider.url,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+provider.key},
+      body:JSON.stringify({model:'gpt-4',max_tokens:1500,messages:[{role:'system',content:systemPrompt},{role:'user',content:prompt}]})
+    });
+    const d=await resp.json();
+    return d.choices?.[0]?.message?.content||d.content?.[0]?.text||'لا توجد استجابة';
+  }
+}
+
+// Updated aiAnalyze to use new callAI
+async function aiAnalyze(type){
+  const provider=getActiveProvider();
+  if(!provider){ showApiKeyModal(); return; }
+  const comp=getComp(),n=comp.length;
+  if(!n){ showToast('لا توجد بيانات كافية','err'); return; }
+  const boxId=type+'-ai-box', textId=type+'-ai-text';
+  const box=document.getElementById(boxId), txt=document.getElementById(textId);
+  if(!box||!txt)return;
+  box.style.display='block';
+  txt.innerHTML='<div class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>';
+  const axM=[1,2,3].map(ax=>getAxM(ax));
+  const econ=calcEconIndicators();
+  const dataContext=`بيانات الاستبيان: ن=${n}, م1=${axM[0].toFixed(2)}, م2=${axM[1].toFixed(2)}, م3=${axM[2].toFixed(2)}, ألفا=${cronbach(QUESTIONS).toFixed(3)}`;
+  const prompts={
+    validity:`${dataContext}. الصدق الذاتي=${Math.sqrt(cronbach(QUESTIONS)).toFixed(3)}. اكتب فقرة صدق وثبات الأداة (6-8 جمل) لمذكرة تخرج - الثلاثة أنواع: ظاهري، اتساق داخلي، بناء.`,
+    hypotheses:`${dataContext}. اختبارات T دالة عند 0.05. اكتب تفسيراً لنتائج اختبار الفرضيات (8-10 جمل) للفصل الرابع من مذكرة تخرج.`,
+    dimensions:`${dataContext}. اكتب تحليلاً للأبعاد (8-10 جمل) لمذكرة تخرج في التدقيق المحاسبي.`,
+    reliability:`${dataContext}. معيار Nunnally 1978. اكتب تفسيراً لثبات الأداة (6-8 جمل) لمذكرة تخرج.`,
+    descriptive:`${dataContext}. اكتب تفسيراً وصفياً (6-8 جمل) لمذكرة تخرج.`,
+    ttest:`${dataContext}. T-test مقابل μ=3. اكتب تفسير T-test (6-8 جمل) لمذكرة تخرج.`,
+    correlation:`${dataContext}. اكتب تفسير مصفوفة الارتباط (6-8 جمل) لمذكرة تخرج.`,
+    anova:`${dataContext}. اكتب تفسير ANOVA بين الفئات المهنية (6-8 جمل) لمذكرة تخرج.`,
+    regression:`${dataContext}. نموذج انحدار متعدد. اكتب تفسيره (6-8 جمل) لمذكرة تخرج.`,
+    economic:`${dataContext}, كفاءة=${econ?.efficiencyPct||'—'}%, ROI=${econ?.roiPct||'—'}%. اكتب تحليلاً اقتصادياً (8-10 جمل) لمذكرة تخرج.`,
+    compare:`${dataContext}. قارن بين التحليل الإحصائي والاقتصادي (8-10 جمل) لمذكرة تخرج.`
+  };
+  try {
+    const content=await callAI(prompts[type]);
+    txt.innerHTML='';
+    let i=0;
+    const tw=()=>{if(i<content.length){txt.innerHTML=content.slice(0,i+1)+'<span class="ai-cursor"></span>';i++;setTimeout(tw,16);}else txt.innerHTML=content;};
+    tw();
+  } catch(e){ txt.innerHTML=`<span style="color:var(--red)">⚠ ${e.message}</span>`; }
+}
+
+// ═══════════════════════════════════
+//  AI CHAT
+// ═══════════════════════════════════
+let chatHistory=[];
+function buildDataContext(){
+  const comp=getComp(),n=comp.length;
+  if(!n) return '';
+  const axM=[1,2,3].map(ax=>getAxM(ax));
+  const alpha=cronbach(QUESTIONS);
+  const alphaAx=[1,2,3].map(ax=>cronbach(QUESTIONS.filter(q=>q.axis===ax)));
+  const tt1=[1,2,3].map(ax=>{const qs=QUESTIONS.filter(q=>q.axis===ax);const v=comp.map(r=>qs.reduce((s,q)=>s+(r.answers[q.id]||0),0)/qs.length);return ttest(v,3);});
+  const axVals=[1,2,3].map(ax=>comp.map(r=>QUESTIONS.filter(q=>q.axis===ax).reduce((s,q)=>s+(r.answers[q.id]||0),0)));
+  const r12=pearson(axVals[0],axVals[1]),r13=pearson(axVals[0],axVals[2]),r23=pearson(axVals[1],axVals[2]);
+  return `=== بيانات الاستبيان (لا تسألني عنها — استخدمها مباشرة) ===
+عدد المستجيبين: ${n} | المكتملون: ${comp.length}
+المتوسطات: م1=${axM[0].toFixed(3)} (${interp(axM[0]).l}), م2=${axM[1].toFixed(3)} (${interp(axM[1]).l}), م3=${axM[2].toFixed(3)} (${interp(axM[2]).l})
+المتوسط العام: ${mean(axM).toFixed(3)}
+ألفا كرونباخ: كلي=${alpha.toFixed(3)}, م1=${alphaAx[0].toFixed(3)}, م2=${alphaAx[1].toFixed(3)}, م3=${alphaAx[2].toFixed(3)}
+T-test (μ=3): م1: t=${tt1[0].t.toFixed(3)},p=${tt1[0].p.toFixed(3)}|م2: t=${tt1[1].t.toFixed(3)},p=${tt1[1].p.toFixed(3)}|م3: t=${tt1[2].t.toFixed(3)},p=${tt1[2].p.toFixed(3)}
+بيرسون: r(م1,م2)=${r12.toFixed(3)}, r(م1,م3)=${r13.toFixed(3)}, r(م2,م3)=${r23.toFixed(3)}
+المحاور: م1=أدوات الذكاء الاصطناعي(10 فقرات), م2=جودة التدقيق(11 فقرات), م3=مهنية التدقيق(12 فقرات)
+موضوع الدراسة: تأثير أدوات الذكاء الاصطناعي على جودة ومهنية التدقيق المحاسبي — الجزائر
+===`;
+}
+async function sendChat(){
+  const provider=getActiveProvider();
+  if(!provider){ showApiKeyModal(); return; }
+  const input=document.getElementById('chat-input');
+  const msg=input.value.trim();
+  if(!msg)return;
+  const container=document.getElementById('chat-messages');
+  const welcome=document.getElementById('chat-welcome');
+  if(welcome)welcome.remove();
+  // Add user message
+  container.innerHTML+=`<div class="chat-msg user"><div class="chat-avatar user">👤</div><div class="chat-bubble user">${msg}</div></div>`;
+  input.value='';
+  // Add AI thinking
+  const thinkId='think-'+Date.now();
+  container.innerHTML+=`<div class="chat-msg" id="${thinkId}"><div class="chat-avatar ai">🤖</div><div class="chat-bubble ai"><div class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div></div></div>`;
+  container.scrollTop=container.scrollHeight;
+  // Disable send
+  const btn=document.getElementById('chat-send-btn');
+  btn.disabled=true;btn.textContent='⏳ ...';
+  // Build context + history
+  const systemPrompt=`أنت مساعد بحثي أكاديمي متخصص في الإحصاء والتدقيق المحاسبي والذكاء الاصطناعي. تكتب بالعربية الفصحى بأسلوب أكاديمي مناسب لرسائل الماستر الجزائرية. ${buildDataContext()}`;
+  chatHistory.push({role:'user',content:msg});
+  try{
+    const reply=await callAI(chatHistory.map(m=>m.content).join('\n\n'),systemPrompt);
+    chatHistory.push({role:'assistant',content:reply});
+    const thinkEl=document.getElementById(thinkId);
+    if(thinkEl){
+      const msgId='msg-'+Date.now();
+      thinkEl.outerHTML=`<div class="chat-msg" id="${msgId}"><div class="chat-avatar ai">🤖</div><div><div class="chat-bubble ai">${reply.replace(/\n/g,'<br>')}</div><button class="chat-copy-btn" onclick="copyText(document.getElementById('${msgId}').querySelector('.chat-bubble').innerText)">📋 نسخ</button></div></div>`;
+    }
+  }catch(e){
+    document.getElementById(thinkId).querySelector('.chat-bubble').innerHTML=`<span style="color:var(--red)">⚠ ${e.message}</span>`;
+  }
+  btn.disabled=false;btn.textContent='📤 إرسال';
+  container.scrollTop=container.scrollHeight;
+}
+async function sendQuickPrompt(p){
+  document.getElementById('chat-input').value=p;
+  await sendChat();
+}
+function clearChat(){
+  chatHistory=[];
+  const c=document.getElementById('chat-messages');
+  c.innerHTML=`<div id="chat-welcome" style="text-align:center;padding:2rem;color:var(--text3)"><div style="font-size:36px;margin-bottom:12px">🤖</div><div style="font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px">مساعد البحث الأكاديمي</div><div style="font-size:12px;line-height:1.8">تم مسح المحادثة — ابدأ سؤالاً جديداً</div></div>`;
+}
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>showToast('✅ تم النسخ للحافظة','ok')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast('✅ تم النسخ','ok');
+  });
+}
+
+// ═══════════════════════════════════
+//  DATA MERGE
+// ═══════════════════════════════════
+let mergeData=null,mergeDupCount=0;
+function handleMergeDrop(e){
+  e.preventDefault();
+  document.getElementById('merge-dz').style.borderColor='';
+  document.getElementById('merge-dz').style.background='var(--bg3)';
+  const f=e.dataTransfer.files[0];if(f)processMergeFile(f);
+}
+function handleMergeFile(e){const f=e.target.files[0];if(f)processMergeFile(f);}
+function processMergeFile(f){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      let data=[];
+      if(f.name.endsWith('.json')){
+        const j=JSON.parse(e.target.result);
+        data=Array.isArray(j)?j:(j.respondents||j.submissions||Object.values(j));
+      } else {
+        data=parseCSV(e.target.result);
+      }
+      // Normalize data
+      data=data.map(r=>({
+        category:r.category||r['الفئة']||'',
+        education:r.education||r['المؤهل']||'',
+        experience:r.experience||r['الخبرة']||'',
+        aiUsage:r.aiUsage||r['استخدام AI']||'',
+        answers:r.answers||buildAnswersFromFlat(r),
+        _source:'imported',
+        _importedAt:new Date().toISOString()
+      })).filter(r=>r.category&&Object.keys(r.answers||{}).length>=10);
+      // Deduplicate against existing
+      const existing=respondents;
+      let added=0,dups=0,invalid=0;
+      const toAdd=[];
+      data.forEach(newR=>{
+        if(!newR.category){invalid++;return;}
+        const isDup=existing.some(old=>isLikelySameRecord(old,newR));
+        if(isDup){dups++;}
+        else{toAdd.push(newR);added++;}
+      });
+      mergeDupCount=dups;
+      mergeData=toAdd;
+      // Show preview
+      document.getElementById('merge-preview').style.display='block';
+      document.getElementById('merge-preview-info').innerHTML=`
+        📊 <strong>${data.length}</strong> سجل في الملف | 
+        <span class="merge-status-ok">✅ ${added} سجل جديد للإضافة</span> | 
+        <span class="merge-status-dup">⚠ ${dups} مكرر سيُتجاهل</span> | 
+        <span class="merge-status-skip">🚫 ${invalid} ناقص</span>`;
+      document.getElementById('merge-preview-body').innerHTML=toAdd.slice(0,20).map((r,i)=>`
+        <tr><td>${i+1}</td><td>${r.category||'—'}</td><td>${r.education||'—'}</td><td>${r.experience||'—'}</td><td class="merge-status-ok">جديد ✓</td></tr>`).join('')
+        +(data.filter(r=>existing.some(old=>isLikelySameRecord(old,r))).slice(0,5).map(r=>`
+        <tr style="opacity:.5"><td>—</td><td>${r.category||'—'}</td><td>${r.education||'—'}</td><td>${r.experience||'—'}</td><td class="merge-status-dup">مكرر ⚠</td></tr>`).join(''));
+      updateMergeStats();
+    }catch(err){
+      showToast('خطأ في قراءة الملف: '+err.message,'err');
+    }
+  };
+  if(f.name.endsWith('.json')||f.name.endsWith('.csv'))reader.readAsText(f,'UTF-8');
+  else reader.readAsArrayBuffer(f);
+}
+function buildAnswersFromFlat(r){
+  const ans={};
+  QUESTIONS.forEach((q,i)=>{
+    const v=r[`س${q.id}`]||r[`q${q.id}`]||r[`question${q.id}`]||r[i+5];
+    if(v&&!isNaN(v)&&v>=1&&v<=5)ans[q.id]=parseInt(v);
+  });
+  return ans;
+}
+function isLikelySameRecord(a,b){
+  if(!a.answers||!b.answers)return false;
+  // Same Firebase key
+  if(a._key&&b._key&&a._key===b._key)return true;
+  // All 33 answers identical
+  const allSame=QUESTIONS.every(q=>(a.answers[q.id]||0)===(b.answers[q.id]||0));
+  if(allSame&&Object.keys(a.answers).length>5)return true;
+  // Same demographic + majority of answers
+  if(a.category===b.category&&a.experience===b.experience&&a.education===b.education){
+    const sameCount=QUESTIONS.filter(q=>(a.answers[q.id]||0)===(b.answers[q.id]||0)).length;
+    if(sameCount>=28)return true;
+  }
+  return false;
+}
+async function executeMerge(){
+  if(!mergeData||!mergeData.length){showToast('لا توجد بيانات للدمج','err');return;}
+  const fb=window.__fbdb;
+  let addedCount=0;
+  if(fb){
+    // Save to Firebase
+    for(const r of mergeData){
+      try{
+        await fb.push(fb.ref(fb.db,'submissions'),r);
+        addedCount++;
+      }catch(e){console.warn('Firebase push error:',e);}
+    }
+    if(addedCount>0)showToast(`✅ تم دمج ${addedCount} سجل إلى Firebase`,'ok');
+    else{
+      // Firebase failed — save locally
+      respondents=[...respondents,...mergeData];
+      saveLocalData();
+      showToast(`✅ تم دمج ${mergeData.length} سجل محلياً`,'ok');
+    }
+  } else {
+    respondents=[...respondents,...mergeData];
+    saveLocalData();
+    addedCount=mergeData.length;
+    showToast(`✅ تم دمج ${addedCount} سجل محلياً`,'ok');
+  }
+  mergeData=null;
+  document.getElementById('merge-preview').style.display='none';
+  document.getElementById('merge-fi').value='';
+  document.getElementById('merge-dup-count').textContent=mergeDupCount;
+  refreshAll();
+  runFullAnalysis(true);
+  updateMergeStats();
+}
+function cancelMerge(){
+  mergeData=null;
+  document.getElementById('merge-preview').style.display='none';
+  document.getElementById('merge-fi').value='';
+}
+function saveLocalData(){
+  localStorage.setItem('offline_submissions',JSON.stringify(respondents));
+}
+function updateMergeStats(){
+  const firebaseCount=respondents.filter(r=>r._key||r._source==='firebase').length;
+  const localCount=respondents.filter(r=>r._source==='imported'||(!r._key&&r._source!=='firebase')).length;
+  document.getElementById('merge-firebase-count').textContent=firebaseCount||'—';
+  document.getElementById('merge-local-count').textContent=localCount||'—';
+  document.getElementById('merge-total-count').textContent=respondents.length||'—';
+  document.getElementById('merge-db-status').innerHTML=`
+    • إجمالي السجلات في الذاكرة: <strong>${respondents.length}</strong><br>
+    • المكتملة (إجابات كاملة): <strong>${getComp().length}</strong><br>
+    • مصدر Firebase: <strong>${firebaseCount}</strong><br>
+    • مستورد محلياً: <strong>${localCount}</strong><br>
+    • آخر تحديث: <strong>${new Date().toLocaleTimeString('ar-DZ')}</strong>`;
+}
+function backupLocalData(){
+  if(!respondents.length){showToast('لا توجد بيانات','err');return;}
+  const blob=new Blob([JSON.stringify({respondents,exportedAt:new Date().toISOString(),count:respondents.length},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`survey_backup_${Date.now()}.json`;a.click();
+  showToast(`✅ تم تصدير ${respondents.length} سجل للنسخ الاحتياطي`,'ok');
+}
+function clearLocalData(){
+  if(!confirm('سيُحذف فقط الاستبيانات المحلية (المستوردة). Firebase لن يتأثر. متأكد؟'))return;
+  respondents=respondents.filter(r=>r._key); // keep only Firebase records
+  saveLocalData();
+  refreshAll();
+  updateMergeStats();
+  showToast('✅ تم مسح البيانات المحلية','ok');
+}
 
 async function aiAnalyze(type){
   const key=localStorage.getItem('claude_key');
@@ -2638,7 +3156,8 @@ function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(s=>s.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  document.getElementById('nav-'+name).classList.add('active');
+  const nav=document.getElementById('nav-'+name);
+  if(nav)nav.classList.add('active');
   const pageRenders={
     analysis:renderAnalysis, reliability:renderReliability,
     validity:renderValidity, descriptive:renderDescriptive,
@@ -2646,7 +3165,8 @@ function showPage(name){
     anova:renderAnova, regression:renderRegression,
     hypotheses:renderHypotheses, dimensions:renderDimensions,
     ranking:renderRanking, economic:renderEconomic,
-    compare:renderCompare, individual:renderIndividual
+    compare:renderCompare, individual:renderIndividual,
+    merge:updateMergeStats
   };
   if(pageRenders[name]&&getComp().length) pageRenders[name]();
   window.scrollTo(0,0);
@@ -2748,6 +3268,7 @@ function showToast(msg,type=''){
 window.addEventListener('DOMContentLoaded',()=>{
   checkAuth();
   initTheme();
+  updateProviderStatus();
   // Load offline fallback
   setTimeout(()=>{
     if(!window.__respondents){
@@ -2759,6 +3280,7 @@ window.addEventListener('DOMContentLoaded',()=>{
         if(respondents.length>=2) runFullAnalysis(true);
       }
     }
+    updateMergeStats();
   },1500);
 });
 window.respondents=respondents;
