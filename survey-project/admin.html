@@ -2160,7 +2160,10 @@ function renderLiveResponses(arr){
 
 function renderIndividual(){
   const comp=getComp();
-  document.getElementById('ind-grid').innerHTML=comp.map((r,i)=>{
+  const el = document.getElementById("something");
+  if (el) {
+    el.innerHTML = "...";
+  }
     const m=r.answers?mean(Object.values(r.answers)):0;
     const ip=interp(m);
     const catCol={'أستاذ جامعي / أكاديمي':'#3b6ff0','محاسب معتمد':'#059669','مدقق حسابات':'#d97706'};
