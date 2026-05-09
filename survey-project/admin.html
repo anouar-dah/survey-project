@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة التحكم — التحليل المالي الذكي وتقييم الأداء المالي</title>
+<title>لوحة التحكم — تحليل الاستبيان</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
@@ -538,7 +538,7 @@ tbody tr:last-child td{border-bottom:none}
   <div class="login-card">
     <div class="login-logo">📊</div>
     <div class="login-title">لوحة تحكم المشرف</div>
-    <div class="login-sub">التحليل المالي الذكي وتقييم الأداء المالي</div>
+    <div class="login-sub">تأثير الذكاء الاصطناعي على التدقيق المحاسبي</div>
     <div class="login-field">
       <span class="fi">👤</span>
       <input type="text" id="login-user" placeholder="اسم المستخدم" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
@@ -571,7 +571,7 @@ tbody tr:last-child td{border-bottom:none}
     <div class="hdr-logo">📊</div>
     <div>
       <div class="hdr-title">لوحة التحكم — تحليل الاستبيان</div>
-      <div class="hdr-sub">التحليل المالي الذكي وتقييم الأداء المالي</div>
+      <div class="hdr-sub">تأثير الذكاء الاصطناعي على التدقيق المحاسبي</div>
     </div>
   </div>
   <div class="hdr-right">
@@ -657,14 +657,14 @@ tbody tr:last-child td{border-bottom:none}
     <div class="kpi"><div class="kpi-icon">🔒</div><div class="kpi-val skeleton" style="height:36px;width:60px;margin-bottom:4px"></div><div class="kpi-lbl">ألفا كرونباخ</div></div>
   </div>
   <div class="charts-2">
-    <div class="card"><div class="card-head"><div class="card-title">👔 الفئة الوظيفية</div></div><div class="chart-wrap" style="height:220px"><canvas id="c-cat"></canvas></div></div>
+    <div class="card"><div class="card-head"><div class="card-title">👔 الفئة المهنية</div></div><div class="chart-wrap" style="height:220px"><canvas id="c-cat"></canvas></div></div>
     <div class="card"><div class="card-head"><div class="card-title">📅 سنوات الخبرة</div></div><div class="chart-wrap" style="height:220px"><canvas id="c-exp"></canvas></div></div>
   </div>
   <div class="charts-2">
-    <div class="card"><div class="card-head"><div class="card-title">🏢 قطاع العمل</div></div><div class="chart-wrap" style="height:220px"><canvas id="c-ai"></canvas></div></div>
+    <div class="card"><div class="card-head"><div class="card-title">🤖 استخدام الذكاء الاصطناعي</div></div><div class="chart-wrap" style="height:220px"><canvas id="c-ai"></canvas></div></div>
     <div class="card"><div class="card-head"><div class="card-title">🎓 المؤهل العلمي</div></div><div class="chart-wrap" style="height:220px"><canvas id="c-educ"></canvas></div></div>
   </div>
-  <div class="card full"><div class="card-head"><div class="card-title">📊 متوسطات المحورين الرئيسيين</div></div><div class="chart-wrap" style="height:250px"><canvas id="c-axes"></canvas></div></div>
+  <div class="card full"><div class="card-head"><div class="card-title">📊 متوسطات المحاور الثلاثة</div></div><div class="chart-wrap" style="height:250px"><canvas id="c-axes"></canvas></div></div>
 </div>
 
 <!-- ─── RESPONSES ─── -->
@@ -690,10 +690,10 @@ tbody tr:last-child td{border-bottom:none}
   </div>
   <div class="tc active" id="at-demog">
     <div class="charts-2">
-      <div class="card"><div class="card-title">الفئة الوظيفية</div><div class="chart-wrap" style="height:240px"><canvas id="a-cat"></canvas></div></div>
+      <div class="card"><div class="card-title">الفئة المهنية</div><div class="chart-wrap" style="height:240px"><canvas id="a-cat"></canvas></div></div>
       <div class="card"><div class="card-title">المؤهل العلمي</div><div class="chart-wrap" style="height:240px"><canvas id="a-educ"></canvas></div></div>
       <div class="card"><div class="card-title">سنوات الخبرة</div><div class="chart-wrap" style="height:240px"><canvas id="a-exp"></canvas></div></div>
-      <div class="card"><div class="card-title">قطاع العمل</div><div class="chart-wrap" style="height:240px"><canvas id="a-ai"></canvas></div></div>
+      <div class="card"><div class="card-title">استخدام الذكاء الاصطناعي</div><div class="chart-wrap" style="height:240px"><canvas id="a-ai"></canvas></div></div>
     </div>
   </div>
   <div class="tc" id="at-axes">
@@ -810,7 +810,7 @@ tbody tr:last-child td{border-bottom:none}
     </div>
   </div>
   <div class="card">
-    <div class="card-title">مخطط الارتباط المبعثر — التحليل المالي الذكي × تقييم الأداء المالي</div>
+    <div class="card-title">مخطط الارتباط المبعثر — Scatter Plot (المحور 1 × المحور 2)</div>
     <div class="chart-wrap" style="height:280px"><canvas id="corr-scatter"></canvas></div>
   </div>
   <div id="corr-ai-box" class="ai-box" style="display:none">
@@ -855,7 +855,7 @@ tbody tr:last-child td{border-bottom:none}
   <div class="pg-hdr"><div class="pg-title">الانحدار الخطي البسيط والمتعدد</div></div>
   <div class="spss-section">
     <div class="spss-head">
-      <div class="spss-head-title">📉 تأثير التحليل المالي الذكي على تقييم الأداء المالي — Stepwise</div>
+      <div class="spss-head-title">📉 تأثير المحورين الأول والثاني على المحور الثالث</div>
       <button class="ai-btn" onclick="aiAnalyze('regression')">🤖 تفسير بالذكاء الاصطناعي</button>
     </div>
     <div class="spss-body">
@@ -863,12 +863,12 @@ tbody tr:last-child td{border-bottom:none}
         <div class="obs-label">📌 تفسير الانحدار</div>
         <strong>R²:</strong> نسبة التباين المفسَّر — <strong>β:</strong> معامل الانحدار الموحّد — <strong>t:</strong> دلالة المتغير — <strong>VIF:</strong> أقل من 10 يعني لا تعددية خطية
       </div>
-      <h4 style="font-size:13px;margin:1rem 0 .5rem;font-weight:700;color:var(--text)">⭐ مهم — نموذج الانحدار المتعدد التدريجي (المتغير التابع: تقييم الأداء المالي)</h4>
+      <h4 style="font-size:13px;margin:1rem 0 .5rem;font-weight:700;color:var(--text)">⭐ مهم — نموذج الانحدار المتعدد (المتغير التابع: مهنية التدقيق)</h4>
       <div style="display:flex;justify-content:flex-end;margin-bottom:4px"><button onclick="copyTableAsText('reg-table','نموذج الانحدار الخطي المتعدد')" style="font-size:10px;padding:2px 8px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 نسخ الجدول</button></div>
       <div class="tbl-wrap"><table id="reg-table"><thead><tr><th>المتغير</th><th>B (غير موحّد)</th><th>β (موحّد)</th><th>t</th><th>Sig (p)</th><th>VIF</th><th>الدلالة</th></tr></thead><tbody id="reg-body"></tbody></table></div>
       <div id="reg-summary" style="margin-top:1rem;display:flex;gap:12px;flex-wrap:wrap"></div>
       <div class="card" style="margin-top:1rem">
-        <div class="card-title">مخطط الانحدار — التحليل المالي الذكي ← تقييم الأداء المالي</div>
+        <div class="card-title">مخطط الانحدار (المحور 1 ← المحور 3)</div>
         <div class="chart-wrap" style="height:260px"><canvas id="reg-scatter"></canvas></div>
       </div>
     </div>
@@ -893,7 +893,7 @@ tbody tr:last-child td{border-bottom:none}
 <!-- ─── ECONOMIC ANALYSIS ─── -->
 <div class="page" id="page-economic">
   <div class="pg-hdr">
-    <div><div class="pg-title">التحليل الاقتصادي</div><div class="pg-sub">تحليل العائد الاقتصادي لتبني الذكاء الاصطناعي في التحليل المالي</div></div>
+    <div><div class="pg-title">التحليل الاقتصادي</div><div class="pg-sub">تحليل العائد الاقتصادي لتبني الذكاء الاصطناعي في التدقيق المحاسبي</div></div>
     <button class="ai-btn" onclick="aiAnalyze('economic')">🤖 تفسير اقتصادي بالذكاء الاصطناعي</button>
   </div>
   
@@ -1546,41 +1546,45 @@ try {
 //  CONSTANTS
 // ═══════════════════════════════════
 const QUESTIONS = [
-  {id:1,text:"تحليلات الذكاء الاصطناعي توفر نتائج مالية أكثر دقة من الطرق التقليدية",axis:1,dim:"البعد الأول: دقة التحليل المالي"},
-  {id:2,text:"تقنيات الذكاء الاصطناعي تقلل من التحيز البشري في تفسير البيانات المالية",axis:1,dim:"البعد الأول: دقة التحليل المالي"},
-  {id:3,text:"أدوات الذكاء الاصطناعي تكتشف الأنماط الخفية في البيانات المالية بشكل أفضل",axis:1,dim:"البعد الأول: دقة التحليل المالي"},
-  {id:4,text:"الذكاء الاصطناعي يحسن جودة التنبؤات المالية",axis:1,dim:"البعد الأول: دقة التحليل المالي"},
-  {id:5,text:"الأخطاء في التقارير المالية تنخفض عند استخدام الذكاء الاصطناعي",axis:1,dim:"البعد الأول: دقة التحليل المالي"},
-  {id:6,text:"يختصر الذكاء الاصطناعي الوقت اللازم لإعداد التقارير المالية",axis:1,dim:"البعد الثاني: سرعة وكفاءة المعالجة"},
-  {id:7,text:"تتيح أدوات الذكاء الاصطناعي معالجة كميات ضخمة من البيانات المالية",axis:1,dim:"البعد الثاني: سرعة وكفاءة المعالجة"},
-  {id:8,text:"يتيح الذكاء الاصطناعي التحليل المالي الفوري لدعم القرارات العاجلة",axis:1,dim:"البعد الثاني: سرعة وكفاءة المعالجة"},
-  {id:9,text:"أتمتة التحليل المالي بالذكاء الاصطناعي تحرر الموارد البشرية لمهام أعلى قيمة",axis:1,dim:"البعد الثاني: سرعة وكفاءة المعالجة"},
-  {id:10,text:"تكاليف تطبيق الذكاء الاصطناعي في التحليل المالي مرتفعة مقارنة بالفوائد",axis:1,dim:"البعد الثالث: التكلفة والموارد"},
-  {id:11,text:"يتطلب تطبيق أنظمة الذكاء الاصطناعي المالية بنية تحتية تقنية متطورة",axis:1,dim:"البعد الثالث: التكلفة والموارد"},
-  {id:12,text:"تحقق المؤسسات وفورات على المدى الطويل من الذكاء الاصطناعي المالي",axis:1,dim:"البعد الثالث: التكلفة والموارد"},
-  {id:13,text:"العائد على الاستثمار في أنظمة الذكاء الاصطناعي المالية يبرر تكاليفها",axis:1,dim:"البعد الثالث: التكلفة والموارد"},
-  {id:14,text:"ضعف جودة البيانات يشكل عائقاً رئيسياً أمام تطبيق الذكاء الاصطناعي المالي",axis:1,dim:"البعد الرابع: تحديات التطبيق"},
-  {id:15,text:"مقاومة الموظفين للتغيير تعيق تبني أنظمة الذكاء الاصطناعي المالية",axis:1,dim:"البعد الرابع: تحديات التطبيق"},
-  {id:16,text:"غياب الكوادر المتخصصة يحد من الاستفادة من الذكاء الاصطناعي المالي",axis:1,dim:"البعد الرابع: تحديات التطبيق"},
-  {id:17,text:"المخاوف الأمنية وخصوصية البيانات تعيق تطبيق الذكاء الاصطناعي المالي",axis:1,dim:"البعد الرابع: تحديات التطبيق"},
-  {id:18,text:"يوفر الذكاء الاصطناعي تقييماً أكثر شمولاً للأداء مقارنة بالأساليب التقليدية",axis:2,dim:"البعد الخامس: فعالية التقييم"},
-  {id:19,text:"تساعد نماذج الذكاء الاصطناعي في الكشف المبكر عن مؤشرات الأداء الضعيف",axis:2,dim:"البعد الخامس: فعالية التقييم"},
-  {id:20,text:"يحسن الذكاء الاصطناعي دقة مقاييس الأداء المالي (ROE، ROA، الربحية)",axis:2,dim:"البعد الخامس: فعالية التقييم"},
-  {id:21,text:"التحليل المالي بالذكاء الاصطناعي يعزز موثوقية تقارير الأداء المالي",axis:2,dim:"البعد الخامس: فعالية التقييم"},
-  {id:22,text:"يمكّن الذكاء الاصطناعي دمج مصادر بيانات متعددة لتقييم شامل للأداء",axis:2,dim:"البعد السادس: مصادر المعلومات"},
-  {id:23,text:"تحسّن جودة المعلومات المستخرجة بالذكاء الاصطناعي من دقة التقييم المالي",axis:2,dim:"البعد السادس: مصادر المعلومات"},
-  {id:24,text:"يساعد الذكاء الاصطناعي في تحديد المعلومات المالية الأكثر أهمية للقرار",axis:2,dim:"البعد السادس: مصادر المعلومات"},
-  {id:25,text:"يمكن للذكاء الاصطناعي تحليل البيانات غير الهيكلية للتقييم المالي",axis:2,dim:"البعد السادس: مصادر المعلومات"},
-  {id:26,text:"يوفر الذكاء الاصطناعي توصيات مالية قابلة للتنفيذ بناءً على التقييم",axis:2,dim:"البعد السابع: دعم القرارات"},
-  {id:27,text:"يساعد الذكاء الاصطناعي الإدارة في قرارات استراتيجية مستندة لتحليلات دقيقة",axis:2,dim:"البعد السابع: دعم القرارات"},
-  {id:28,text:"يعزز الذكاء الاصطناعي القدرة التنافسية من خلال تحسين قرارات التخصيص المالي",axis:2,dim:"البعد السابع: دعم القرارات"},
-  {id:29,text:"التحليل المالي بالذكاء الاصطناعي يرفع مستوى الشفافية في تقارير الأداء المالي",axis:2,dim:"البعد السابع: دعم القرارات"}
+  {id:1,text:"تساهم أدوات الذكاء الاصطناعي في أتمتة المهام الروتينية في التدقيق",axis:1,dim:"الأتمتة وتحليل البيانات"},
+  {id:2,text:"تساعد هذه الأدوات في تحليل البيانات المالية بكفاءة",axis:1,dim:"الأتمتة وتحليل البيانات"},
+  {id:3,text:"تقلل الأدوات الذكية من الوقت اللازم لإنجاز مهام التدقيق",axis:1,dim:"الأتمتة وتحليل البيانات"},
+  {id:4,text:"تساعد أدوات الذكاء الاصطناعي في اكتشاف الأخطاء المحاسبية بدقة",axis:1,dim:"الكشف والتحليل المتقدم"},
+  {id:5,text:"تساهم هذه الأدوات في الكشف عن أنماط الاحتيال المعقدة",axis:1,dim:"الكشف والتحليل المتقدم"},
+  {id:6,text:"تدعم أدوات الذكاء الاصطناعي تحليل المخاطر بطريقة أكثر عمقاً",axis:1,dim:"الكشف والتحليل المتقدم"},
+  {id:7,text:"أدوات الذكاء الاصطناعي تفتقر إلى القدرة على فهم السياق القانوني والمهني",axis:1,dim:"حدود الاستخدام"},
+  {id:8,text:"تعتمد دقة نتائج هذه الأدوات على جودة البيانات المدخلة",axis:1,dim:"حدود الاستخدام"},
+  {id:9,text:"قد تحتوي مخرجات الذكاء الاصطناعي على أخطاء غير ظاهرة للمدقق",axis:1,dim:"حدود الاستخدام"},
+  {id:10,text:"يثير استخدام الذكاء الاصطناعي السحابي مخاوف تتعلق بسرية بيانات العملاء",axis:1,dim:"حدود الاستخدام"},
+  {id:11,text:"يساهم الذكاء الاصطناعي في تحسين جودة أدلة الإثبات التدقيقية",axis:2,dim:"كفاية وملاءمة الأدلة"},
+  {id:12,text:"يساعد في الحصول على أدلة تدقيق أكثر ملائمة لاتخاذ القرار",axis:2,dim:"كفاية وملاءمة الأدلة"},
+  {id:13,text:"يعزز الذكاء الاصطناعي من موثوقية نتائج التدقيق",axis:2,dim:"كفاية وملاءمة الأدلة"},
+  {id:14,text:"يزيد الذكاء الاصطناعي من نطاق التغطية مقارنة بأسلوب العينات التقليدي",axis:2,dim:"نطاق وعمق التدقيق"},
+  {id:15,text:"يساهم في توسيع عمق الاختبارات التدقيقية",axis:2,dim:"نطاق وعمق التدقيق"},
+  {id:16,text:"يساعد في فحص عدد أكبر من العمليات المالية",axis:2,dim:"نطاق وعمق التدقيق"},
+  {id:17,text:"يساعد الذكاء الاصطناعي في تعزيز استنتاجات الحكم المهني للمدقق",axis:2,dim:"دعم اتخاذ القرار"},
+  {id:18,text:"يساعد في تحديد مناطق الخطر الجوهرية بشكل أدق",axis:2,dim:"دعم اتخاذ القرار"},
+  {id:19,text:"يساهم في تحسين تقييم المخاطر وفق معايير التدقيق",axis:2,dim:"دعم اتخاذ القرار"},
+  {id:20,text:"تتطلب مخرجات الذكاء الاصطناعي مراجعة بشرية مستمرة",axis:2,dim:"القيود"},
+  {id:21,text:"لا يمكن الاعتماد على الذكاء الاصطناعي بشكل كامل في اتخاذ قرارات تدقيقية",axis:2,dim:"القيود"},
+  {id:22,text:"يساهم الذكاء الاصطناعي في تحسين كفاءة المدقق",axis:3,dim:"الكفاءة المهنية"},
+  {id:23,text:"يعزز قدرة المدقق على التحليل الاستشرافي للمخاطر",axis:3,dim:"الكفاءة المهنية"},
+  {id:24,text:"يقلل من احتمالية عدم اكتشاف الأخطاء الجوهرية",axis:3,dim:"الكفاءة المهنية"},
+  {id:25,text:"يدعم التكامل بين خبرة المدقق وقدرات الذكاء الاصطناعي جودة العمل",axis:3,dim:"الحكم المهني والاستقلالية"},
+  {id:26,text:"قد يؤدي الاعتماد المفرط على الذكاء الاصطناعي إلى إضعاف الحكم المهني",axis:3,dim:"الحكم المهني والاستقلالية"},
+  {id:27,text:"يبقى المدقق مسؤولاً عن الرأي النهائي رغم استخدام الذكاء الاصطناعي",axis:3,dim:"الحكم المهني والاستقلالية"},
+  {id:28,text:"تواجه المؤسسات صعوبات تقنية في تطبيق أدوات الذكاء الاصطناعي",axis:3,dim:"التحديات المهنية"},
+  {id:29,text:"يمثل نقص التدريب الرقمي عائقاً أمام استخدام هذه الأدوات",axis:3,dim:"التحديات المهنية"},
+  {id:30,text:"يحد تعقيد بعض الأنظمة من استخدامها العملي",axis:3,dim:"التحديات المهنية"},
+  {id:31,text:"سيصبح الذكاء الاصطناعي جزءاً من مهنة التدقيق مستقبلاً",axis:3,dim:"مستقبل المهنة"},
+  {id:32,text:"ستتطلب المهنة مهارات رقمية وتحليلية متقدمة",axis:3,dim:"مستقبل المهنة"},
+  {id:33,text:"سيعتمد التدقيق على نموذج تكاملي بين الإنسان والتكنولوجيا",axis:3,dim:"مستقبل المهنة"}
 ];
-const CAT_L=["موظف مالي / محاسب","مدير مالي / CFO","محلل مالي","أكاديمي / باحث"];
-const EDUC_L=["ليسانس","ماستر","ماجيستر","دكتوراه"];
-const EXP_L=["أقل من 3 سنوات","3-7 سنوات","8-15 سنة","أكثر من 15 سنة"];
-const AI_L=["قطاع بنكي / مالي","شركة خاصة","مؤسسة عامة / حكومية","هيئة أكاديمية"];
-const AX_NAMES=["التحليل المالي الذكي","تقييم الأداء المالي"];
+const CAT_L=["أستاذ جامعي / أكاديمي","محاسب معتمد","مدقق حسابات"];
+const EDUC_L=["ليسانس","ماستر","دكتوراه","شهادة مهنية متخصصة"];
+const EXP_L=["1-5 سنوات","6-10 سنوات","11-15 سنة","أكثر من 15 سنة"];
+const AI_L=["لا أستخدمها","استخدام محدود","استخدام متوسط","استخدام مكثف"];
+const AX_NAMES=["أدوات الذكاء الاصطناعي","جودة التدقيق","مهنية التدقيق"];
 const AX_COL=["#3b6ff0","#059669","#d97706"];
 const LIK_C=["#059669","#34d399","#64748b","#f97316","#dc2626"];
 
@@ -3001,7 +3005,7 @@ ${[1,2,3].map(ax=>`<tr><td>${AX_NAMES[ax-1]}</td><td>${QUESTIONS.filter(q=>q.axi
 <table><tr><th></th>${AX_NAMES.map(n=>`<th>${n}</th>`).join('')}</tr>
 ${corrMatrix.map((row,i)=>`<tr><td><b>${AX_NAMES[i]}</b></td>${row.map(r=>`<td>${r===1?'1.000':r.toFixed(3)}</td>`).join('')}</tr>`).join('')}</table>
 
-<h2 class="page-break">الملحق 5: متوسطات المحورين الرئيسيين</h2>
+<h2 class="page-break">الملحق 5: متوسطات المحاور الثلاثة</h2>
 <table><tr><th>المحور</th><th>المتوسط</th><th>التفسير</th><th>الترتيب</th></tr>
 ${[...axM.map((m,i)=>({m,i}))].sort((a,b)=>b.m-a.m).map((x,rank)=>`<tr><td>${AX_NAMES[x.i]}</td><td><b>${x.m.toFixed(3)}</b></td><td>${interp(x.m).l}</td><td>${rank+1}</td></tr>`).join('')}
 <tr style="background:#dde2f5"><td><b>المتوسط العام</b></td><td><b>${mean(axM).toFixed(3)}</b></td><td>${interp(mean(axM)).l}</td><td>—</td></tr>
@@ -3990,12 +3994,12 @@ function attachChartToolbars(){
     {id:'c-exp',title:'توزيع عينة الدراسة حسب سنوات الخبرة'},
     {id:'c-ai',title:'توزيع عينة الدراسة حسب استخدام الذكاء الاصطناعي'},
     {id:'c-educ',title:'توزيع عينة الدراسة حسب المؤهل العلمي'},
-    {id:'c-axes',title:'متوسطات المحورين الرئيسيين للاستبيان'},
+    {id:'c-axes',title:'متوسطات المحاور الثلاثة للاستبيان'},
     {id:'a-cat',title:'الفئة المهنية للمستجيبين'},
     {id:'a-educ',title:'المؤهل العلمي للمستجيبين'},
     {id:'a-exp',title:'سنوات الخبرة للمستجيبين'},
     {id:'a-ai',title:'مستوى استخدام الذكاء الاصطناعي'},
-    {id:'a-radar',title:'مخطط الرادار — متوسطات المحورين الرئيسيين'},
+    {id:'a-radar',title:'مخطط الرادار — متوسطات المحاور الثلاثة'},
     {id:'rank-chart',title:'ترتيب المحاور حسب المتوسط الحسابي'},
     {id:'corr-scatter',title:'مخطط الانتشار — العلاقة بين المحورين 1 و 2'},
     {id:'reg-scatter',title:'مخطط الانحدار الخطي (المحور 1 ← المحور 3)'},
@@ -4318,7 +4322,7 @@ async function exportToPDF(){
   ${[1,2,3].map((ax,i)=>{const ip=interp(axM[i]);const a=cronbach(QUESTIONS.filter(q=>q.axis===ax));return`<tr><td>${AX_NAMES[i]}</td><td style="font-weight:bold;color:${ip.c}">${axM[i].toFixed(2)}</td><td>${ip.l}</td><td>${a.toFixed(3)}</td></tr>`;}).join('')}
   <tr><td><strong>الكلي</strong></td><td style="font-weight:bold">${mean(axM).toFixed(2)}</td><td>${interp(mean(axM)).l}</td><td style="font-weight:bold">${alpha.toFixed(3)}</td></tr>
 </table>
-${chartImgs['c-axes']?`<div class="fig"><img src="${chartImgs['c-axes']}"><div class="fig-cap">شكل (1): متوسطات المحورين الرئيسيين للاستبيان</div><div class="fig-src">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS (2026).</div></div>`:''}
+${chartImgs['c-axes']?`<div class="fig"><img src="${chartImgs['c-axes']}"><div class="fig-cap">شكل (1): متوسطات المحاور الثلاثة للاستبيان</div><div class="fig-src">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS (2026).</div></div>`:''}
 ${chartImgs['a-radar']?`<div class="fig"><img src="${chartImgs['a-radar']}"><div class="fig-cap">شكل (2): مخطط الرادار — مقارنة المحاور الثلاثة</div><div class="fig-src">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS (2026).</div></div>`:''}
 <div class="ai-box">⭐ مهم — التفسير: ${localStorage.getItem('ai_interp_desc')||'(يُنصح بتشغيل التفسير الآلي)'}</div>
 <h2>2. مصفوفة الارتباط</h2>
