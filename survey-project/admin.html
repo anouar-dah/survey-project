@@ -351,6 +351,7 @@ tbody tr:last-child td{border-bottom:none}
   background:linear-gradient(135deg,#0b0f1a 0%,#111827 40%,#1a1035 100%);
   display:flex;align-items:center;justify-content:center;
 }
+#login-screen.hidden{display:none!important;}
 .login-card{
   background:rgba(255,255,255,.04);
   border:1.5px solid rgba(255,255,255,.1);
@@ -534,24 +535,7 @@ tbody tr:last-child td{border-bottom:none}
 <body>
 
 <!-- ═══ LOGIN SCREEN ═══ -->
-<div id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">📊</div>
-    <div class="login-title">لوحة تحكم المشرف</div>
-    <div class="login-sub">تأثير الذكاء الاصطناعي على التدقيق المحاسبي</div>
-    <div class="login-field">
-      <span class="fi">👤</span>
-      <input type="text" id="login-user" placeholder="اسم المستخدم" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
-    </div>
-    <div class="login-field">
-      <span class="fi">🔑</span>
-      <input type="password" id="login-pass" placeholder="كلمة المرور" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <button class="login-btn" onclick="doLogin()">🔓 تسجيل الدخول</button>
-    <div class="login-error" id="login-error">❌ اسم المستخدم أو كلمة المرور غير صحيحة</div>
-    <div class="login-hint">للوصول المصرح به فقط — admin / admin123</div>
-  </div>
-</div>
+
 
 <!-- ═══ EXPORT FLOATING PANEL ═══ -->
 <div class="export-panel" id="export-panel">
@@ -3348,13 +3332,16 @@ function clearLocalData(){
 //  LOGIN
 // ═══════════════════════════════════
 const ADMIN_CREDENTIALS={username:'admin',password:'admin123'};
+let __adminAuth = false;
+function _getAuth(){ try{ return localStorage.getItem('admin_auth')==='1'||__adminAuth; }catch(e){ return __adminAuth; } }
+function _setAuth(v){ __adminAuth=v; try{ if(v)localStorage.setItem('admin_auth','1'); else localStorage.removeItem('admin_auth'); }catch(e){} }
 function doLogin(){
   const u=document.getElementById('login-user').value.trim();
   const p=document.getElementById('login-pass').value;
   const err=document.getElementById('login-error');
   if(u===ADMIN_CREDENTIALS.username&&p===ADMIN_CREDENTIALS.password){
-    sessionStorage.setItem('admin_auth','1');
-    document.getElementById('login-screen').style.display='none';
+    _setAuth(true);
+    document.getElementById('login-screen').classList.add('hidden');
     showToast('مرحباً، '+u+' 👋','ok');
   } else {
     err.style.display='block';
@@ -3364,18 +3351,12 @@ function doLogin(){
   }
 }
 function doLogout(){
-  sessionStorage.removeItem('admin_auth');
-  document.getElementById('login-screen').style.display='flex';
+  _setAuth(false);
+  document.getElementById('login-screen').classList.remove('hidden');
   document.getElementById('login-user').value='';
   document.getElementById('login-pass').value='';
 }
-function checkAuth(){
-  if(sessionStorage.getItem('admin_auth')!=='1'){
-    document.getElementById('login-screen').style.display='flex';
-  } else {
-    document.getElementById('login-screen').style.display='none';
-  }
-}
+function checkAuth(){ /* login disabled — direct access */ }
 
 // ═══════════════════════════════════
 //  EXPORT FUNCTIONS
