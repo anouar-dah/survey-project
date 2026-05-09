@@ -693,15 +693,28 @@ tbody tr:last-child td{border-bottom:none}
     <div class="card" style="margin-bottom:1.25rem">
       <div class="card-head">
         <div class="card-title">📋 جدول عينة الدراسة</div>
-        <button onclick="copyTableAsText('sample-table','جدول عينة الدراسة')" style="font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 نسخ</button>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:10px;color:var(--text3)">يمكن تعديل الأرقام يدوياً</span>
+          <button onclick="copyTableAsText('sample-table','جدول عينة الدراسة')" style="font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 نسخ</button>
+        </div>
       </div>
       <div class="tbl-wrap">
         <table id="sample-table">
-          <thead><tr><th>العينة</th><th>عدد الاستبانات الموزعة</th><th>الاستبانات المسترجعة</th><th>الاستبانات الصالحة للتحليل</th></tr></thead>
-          <tbody id="sample-tbody">
-            <tr><td id="st-total">—</td><td id="st-dist">—</td><td id="st-ret">—</td><td id="st-valid">—</td></tr>
+          <thead><tr><th>العينة</th><th>عدد الاستبانات الموزعة</th><th>الاستبانات المسترجعة</th><th>الاستبانات الصالحة للتحليل</th><th>نسبة الاسترجاع%</th><th>نسبة الصلاحية%</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>عينة الدراسة</td>
+              <td><input id="inp-dist" type="number" min="1" style="width:70px;padding:4px 6px;border:1.5px solid var(--border2);border-radius:6px;background:var(--bg3);color:var(--text);font-family:'Tajawal',sans-serif;text-align:center" onchange="updateSampleTable()" placeholder="40"></td>
+              <td><input id="inp-ret"  type="number" min="1" style="width:70px;padding:4px 6px;border:1.5px solid var(--border2);border-radius:6px;background:var(--bg3);color:var(--text);font-family:'Tajawal',sans-serif;text-align:center" onchange="updateSampleTable()" placeholder="35"></td>
+              <td id="st-valid" style="font-weight:700;color:var(--green)">—</td>
+              <td id="st-ret-pct" style="font-weight:700">—</td>
+              <td id="st-val-pct" style="font-weight:700">—</td>
+            </tr>
           </tbody>
         </table>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;padding:6px 8px;background:var(--bg3);border-radius:6px">
+        💡 عدد الاستبانات الصالحة للتحليل = عدد المستجيبين المكتملين في قاعدة البيانات (<span id="st-db-count" style="font-weight:700;color:var(--accent)">0</span>). أدخل عدد الموزعة والمسترجعة يدوياً.
       </div>
     </div>
 
@@ -1764,11 +1777,11 @@ function stdS(arr,m){ if(arr.length<2)return 0; const mv=m??mean(arr); return Ma
 function getQM(qid){ return mean(getQVals(qid,getComp())); }
 function getAxM(ax){ const qs=QUESTIONS.filter(q=>q.axis===ax); return mean(qs.map(q=>getQM(q.id))); }
 function interp(m){
-  if(m>=4.2)return{l:"موافقة عالية جداً",c:"#059669",b:"rgba(5,150,105,.1)"};
-  if(m>=3.4)return{l:"موافقة عالية",c:"#10b981",b:"rgba(16,185,129,.1)"};
-  if(m>=2.6)return{l:"محايد",c:"#64748b",b:"rgba(100,116,139,.1)"};
-  if(m>=1.8)return{l:"موافقة منخفضة",c:"#f97316",b:"rgba(249,115,22,.1)"};
-  return{l:"موافقة منخفضة جداً",c:"#dc2626",b:"rgba(220,38,38,.1)"};
+  if(m>=4.2)return{l:"موافقة عالية جداً",dir:"إيجابي جداً",c:"#059669",b:"rgba(5,150,105,.1)"};
+  if(m>=3.4)return{l:"موافقة عالية",dir:"إيجابي",c:"#10b981",b:"rgba(16,185,129,.1)"};
+  if(m>=2.6)return{l:"محايد",dir:"محايد",c:"#64748b",b:"rgba(100,116,139,.1)"};
+  if(m>=1.8)return{l:"موافقة منخفضة",dir:"سلبي",c:"#f97316",b:"rgba(249,115,22,.1)"};
+  return{l:"موافقة منخفضة جداً",dir:"سلبي جداً",c:"#dc2626",b:"rgba(220,38,38,.1)"};
 }
 function chip(m){ const i=interp(m); return `<span class="chip-sm" style="background:${i.b};color:${i.c}">${i.l}</span>`; }
 
@@ -1779,16 +1792,6 @@ function pearson(x,y){
   const dx=Math.sqrt(x.reduce((s,v)=>s+Math.pow(v-mx,2),0));
   const dy=Math.sqrt(y.reduce((s,v)=>s+Math.pow(v-my,2),0));
   return dx&&dy?num/(dx*dy):0;
-}
-
-function cronbach(qs){
-  const comp=getComp(); if(comp.length<2)return 0;
-  const k=qs.length;
-  const vars=qs.map(q=>{ const v=getQVals(q.id,comp); const m=mean(v); return v.reduce((s,x)=>s+Math.pow(x-m,2),0)/v.length; });
-  const totals=comp.map(r=>qs.reduce((s,q)=>s+(r.answers[q.id]||0),0));
-  const m=mean(totals),totV=totals.reduce((s,x)=>s+Math.pow(x-m,2),0)/totals.length;
-  if(!totV)return 1;
-  return(k/(k-1))*(1-vars.reduce((a,b)=>a+b,0)/totV);
 }
 
 function ttest(vals,mu=3){
@@ -2091,10 +2094,10 @@ function renderDash(){
   destroyCharts();
   const catC={},educC={},expC={},aiC={};
   comp.forEach(r=>{catC[r.category]=(catC[r.category]||0)+1;educC[r.education]=(educC[r.education]||0)+1;expC[r.experience]=(expC[r.experience]||0)+1;aiC[r.aiUsage]=(aiC[r.aiUsage]||0)+1});
-  doughnut('c-cat',CAT_L,CAT_L.map(l=>catC[l]||0),['#3b6ff0','#059669','#d97706']);
-  doughnut('c-exp',EXP_L,EXP_L.map(l=>expC[l]||0),['#059669','#34d399','#0891b2','#3b6ff0']);
-  doughnut('c-ai',AI_L,AI_L.map(l=>aiC[l]||0),['#dc2626','#f97316','#059669','#3b6ff0']);
-  doughnut('c-educ',EDUC_L,EDUC_L.map(l=>educC[l]||0),['#3b6ff0','#7c3aed','#059669','#e11d48']);
+  doughnutWithLabels('c-cat',CAT_L,CAT_L.map(l=>catC[l]||0),['#3b6ff0','#059669','#d97706']);
+  doughnutWithLabels('c-exp',EXP_L,EXP_L.map(l=>expC[l]||0),['#059669','#34d399','#0891b2','#3b6ff0']);
+  doughnutWithLabels('c-ai',AI_L,AI_L.map(l=>aiC[l]||0),['#dc2626','#f97316','#059669','#3b6ff0']);
+  doughnutWithLabels('c-educ',EDUC_L,EDUC_L.map(l=>educC[l]||0),['#3b6ff0','#7c3aed','#059669','#e11d48']);
   bar('c-axes',AX_NAMES,axM,AX_COL,[1,5]);
 }
 
@@ -2142,13 +2145,10 @@ function renderAnalysis(){
   const catC={},educC={},expC={},aiC={};
   comp.forEach(r=>{catC[r.category]=(catC[r.category]||0)+1;educC[r.education]=(educC[r.education]||0)+1;expC[r.experience]=(expC[r.experience]||0)+1;aiC[r.aiUsage]=(aiC[r.aiUsage]||0)+1});
 
-  // ── جدول عينة الدراسة ──
-  const totalDist=Math.round(n*1.33); // estimate distributed
-  const retrieved=Math.round(n*1.17); // estimate retrieved
-  document.getElementById('st-total').textContent=n;
-  document.getElementById('st-dist').textContent=totalDist;
-  document.getElementById('st-ret').textContent=retrieved;
+  // ── جدول عينة الدراسة — القيم الحقيقية ──
   document.getElementById('st-valid').textContent=n;
+  document.getElementById('st-db-count').textContent=n;
+  updateSampleTable();
 
   // ── جداول ديموغرافية ──
   const buildDemogTable=(tbody, labels, counts)=>{
@@ -2209,8 +2209,8 @@ function renderReliability(){
   const comp=getComp(),n=comp.length; if(n<2){document.getElementById('alpha-content').innerHTML='<div class="empty"><h3>يلزم مستجيبان على الأقل</h3></div>';return}
   const alphaAll=cronbach(QUESTIONS);
   const alphaAx=[1,2,3].map(ax=>cronbach(QUESTIONS.filter(q=>q.axis===ax)));
-  const ac=a=>a>=.9?'#059669':a>=.7?'#10b981':a>=.6?'#d97706':'#dc2626';
-  const al=a=>a>=.9?'ممتاز':a>=.7?'جيد':a>=.6?'مقبول':'ضعيف';
+  const ac=a=>a>=.9?'#059669':a>=.8?'#10b981':a>=.7?'#3b6ff0':a>=.6?'#d97706':'#dc2626';
+  const al=a=>a>=.9?'ممتاز':a>=.8?'جيد جداً':a>=.7?'جيد':a>=.6?'مقبول':'ضعيف';
 
   // مؤشر ألفا الكلي
   document.getElementById('alpha-content').innerHTML=`
@@ -2321,100 +2321,121 @@ function renderReliability(){
 
 function renderDescriptive(){
   const comp=getComp(),n=comp.length; if(!n)return;
-
-  // ── إحصاء وصفي مقسّم حسب المحاور ──
   const container=document.getElementById('desc-per-axis-container');
   container.innerHTML=[1,2,3].map(ax=>{
     const axQs=QUESTIONS.filter(q=>q.axis===ax);
     const tableId=`desc-table-ax${ax}`;
     const chartId=`desc-chart-ax${ax}`;
-    // حساب متوسط المحور
     const axVals=comp.map(r=>axQs.reduce((s,q)=>s+(r.answers[q.id]||0),0)/axQs.length);
-    const axMean=mean(axVals),axSd=std(axVals,axMean);
+    const axMean=mean(axVals);
+    const axSdS=stdS(axVals,axMean);
     const tt=ttest(axVals,3);
     const axIp=interp(axMean);
     const wt=(axMean/5*100).toFixed(1);
-    return`<div style="margin-bottom:2rem">
-      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:.75rem;padding:.625rem 1rem;background:linear-gradient(135deg,rgba(${ax===1?'59,111,240':ax===2?'5,150,105':'217,119,6'},.08),transparent);border-radius:var(--r2);border-right:3px solid ${AX_COL[ax-1]};display:flex;align-items:center;justify-content:space-between">
-        <span>المحور ${ax}: ${AX_NAMES[ax-1]}</span>
-        <button onclick="copyTableAsText('${tableId}','الإحصاء الوصفي للمحور ${ax}')" style="font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 نسخ</button>
+    const sigTxt=tt.p<.001?'< .001':tt.p<.01?'< .01':tt.p<.05?'< .05':'> .05';
+    const qRows=axQs.map((q,idx)=>{
+      const vals=getQVals(q.id,comp);
+      const m=mean(vals);
+      const s=stdS(vals,m);
+      const sem=s/Math.sqrt(n);
+      const tVal=sem>0?(m-3)/sem:0;
+      const pVal=2*(1-tCDF(Math.abs(tVal),n-1));
+      const sig=pVal<.001?'< .001':pVal<.01?'< .01':pVal<.05?'< .05':'> .05';
+      const wt2=(m/5*100).toFixed(1);
+      const ip=interp(m);
+      return`<tr>
+        <td style="font-weight:700">${String(idx+1).padStart(2,'0')}</td>
+        <td style="text-align:right;font-size:11.5px;padding-right:8px">${q.text}</td>
+        <td style="font-weight:700;color:${ip.c}">${m.toFixed(2)}</td>
+        <td>${s.toFixed(3)}</td>
+        <td>${wt2}%</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${pVal<.05?'var(--green)':'var(--amber)'}">${tVal.toFixed(3)}</td>
+        <td style="color:${pVal<.05?'var(--green)':'var(--amber)'}">${sig}</td>
+        <td>${chip(m)}</td>
+      </tr>`;
+    }).join('');
+    return`<div style="margin-bottom:2.5rem">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:.75rem;padding:.625rem 1rem;background:linear-gradient(135deg,rgba(${ax===1?'59,111,240':ax===2?'5,150,105':'217,119,6'},.1),transparent);border-radius:var(--r2);border-right:3px solid ${AX_COL[ax-1]};display:flex;align-items:center;justify-content:space-between">
+        <span>📊 جدول المحور ${ax}: ${AX_NAMES[ax-1]}</span>
+        <button onclick="copyTableAsText('${tableId}','الإحصاء الوصفي للمحور ${ax}')" style="font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 نسخ الجدول</button>
       </div>
       <div class="tbl-wrap" style="margin-bottom:1rem">
         <table id="${tableId}">
-          <thead><tr><th>م</th><th style="text-align:right">العبـارات</th><th>المتوسط الحسابي</th><th>الانحراف المعياري</th><th>الوزن النسبي%</th><th>T</th><th>مستوى الدلالة</th></tr></thead>
-          <tbody>${axQs.map((q,idx)=>{
-            const vals=getQVals(q.id,comp);
-            const m=mean(vals),s=std(vals,m),sem=s/Math.sqrt(n);
-            const t=(m-3)/sem;
-            const p=2*(1-tCDF(Math.abs(t),n-1));
-            const sig=p<.001?'< .001':p<.01?'< .01':p<.05?'< .05':'> .05 (غير دال)';
-            const wt2=(m/5*100).toFixed(1);
-            const ip=interp(m);
-            return`<tr>
-              <td style="font-weight:700">${String(idx+1).padStart(2,'0')}</td>
-              <td style="text-align:right;font-size:11.5px">X${q.id}</td>
-              <td style="font-weight:700;color:${ip.c}">${m.toFixed(2)}</td>
-              <td>${s.toFixed(3)}</td>
-              <td>${wt2}%</td>
-              <td style="font-family:'JetBrains Mono',monospace;font-weight:700">${t.toFixed(3)}</td>
-              <td style="color:${p<.05?'var(--green)':'var(--amber)'}">${sig}</td>
-            </tr>`;
-          }).join('')}
-          <tr style="background:var(--bg3)">
-            <td colspan="2"><strong>${AX_NAMES[ax-1]}</strong></td>
-            <td style="font-weight:900;color:${axIp.c}">${axMean.toFixed(2)}</td>
-            <td>${axSd.toFixed(3)}</td>
+          <thead><tr><th>م</th><th style="text-align:right;min-width:200px">العبـارات</th><th>المتوسط الحسابي</th><th>الانحراف المعياري</th><th>الوزن النسبي%</th><th>قيمة T</th><th>مستوى الدلالة</th><th>التفسير</th></tr></thead>
+          <tbody>${qRows}
+          <tr style="background:linear-gradient(135deg,rgba(${ax===1?'59,111,240':ax===2?'5,150,105':'217,119,6'},.07),transparent);font-weight:700;border-top:2px solid ${AX_COL[ax-1]}44">
+            <td colspan="2" style="text-align:right;padding-right:8px"><strong>المحور ككل: ${AX_NAMES[ax-1]}</strong></td>
+            <td style="font-weight:900;color:${axIp.c};font-size:13px">${axMean.toFixed(2)}</td>
+            <td>${axSdS.toFixed(3)}</td>
             <td>${wt}%</td>
-            <td style="font-family:'JetBrains Mono',monospace;font-weight:700">${tt.t.toFixed(3)}</td>
-            <td style="color:${tt.p<.05?'var(--green)':'var(--amber)'}">${tt.p<.001?'< .001':tt.p<.01?'< .01':tt.p<.05?'< .05':'> .05'}</td>
-          </tr>
-          </tbody>
+            <td style="font-family:'JetBrains Mono',monospace;color:${tt.p<.05?'var(--green)':'var(--amber)'}">${tt.t.toFixed(3)}</td>
+            <td style="color:${tt.p<.05?'var(--green)':'var(--amber)'}">${sigTxt}</td>
+            <td><span class="badge ${axMean>=4.2?'b-green':axMean>=3.4?'b-blue':axMean>=2.6?'b-amber':'b-red'}">${axIp.l}</span></td>
+          </tr></tbody>
         </table>
+      </div>
+      <div class="obs-box" style="margin-bottom:1rem;border-right-color:${AX_COL[ax-1]};background:rgba(${ax===1?'59,111,240':ax===2?'5,150,105':'217,119,6'},.03)">
+        <div class="obs-label" style="color:${AX_COL[ax-1]}">📝 التفسير العلمي للمحور ${ax}: ${AX_NAMES[ax-1]}</div>
+        بلغ المتوسط الحسابي العام للمحور <strong>${axMean.toFixed(2)}</strong> من 5، بانحراف معياري <strong>${axSdS.toFixed(3)}</strong>، وبوزن نسبي <strong>${wt}%</strong>. يقع ضمن مستوى "<strong>${axIp.l}</strong>" على مقياس ليكرت الخماسي (${axMean>=4.2?'4.2–5':axMean>=3.4?'3.4–4.2':axMean>=2.6?'2.6–3.4':axMean>=1.8?'1.8–2.6':'1–1.8'})، مما يشير إلى اتجاه <strong style="color:${axIp.c}">${axIp.dir}</strong>.
+        ${tt.p<.05?`اختبار T = <strong>${tt.t.toFixed(3)}</strong> دال عند مستوى <strong>${sigTxt}</strong> وهو أقل من 0.05، أي يوجد فرق دال إحصائياً عن القيمة المحايدة (3).`:`اختبار T = <strong>${tt.t.toFixed(3)}</strong> غير دال (p ${sigTxt} > 0.05)، أي لا يوجد فرق دال إحصائياً عن القيمة المحايدة.`}
       </div>
       <div class="card">
         <div class="card-head">
-          <div class="card-title">📊 الرسم البياني: متوسطات عبارات المحور ${ax}</div>
+          <div class="card-title">📊 الشكل: متوسطات عبارات المحور ${ax} — ${AX_NAMES[ax-1]}</div>
           <button onclick="copyChartToClipboard('${chartId}')" style="font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">🖼 نسخ الرسم</button>
         </div>
-        <div class="chart-wrap" style="height:250px"><canvas id="${chartId}"></canvas></div>
+        <div class="chart-wrap" style="height:280px"><canvas id="${chartId}"></canvas></div>
+        <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:4px">الخط الأحمر المتقطع = القيمة المرجعية (3) | الأرقام فوق الأعمدة = المتوسط الحسابي</div>
       </div>
     </div>`;
   }).join('');
 
-  // رسم بيانيات لكل محور
+  // بناء الرسوم البيانية — مع قيم الأرقام فوق الأعمدة
   [1,2,3].forEach(ax=>{
     const axQs=QUESTIONS.filter(q=>q.axis===ax);
     const chartId=`desc-chart-ax${ax}`;
     const c=document.getElementById(chartId);
-    if(c){
-      if(charts[chartId])charts[chartId].destroy();
-      charts[chartId]=new Chart(c,{
-        type:'bar',
-        data:{
-          labels:axQs.map(q=>`X${q.id}`),
-          datasets:[{
-            label:'المتوسط',
-            data:axQs.map(q=>getQM(q.id)),
-            backgroundColor:AX_COL[ax-1]+'99',
-            borderColor:AX_COL[ax-1],
-            borderWidth:2,borderRadius:6
-          },{
-            label:'القيمة المرجعية (3)',
-            data:axQs.map(()=>3),
-            type:'line',
-            borderColor:'#dc2626',borderDash:[5,5],borderWidth:2,pointRadius:0,fill:false
-          }]
+    if(!c)return;
+    if(charts[chartId])charts[chartId].destroy();
+    const vals=axQs.map(q=>parseFloat(getQM(q.id).toFixed(2)));
+    charts[chartId]=new Chart(c,{
+      type:'bar',
+      data:{
+        labels:axQs.map((_,i)=>`X${i+1}`),
+        datasets:[
+          {label:'المتوسط الحسابي',data:vals,backgroundColor:AX_COL[ax-1]+'99',borderColor:AX_COL[ax-1],borderWidth:2,borderRadius:7},
+          {label:'القيمة المرجعية (3)',data:axQs.map(()=>3),type:'line',borderColor:'#dc2626',borderDash:[6,4],borderWidth:2,pointRadius:0,fill:false,tension:0}
+        ]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{
+          legend:{labels:{color:'var(--text2)',font:{family:'Tajawal',size:11}}},
+          tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===0?`المتوسط: ${ctx.raw.toFixed(2)} / الوزن: ${(ctx.raw/5*100).toFixed(1)}%`:null}}
         },
-        options:{
-          responsive:true,maintainAspectRatio:false,
-          plugins:{legend:{labels:{color:'var(--text2)',font:{family:'Tajawal',size:11}}}},
-          scales:{
-            y:{min:1,max:5,ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.06)'}},
-            x:{ticks:{color:'var(--text2)',font:{family:'Tajawal',size:11}},grid:{display:false}}
-          }
+        scales:{
+          y:{min:1,max:5,ticks:{color:'var(--text3)',callback:v=>v.toFixed(1)},grid:{color:'rgba(0,0,0,.06)'}},
+          x:{ticks:{color:'var(--text2)',font:{family:'Tajawal',size:11}},grid:{display:false}}
         }
-      });
-    }
+      },
+      plugins:[{
+        id:'valLabels',
+        afterDatasetsDraw(chart){
+          const{ctx}=chart;
+          const meta=chart.getDatasetMeta(0);
+          ctx.save();
+          meta.data.forEach((bar,i)=>{
+            const v=vals[i];
+            ctx.fillStyle=AX_COL[ax-1];
+            ctx.font='bold 11px Tajawal,Arial';
+            ctx.textAlign='center';
+            ctx.textBaseline='bottom';
+            ctx.fillText(v.toFixed(2), bar.x, bar.y-3);
+          });
+          ctx.restore();
+        }
+      }]
+    });
   });
 }
 
@@ -3260,7 +3281,41 @@ function cancelMerge(){
 function saveLocalData(){
   localStorage.setItem('offline_submissions',JSON.stringify(respondents));
 }
-function updateMergeStats(){
+function updateSampleTable(){
+  const n=getComp().length;
+  const dist=parseInt(document.getElementById('inp-dist')?.value)||n;
+  const ret=parseInt(document.getElementById('inp-ret')?.value)||n;
+  const valid=n;
+  const el=document.getElementById('st-valid');
+  const retPct=document.getElementById('st-ret-pct');
+  const valPct=document.getElementById('st-val-pct');
+  const dbEl=document.getElementById('st-db-count');
+  if(el)el.textContent=valid;
+  if(retPct)retPct.textContent=dist>0?(ret/dist*100).toFixed(1)+'%':'—';
+  if(valPct)valPct.textContent=ret>0?(valid/ret*100).toFixed(1)+'%':'—';
+  if(dbEl)dbEl.textContent=valid;
+}
+
+// دالة Cronbach's Alpha — المعادلة الأصلية الدقيقة
+function cronbach(qs){
+  const comp=getComp(); if(comp.length<2)return 0;
+  const k=qs.length; if(k<2)return 0;
+  const n=comp.length;
+  // تباين كل فقرة (population variance)
+  const itemVars=qs.map(q=>{
+    const vals=comp.map(r=>r.answers[q.id]||0);
+    const m=vals.reduce((a,b)=>a+b,0)/n;
+    return vals.reduce((s,v)=>s+Math.pow(v-m,2),0)/n;
+  });
+  const sumItemVar=itemVars.reduce((a,b)=>a+b,0);
+  // تباين المجموع
+  const totals=comp.map(r=>qs.reduce((s,q)=>s+(r.answers[q.id]||0),0));
+  const mt=totals.reduce((a,b)=>a+b,0)/n;
+  const totVar=totals.reduce((s,v)=>s+Math.pow(v-mt,2),0)/n;
+  if(totVar===0)return 1;
+  return(k/(k-1))*(1-(sumItemVar/totVar));
+}
+
   const firebaseCount=respondents.filter(r=>r._key||r._source==='firebase').length;
   const localCount=respondents.filter(r=>r._source==='imported'||(!r._key&&r._source!=='firebase')).length;
   document.getElementById('merge-firebase-count').textContent=firebaseCount||'—';
@@ -3551,7 +3606,7 @@ function renderValidity(){
 
   // ── جداول الاتساق الداخلي — كل محور في جدول منفصل ──
   const icContainer=document.getElementById('icit-per-axis-container');
-  const ac=a=>a>=.9?'#059669':a>=.7?'#10b981':a>=.6?'#d97706':'#dc2626';
+  const ac=a=>a>=.9?'#059669':a>=.8?'#10b981':a>=.7?'#3b6ff0':a>=.6?'#d97706':'#dc2626';
   icContainer.innerHTML=[1,2,3].map(ax=>{
     const axQs=QUESTIONS.filter(q=>q.axis===ax);
     const tableId=`icit-table-ax${ax}`;
@@ -4206,6 +4261,63 @@ function destroyCharts(){ Object.values(charts).forEach(c=>{try{c.destroy()}catc
 function doughnut(id,labels,data,colors){
   const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
   charts[id]=new Chart(el,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'var(--bg2)',borderWidth:3,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'var(--text2)',font:{size:11,family:'Tajawal'},boxWidth:11,padding:8}}}}});
+}
+// دائرة نسبية مع إظهار النسبة والتكرار على الرسم مباشرة
+function doughnutWithLabels(id,labels,data,colors){
+  const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
+  const total=data.reduce((a,b)=>a+b,0)||1;
+  charts[id]=new Chart(el,{
+    type:'doughnut',
+    data:{
+      labels:labels.map((l,i)=>`${l} (${data[i]} — ${(data[i]/total*100).toFixed(1)}%)`),
+      datasets:[{
+        data,
+        backgroundColor:colors,
+        borderColor:'var(--bg2)',
+        borderWidth:3,
+        hoverOffset:8
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{
+          position:'right',
+          labels:{color:'var(--text2)',font:{size:11,family:'Tajawal'},boxWidth:12,padding:8}
+        },
+        tooltip:{
+          callbacks:{
+            label:ctx=>`${ctx.label.split('(')[0].trim()}: ${ctx.raw} (${(ctx.raw/total*100).toFixed(1)}%)`
+          }
+        },
+        datalabels:{display:false}
+      }
+    },
+    plugins:[{
+      id:'pieLabels',
+      afterDatasetsDraw(chart){
+        const{ctx,data:d}=chart;
+        const ds=d.datasets[0];
+        const meta=chart.getDatasetMeta(0);
+        ctx.save();
+        meta.data.forEach((arc,i)=>{
+          const val=ds.data[i];
+          const pct=(val/total*100).toFixed(1);
+          if(val===0)return;
+          const [cx,cy]=arc.getCenterPoint?[arc.getCenterPoint().x,arc.getCenterPoint().y]:[0,0];
+          ctx.fillStyle='#fff';
+          ctx.font='bold 11px Tajawal, Arial';
+          ctx.textAlign='center';
+          ctx.textBaseline='middle';
+          if(parseFloat(pct)>5){
+            ctx.fillText(`${pct}%`,cx,cy-6);
+            ctx.fillText(`n=${val}`,cx,cy+7);
+          }
+        });
+        ctx.restore();
+      }
+    }]
+  });
 }
 function bar(id,labels,data,color,range){
   const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
