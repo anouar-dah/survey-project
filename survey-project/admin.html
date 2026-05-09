@@ -535,7 +535,24 @@ tbody tr:last-child td{border-bottom:none}
 <body>
 
 <!-- ═══ LOGIN SCREEN ═══ -->
-
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">📊</div>
+    <div class="login-title">لوحة تحكم المشرف</div>
+    <div class="login-sub">تأثير الذكاء الاصطناعي على التدقيق المحاسبي</div>
+    <div class="login-field">
+      <span class="fi">👤</span>
+      <input type="text" id="login-user" placeholder="اسم المستخدم" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+    </div>
+    <div class="login-field">
+      <span class="fi">🔑</span>
+      <input type="password" id="login-pass" placeholder="كلمة المرور" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">🔓 تسجيل الدخول</button>
+    <div class="login-error" id="login-error">❌ اسم المستخدم أو كلمة المرور غير صحيحة</div>
+    <div class="login-hint">للوصول المصرح به فقط — admin / admin123</div>
+  </div>
+</div>
 
 <!-- ═══ EXPORT FLOATING PANEL ═══ -->
 <div class="export-panel" id="export-panel">
@@ -3311,7 +3328,7 @@ function cronbach(qs){
     • مصدر Firebase: <strong>${firebaseCount}</strong><br>
     • مستورد محلياً: <strong>${localCount}</strong><br>
     • آخر تحديث: <strong>${new Date().toLocaleTimeString('ar-DZ')}</strong>`;
-}
+
 function backupLocalData(){
   if(!respondents.length){showToast('لا توجد بيانات','err');return;}
   const blob=new Blob([JSON.stringify({respondents,exportedAt:new Date().toISOString(),count:respondents.length},null,2)],{type:'application/json'});
@@ -3356,7 +3373,13 @@ function doLogout(){
   document.getElementById('login-user').value='';
   document.getElementById('login-pass').value='';
 }
-function checkAuth(){ /* login disabled — direct access */ }
+function checkAuth(){
+  if(_getAuth()){
+    document.getElementById('login-screen').classList.add('hidden');
+  } else {
+    document.getElementById('login-screen').classList.remove('hidden');
+  }
+}
 
 // ═══════════════════════════════════
 //  EXPORT FUNCTIONS
