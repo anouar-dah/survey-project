@@ -1147,27 +1147,113 @@ tbody tr:last-child td{border-bottom:none}
 <!-- ─── DIMENSIONS ─── -->
 <div class="page" id="page-dimensions">
   <div class="pg-hdr">
-    <div><div class="pg-title">تحليل الأبعاد — Dimensions Analysis</div><div class="pg-sub">تفصيل كل بُعد بمتوسطاته وفقراته وتفسيره الإحصائي</div></div>
-    <div style="display:flex;gap:8px">
-      <button class="sec-export-btn" onclick="exportSection('dim-container','تحليل الأبعاد')">📤 تصدير</button>
-      <button class="ai-btn" onclick="aiAnalyze('dimensions')">🤖 تحليل الأبعاد</button>
+    <div>
+      <div class="pg-title">🗂 تحليل الأبعاد — Dimensions Analysis</div>
+      <div class="pg-sub">تحليل إحصائي أكاديمي لكل بُعد: متوسط • انحراف • ارتباط • رسم بياني • تفسير مستوى SPSS</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-analyze" onclick="renderDimensions()">🔄 تحديث التحليل</button>
+      <button class="btn" style="background:var(--green);color:#fff" onclick="exportDimensionsToWord()">📄 تصدير Word</button>
+      <button class="ai-btn" onclick="aiAnalyze('dimensions')">🤖 تفسير AI شامل</button>
     </div>
   </div>
 
-  <!-- Overview chart -->
+  <!-- ═══ OVERVIEW SUMMARY TABLE (SPSS-style) ═══ -->
   <div class="card" style="margin-bottom:1.5rem">
     <div class="card-head">
-      <div class="card-title">📊 مقارنة متوسطات جميع الأبعاد</div>
-      <button class="sec-export-btn" onclick="copyChartToClipboard('dim-overview-chart')">📋 نسخ الرسم</button>
+      <div>
+        <div class="card-title">📋 الجدول (1): ملخص نتائج تحليل الأبعاد — Statistics Summary</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">يُعرض الترتيب حسب المتوسط الحسابي تنازلياً</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button onclick="copyTableAsText('dim-summary-table','ملخص نتائج تحليل أبعاد الاستبيان')" style="font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 نسخ الجدول</button>
+      </div>
     </div>
-    <div class="chart-wrap" style="height:320px"><canvas id="dim-overview-chart"></canvas></div>
+    <div class="tbl-wrap">
+      <table id="dim-summary-table">
+        <thead>
+          <tr>
+            <th>الترتيب</th>
+            <th>البُعد</th>
+            <th>المحور</th>
+            <th>عدد الفقرات</th>
+            <th>المتوسط M</th>
+            <th>الانحراف SD</th>
+            <th>الخطأ المعياري SE</th>
+            <th>التباين Var</th>
+            <th>الحد الأدنى Min</th>
+            <th>الحد الأقصى Max</th>
+            <th>مستوى الموافقة</th>
+          </tr>
+        </thead>
+        <tbody id="dim-summary-tbody"></tbody>
+      </table>
+    </div>
+    <div style="font-size:10px;color:var(--text3);margin-top:8px;text-align:center">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS (2026).</div>
   </div>
 
+  <!-- ═══ OVERVIEW CHART ═══ -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <div class="card-head">
+      <div>
+        <div class="card-title">📊 شكل (1): متوسطات الأبعاد — مقارنة بيانية شاملة</div>
+        <div style="font-size:10px;color:var(--text3)">سلم ليكرت من 1 إلى 5 | الخط المرجعي = 3 (الحياد)</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button onclick="copyChart('dim-overview-chart',1,'متوسطات أبعاد الاستبيان')" style="font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 نسخ للـ Word</button>
+        <button onclick="downloadChart('dim-overview-chart',1,'متوسطات أبعاد الاستبيان')" style="font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--green);cursor:pointer;font-family:'Tajawal',sans-serif">⬇ PNG</button>
+      </div>
+    </div>
+    <div class="chart-wrap" style="height:340px"><canvas id="dim-overview-chart"></canvas></div>
+    <div style="font-size:10px;color:var(--text3);margin-top:8px;text-align:center">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS (2026).</div>
+  </div>
+
+  <!-- ═══ AXES COMPARISON RADAR + PIE ═══ -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem" id="dim-charts-row">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">📊 شكل (2): مخطط الرادار — مقارنة المحاور الثلاثة</div>
+        <button onclick="copyChart('dim-radar',2,'مخطط الرادار للمحاور الثلاثة')" style="font-size:10px;padding:2px 8px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋</button>
+      </div>
+      <div class="chart-wrap" style="height:280px"><canvas id="dim-radar"></canvas></div>
+      <div style="font-size:9px;color:var(--text3);text-align:center;margin-top:6px">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS (2026).</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">📊 شكل (3): توزيع الأوزان النسبية للأبعاد</div>
+        <button onclick="copyChart('dim-pie',3,'الأوزان النسبية للأبعاد')" style="font-size:10px;padding:2px 8px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋</button>
+      </div>
+      <div class="chart-wrap" style="height:280px"><canvas id="dim-pie"></canvas></div>
+      <div style="font-size:9px;color:var(--text3);text-align:center;margin-top:6px">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS (2026).</div>
+    </div>
+  </div>
+
+  <!-- ═══ PER-DIMENSION DETAILED CARDS ═══ -->
   <div id="dim-container"></div>
 
-  <div id="dimensions-ai-box" class="ai-box" style="display:none">
-    <div class="ai-box-head"><div class="ai-icon">🤖</div><div class="ai-box-title">تفسير الذكاء الاصطناعي — الأبعاد</div></div>
-    <div class="ai-content" id="dimensions-ai-text"></div>
+  <!-- ═══ CORRELATION MATRIX BETWEEN DIMS ═══ -->
+  <div class="card" style="margin-top:1.5rem;margin-bottom:1.5rem" id="dim-corr-section">
+    <div class="card-head">
+      <div>
+        <div class="card-title">📋 الجدول (2): مصفوفة الارتباط بين الأبعاد — Pearson Correlation Matrix</div>
+        <div style="font-size:10px;color:var(--text3)">** دالة عند مستوى 0.01 | * دالة عند مستوى 0.05</div>
+      </div>
+      <button onclick="copyTableAsText('dim-corr-table','مصفوفة ارتباط بيرسون بين أبعاد الاستبيان')" style="font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 نسخ</button>
+    </div>
+    <div class="tbl-wrap"><table id="dim-corr-table"><thead id="dim-corr-head"></thead><tbody id="dim-corr-body"></tbody></table></div>
+    <div style="font-size:10px;color:var(--text3);margin-top:8px;text-align:center">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS (2026).</div>
+  </div>
+
+  <!-- ═══ AI BOX ═══ -->
+  <div id="dimensions-ai-box" class="ai-box">
+    <div class="ai-box-head">
+      <div class="ai-icon">🤖</div>
+      <div>
+        <div class="ai-box-title">⭐ مهم — تفسير الذكاء الاصطناعي: تحليل الأبعاد</div>
+        <div style="font-size:10px;color:var(--text3)">جاهز للنسخ في الفصل الرابع من المذكرة</div>
+      </div>
+    </div>
+    <div class="ai-content" id="dimensions-ai-text"><span style="color:var(--text3);font-size:12px">اضغط "تفسير AI شامل" للحصول على تفسير أكاديمي لكل الأبعاد...</span></div>
   </div>
 </div>
 
@@ -3195,82 +3281,431 @@ function renderHypotheses(){
 // ═══════════════════════════════════
 function renderDimensions(){
   const comp=getComp(),n=comp.length; if(!n)return;
-  const dims={};
-  QUESTIONS.forEach(q=>{if(!dims[q.dim])dims[q.dim]={axis:q.axis,qs:[]};dims[q.dim].qs.push(q)});
 
-  // Overview bar chart
-  const dimNames=Object.keys(dims);
-  const dimMeans=dimNames.map(d=>mean(dims[d].qs.map(q=>getQM(q.id))));
-  const dimColors=dimNames.map(d=>AX_COL[dims[d].axis-1]);
+  // ── Build dims map ──
+  const dimsMap={};
+  QUESTIONS.forEach(q=>{
+    if(!dimsMap[q.dim])dimsMap[q.dim]={axis:q.axis,axName:AX_NAMES[q.axis-1],qs:[]};
+    dimsMap[q.dim].qs.push(q);
+  });
 
+  // ── Compute stats per dim ──
+  const AX_COL_FULL=['#3b6ff0','#059669','#d97706'];
+  const dimEntries=Object.entries(dimsMap).map(([name,d])=>{
+    const scores=comp.map(r=>d.qs.reduce((s,q)=>s+(r.answers[q.id]||0),0)/d.qs.length);
+    const m=mean(scores),sd=std(scores,m);
+    const se=sd/Math.sqrt(n);
+    const vr=sd*sd;
+    const mn=Math.min(...scores),mx=Math.max(...scores);
+    const ip=interp(m);
+    return {name,axis:d.axis,axName:d.axName,qs:d.qs,scores,m,sd,se,vr,mn,mx,ip};
+  });
+  const sorted=[...dimEntries].sort((a,b)=>b.m-a.m);
+
+  // ═══════════════════════════════════
+  //  TABLE 1: Summary
+  // ═══════════════════════════════════
+  const tbody=document.getElementById('dim-summary-tbody');
+  if(tbody){
+    tbody.innerHTML=sorted.map((d,i)=>`
+      <tr>
+        <td style="font-weight:800;color:var(--accent)">${i+1}</td>
+        <td style="text-align:right;font-weight:700">${d.name}</td>
+        <td><span style="background:${AX_COL_FULL[d.axis-1]}22;color:${AX_COL_FULL[d.axis-1]};padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">م${d.axis}</span></td>
+        <td>${d.qs.length}</td>
+        <td style="font-weight:800;color:${d.ip.c};font-size:14px">${d.m.toFixed(3)}</td>
+        <td>${d.sd.toFixed(3)}</td>
+        <td style="color:var(--text3)">${d.se.toFixed(3)}</td>
+        <td style="color:var(--text3)">${d.vr.toFixed(3)}</td>
+        <td style="color:var(--text3)">${d.mn.toFixed(2)}</td>
+        <td style="color:var(--text3)">${d.mx.toFixed(2)}</td>
+        <td><span style="background:${d.ip.b};color:${d.ip.c};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">${d.ip.l}</span></td>
+      </tr>`).join('')
+    +`<tr style="background:linear-gradient(135deg,rgba(59,111,240,.08),rgba(124,58,237,.05));font-weight:800">
+        <td>—</td><td style="text-align:right">المتوسط العام</td><td>—</td>
+        <td>${dimEntries.reduce((s,d)=>s+d.qs.length,0)}</td>
+        <td style="color:${interp(mean(dimEntries.map(d=>d.m))).c};font-size:14px">${mean(dimEntries.map(d=>d.m)).toFixed(3)}</td>
+        <td>${mean(dimEntries.map(d=>d.sd)).toFixed(3)}</td>
+        <td colspan="5" style="color:var(--text3);font-size:11px">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS (2026).</td>
+      </tr>`;
+  }
+
+  // ═══════════════════════════════════
+  //  CHART 1: Horizontal Bar — Overview
+  // ═══════════════════════════════════
   const oc=document.getElementById('dim-overview-chart');
   if(oc){
     if(charts['dim-overview-chart'])charts['dim-overview-chart'].destroy();
     charts['dim-overview-chart']=new Chart(oc,{
       type:'bar',
       data:{
-        labels:dimNames,
+        labels:sorted.map(d=>d.name),
         datasets:[{
-          data:dimMeans,
-          backgroundColor:dimColors.map(c=>c+'bb'),
-          borderColor:dimColors,
+          label:'المتوسط الحسابي',
+          data:sorted.map(d=>d.m),
+          backgroundColor:sorted.map(d=>AX_COL_FULL[d.axis-1]+'99'),
+          borderColor:sorted.map(d=>AX_COL_FULL[d.axis-1]),
           borderWidth:2,borderRadius:8,borderSkipped:false
+        },{
+          label:'الانحراف المعياري',
+          data:sorted.map(d=>d.sd),
+          backgroundColor:'rgba(100,100,100,.15)',
+          borderColor:'rgba(100,100,100,.4)',
+          borderWidth:1,borderRadius:4,borderSkipped:false,type:'bar'
         }]
       },
       options:{
         responsive:true,maintainAspectRatio:false,
         indexAxis:'y',
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`المتوسط: ${ctx.raw.toFixed(3)} — ${interp(ctx.raw).l}`}}},
+        plugins:{
+          legend:{display:true,position:'top',labels:{color:'var(--text2)',font:{family:'Tajawal',size:11},boxWidth:12}},
+          tooltip:{callbacks:{label:ctx=>{
+            const d=sorted[ctx.dataIndex];
+            return ctx.datasetIndex===0?` المتوسط: ${d.m.toFixed(3)} — ${d.ip.l}`:` الانحراف: ${d.sd.toFixed(3)}`;
+          }}},
+          annotation:{annotations:{line1:{type:'line',xMin:3,xMax:3,borderColor:'rgba(220,38,38,.5)',borderWidth:2,borderDash:[6,3],label:{display:true,content:'الحياد=3',position:'end',color:'#dc2626',font:{size:10}}}}}
+        },
         scales:{
-          x:{min:1,max:5,ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.05)'}},
-          y:{ticks:{color:'var(--text2)',font:{size:11,family:'Tajawal'}},grid:{display:false}}
+          x:{min:1,max:5,grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'var(--text3)',callback:v=>v.toFixed(1)}},
+          y:{ticks:{color:'var(--text2)',font:{size:10,family:'Tajawal'}},grid:{display:false}}
         }
       }
     });
   }
 
-  // Individual dimension cards
-  const axColors=['#3b6ff0','#059669','#d97706'];
-  document.getElementById('dim-container').innerHTML=Object.entries(dims).map(([dName,{axis,qs}])=>{
-    const dMeans=qs.map(q=>getQM(q.id));
-    const dM=mean(dMeans),dSD=std(dMeans,dM);
-    const ip=interp(dM);
-    const sorted=[...qs].sort((a,b)=>getQM(b.id)-getQM(a.id));
-    return`
-    <div class="dim-card">
-      <div class="dim-head">
+  // ═══════════════════════════════════
+  //  CHART 2: Radar — Axes
+  // ═══════════════════════════════════
+  const axMeans=[1,2,3].map(ax=>mean(dimEntries.filter(d=>d.axis===ax).map(d=>d.m)));
+  const rc=document.getElementById('dim-radar');
+  if(rc){
+    if(charts['dim-radar'])charts['dim-radar'].destroy();
+    charts['dim-radar']=new Chart(rc,{
+      type:'radar',
+      data:{
+        labels:AX_NAMES,
+        datasets:[{
+          label:'المتوسط',data:axMeans,
+          backgroundColor:'rgba(59,111,240,.15)',borderColor:'#3b6ff0',
+          borderWidth:2.5,pointBackgroundColor:'#3b6ff0',pointRadius:6,fill:true
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{r:{
+          min:1,max:5,ticks:{stepSize:1,color:'var(--text3)',backdropColor:'transparent',font:{family:'Tajawal',size:10}},
+          pointLabels:{color:'var(--text2)',font:{size:11,family:'Tajawal'}},
+          grid:{color:'rgba(0,0,0,.08)'}
+        }}
+      }
+    });
+  }
+
+  // ═══════════════════════════════════
+  //  CHART 3: Pie — Weight distribution
+  // ═══════════════════════════════════
+  const pc=document.getElementById('dim-pie');
+  if(pc){
+    if(charts['dim-pie'])charts['dim-pie'].destroy();
+    const totalM=dimEntries.reduce((s,d)=>s+d.m,0);
+    const pieColors=['#3b6ff0','#059669','#d97706','#7c3aed','#0891b2','#e11d48','#0f766e','#b45309','#6366f1','#10b981','#f59e0b','#8b5cf6'];
+    charts['dim-pie']=new Chart(pc,{
+      type:'doughnut',
+      data:{
+        labels:dimEntries.map(d=>d.name),
+        datasets:[{
+          data:dimEntries.map(d=>((d.m/totalM)*100).toFixed(1)),
+          backgroundColor:pieColors.slice(0,dimEntries.length),
+          borderColor:'var(--bg2)',borderWidth:3,hoverOffset:10
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{
+          legend:{position:'right',labels:{color:'var(--text2)',font:{size:10,family:'Tajawal'},boxWidth:10,padding:6}},
+          tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw}% من إجمالي التأثير`}}
+        }
+      }
+    });
+  }
+
+  // ═══════════════════════════════════
+  //  INDIVIDUAL DIMENSION CARDS (academic)
+  // ═══════════════════════════════════
+  let globalFigNum=4;
+  const container=document.getElementById('dim-container');
+  if(!container)return;
+
+  // Group by axis for styled sections
+  const byAxis=[1,2,3].map(ax=>({ax,axName:AX_NAMES[ax-1],dims:dimEntries.filter(d=>d.axis===ax)}));
+
+  container.innerHTML=byAxis.map(({ax,axName,dims})=>`
+    <div style="margin-bottom:2rem">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding:10px 16px;background:${AX_COL_FULL[ax-1]}11;border-radius:var(--r2);border-right:4px solid ${AX_COL_FULL[ax-1]}">
+        <span style="font-size:18px">📂</span>
         <div>
-          <div class="dim-name">${dName}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px">${qs.length} فقر${qs.length===1?'ة':'ات'} — المحور ${axis}: ${AX_NAMES[axis-1]}</div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <span class="dim-axis-badge" style="background:${axColors[axis-1]}">المحور ${axis}</span>
-          <span class="badge" style="background:${ip.b};color:${ip.c}">${ip.l}</span>
-          <button class="sec-export-btn" onclick="exportSection(this.closest('.dim-card').id||'dim-container','${dName}')">📋</button>
+          <div style="font-weight:800;font-size:14px;color:${AX_COL_FULL[ax-1]}">المحور ${ax}: ${axName}</div>
+          <div style="font-size:11px;color:var(--text3)">${dims.length} أبعاد | ${dims.reduce((s,d)=>s+d.qs.length,0)} فقرة | المتوسط العام: ${mean(dims.map(d=>d.m)).toFixed(3)}</div>
         </div>
       </div>
-      <div class="dim-body">
-        <div class="dim-stat-row">
-          <div class="dim-stat"><div class="ds-val" style="color:${ip.c}">${dM.toFixed(3)}</div><div class="ds-lbl">المتوسط</div></div>
-          <div class="dim-stat"><div class="ds-val" style="color:var(--text2)">${dSD.toFixed(3)}</div><div class="ds-lbl">الانحراف</div></div>
-          <div class="dim-stat"><div class="ds-val" style="color:var(--teal)">${qs.length}</div><div class="ds-lbl">الفقرات</div></div>
-          <div class="dim-stat"><div class="ds-val" style="color:${dM>3?'var(--green)':'var(--red)'}">${(dM-3>0?'+':'')+(dM-3).toFixed(2)}</div><div class="ds-lbl">الفرق عن 3</div></div>
-          <div class="dim-stat"><div class="ds-val" style="color:var(--purple)">${(Math.sqrt(dM/5)*100).toFixed(0)}%</div><div class="ds-lbl">نسبة الأثر</div></div>
-        </div>
-        <div class="dim-q-list">
-          ${sorted.map(q=>{
-            const m=getQM(q.id);const ip2=interp(m);
-            return`<div class="dim-q-item">
-              <div class="dim-q-id">${q.id}</div>
-              <div class="dim-q-text">${q.text}</div>
-              <div class="dim-q-bar"><div class="dim-q-fill" style="width:${(m-1)/4*100}%;background:${ip2.c}"></div></div>
-              <div class="dim-q-val" style="color:${ip2.c}">${m.toFixed(2)}</div>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+      ${dims.map((d,di)=>{
+        const figN=globalFigNum++;
+        const chartId=`dim-chart-ax${ax}-${di}`;
+        const tableId=`dim-table-ax${ax}-${di}`;
+        const qSorted=[...d.qs].sort((a,b)=>getQM(b.id)-getQM(a.id));
+        const axC=AX_COL_FULL[ax-1];
+        return `
+        <div class="card" style="margin-bottom:1.5rem;border-top:3px solid ${axC}">
+          <!-- DIM HEADER -->
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1.25rem">
+            <div>
+              <div style="font-size:16px;font-weight:800;color:var(--text)">${d.name}</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:3px">المحور ${ax}: ${axName} — ${d.qs.length} فقرات</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+              <span style="padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;background:${d.ip.b};color:${d.ip.c}">${d.ip.l}</span>
+              <button onclick="copyTableAsText('${tableId}','${d.name}')" style="font-size:10px;padding:3px 9px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 الجدول</button>
+              <button onclick="copyChart('${chartId}',${figN},'${d.name}')" style="font-size:10px;padding:3px 9px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--green);cursor:pointer;font-family:'Tajawal',sans-serif">📋 الرسم</button>
+              <button onclick="downloadChart('${chartId}',${figN},'${d.name}')" style="font-size:10px;padding:3px 9px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--text3);cursor:pointer;font-family:'Tajawal',sans-serif">⬇ PNG</button>
+            </div>
+          </div>
+
+          <!-- STATS ROW -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:1.25rem">
+            ${[
+              {v:d.m.toFixed(3),l:'المتوسط M',c:d.ip.c,desc:'قيمة الموافقة'},
+              {v:d.sd.toFixed(3),l:'الانحراف SD',c:'var(--text2)',desc:'مدى التشتت'},
+              {v:d.se.toFixed(3),l:'الخطأ المعياري SE',c:'var(--teal)',desc:'دقة التقدير'},
+              {v:(d.mn).toFixed(2)+' – '+(d.mx).toFixed(2),l:'Min – Max',c:'var(--text3)',desc:'نطاق الاستجابات'},
+              {v:((d.m-3)>=0?'+':'')+(d.m-3).toFixed(3),l:'الفرق عن 3',c:d.m>3?'var(--green)':'var(--red)',desc:'الانحراف عن الحياد'},
+              {v:((d.m/5)*100).toFixed(1)+'%',l:'نسبة الموافقة',c:'var(--purple)',desc:'من الإجمالي'},
+            ].map(s=>`<div style="background:var(--bg3);border-radius:var(--r3);padding:10px;text-align:center;border:1px solid var(--border)">
+              <div style="font-size:16px;font-weight:800;color:${s.c}">${s.v}</div>
+              <div style="font-size:10px;font-weight:700;color:var(--text2);margin-top:2px">${s.l}</div>
+              <div style="font-size:9px;color:var(--text3)">${s.desc}</div>
+            </div>`).join('')}
+          </div>
+
+          <!-- SPSS TABLE -->
+          <div style="margin-bottom:1.25rem">
+            <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px">📋 الجدول: الإحصاء الوصفي لفقرات بُعد "${d.name}"</div>
+            <div class="tbl-wrap">
+              <table id="${tableId}">
+                <thead>
+                  <tr>
+                    <th>رقم الفقرة</th>
+                    <th style="text-align:right">نص الفقرة</th>
+                    <th>المتوسط M</th>
+                    <th>الانحراف SD</th>
+                    <th>المستوى</th>
+                    <th>الترتيب</th>
+                    <th>شريط التقييم</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${qSorted.map((q,qi)=>{
+                    const m=getQM(q.id),sd2=getQSD(q.id),ip2=interp(m);
+                    return`<tr>
+                      <td style="font-weight:700;color:var(--text3)">Q${q.id}</td>
+                      <td style="text-align:right;font-size:11px;max-width:280px">${q.text}</td>
+                      <td style="font-weight:800;color:${ip2.c}">${m.toFixed(3)}</td>
+                      <td>${sd2.toFixed(3)}</td>
+                      <td><span style="background:${ip2.b};color:${ip2.c};padding:1px 8px;border-radius:20px;font-size:10px;font-weight:700">${ip2.l}</span></td>
+                      <td style="font-weight:700">${qi+1}</td>
+                      <td style="min-width:100px"><div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden"><div style="height:100%;width:${((m-1)/4*100).toFixed(1)}%;background:${ip2.c};border-radius:4px;transition:width .5s"></div></div></td>
+                    </tr>`;
+                  }).join('')}
+                  <tr style="background:${axC}11;font-weight:800;border-top:2px solid ${axC}33">
+                    <td colspan="2" style="text-align:right;padding-right:12px">متوسط البُعد</td>
+                    <td style="color:${d.ip.c};font-size:14px">${d.m.toFixed(3)}</td>
+                    <td>${d.sd.toFixed(3)}</td>
+                    <td><span style="background:${d.ip.b};color:${d.ip.c};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:800">${d.ip.l}</span></td>
+                    <td colspan="2" style="font-size:10px;color:var(--text3)">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS (2026).</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- CHART -->
+          <div style="margin-bottom:1rem">
+            <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px">شكل (${figN}): المتوسطات الحسابية لفقرات بُعد "${d.name}"</div>
+            <div style="height:${Math.max(160, d.qs.length*38)}px">
+              <canvas id="${chartId}"></canvas>
+            </div>
+            <div style="font-size:9px;color:var(--text3);text-align:center;margin-top:4px">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS (2026).</div>
+          </div>
+
+          <!-- INTERPRETATION BOX (academic) -->
+          <div style="background:linear-gradient(135deg,${axC}08,${axC}04);border-right:4px solid ${axC};border-radius:var(--r2);padding:14px;margin-top:10px">
+            <div style="font-size:11px;font-weight:800;color:${axC};margin-bottom:8px">⭐ مهم — التفسير الأكاديمي: ${d.name}</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.9" id="dim-interp-${ax}-${di}">
+              ${(()=>{
+                const lvl=d.ip.l;
+                const diff=(d.m-3)>=0?'أعلى من':'أدنى من';
+                const diffVal=Math.abs(d.m-3).toFixed(3);
+                const top=qSorted[0];const bot=qSorted[qSorted.length-1];
+                const topM=getQM(top.id).toFixed(3);const botM=getQM(bot.id).toFixed(3);
+                return `يتضح من الجدول أعلاه أن بُعد "<strong>${d.name}</strong>" حقق متوسطاً حسابياً قدره (M=${d.m.toFixed(3)})، وانحرافاً معيارياً (SD=${d.sd.toFixed(3)})، وهو ما يقع ضمن المستوى <strong>"${lvl}"</strong> وفق سلم ليكرت الخماسي المعتمد في الدراسة. كما يُشير هذا المتوسط إلى أن إجابات أفراد العينة تميل ${diff} قيمة الحياد (3) بفارق (${diffVal})، مما يعكس ${d.m>3?'توافقاً إيجابياً':'تحفظاً نسبياً'} لدى المهنيين المستجوبين. وتُظهر نتائج الفقرات أن أعلى تقييم حققه البند "<strong>${top.text}</strong>" بمتوسط (${topM})، في حين حصل البند "<strong>${bot.text}</strong>" على أدنى متوسط (${botM}). ويُفسّر الانحراف المعياري (${d.sd.toFixed(3)}) مدى التشتت في استجابات أفراد العينة حول هذا البُعد. وبناءً على ذلك، ${d.m>=3.68?'تُقبل الفرضية الفرعية المتعلقة بهذا البُعد، إذ تتجاوز المتوسطات قيمة الحياد بدلالة إحصائية.':'تستدعي نتائج هذا البُعد مزيداً من التحليل والدراسة.'} <span style="font-size:10px;color:var(--text3)">(المصدر: من إعداد الباحث اعتماداً على نتائج SPSS، 2026)</span>`;
+              })()}
+            </div>
+            <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+              <button onclick="copyText(document.getElementById('dim-interp-${ax}-${di}').innerText)" style="font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid ${axC}44;background:${axC}11;color:${axC};cursor:pointer;font-family:'Tajawal',sans-serif">📋 نسخ التفسير</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+
+  // ── Render individual bar charts ──
+  setTimeout(()=>{
+    let fN2=4;
+    byAxis.forEach(({ax,dims})=>{
+      dims.forEach((d,di)=>{
+        const id=`dim-chart-ax${ax}-${di}`;
+        const el=document.getElementById(id);
+        if(!el)return;
+        if(charts[id])charts[id].destroy();
+        const qS=[...d.qs].sort((a,b)=>getQM(b.id)-getQM(a.id));
+        const axC=AX_COL_FULL[ax-1];
+        charts[id]=new Chart(el,{
+          type:'bar',
+          data:{
+            labels:qS.map(q=>`Q${q.id}`),
+            datasets:[{
+              label:'المتوسط الحسابي',
+              data:qS.map(q=>getQM(q.id)),
+              backgroundColor:qS.map(q=>interp(getQM(q.id)).c+'aa'),
+              borderColor:qS.map(q=>interp(getQM(q.id)).c),
+              borderWidth:2,borderRadius:6,borderSkipped:false
+            },{
+              label:'الانحراف المعياري',
+              data:qS.map(q=>getQSD(q.id)),
+              type:'bar',backgroundColor:'rgba(180,180,180,.2)',
+              borderColor:'rgba(180,180,180,.5)',borderWidth:1,borderRadius:3
+            }]
+          },
+          options:{
+            responsive:true,maintainAspectRatio:false,
+            plugins:{
+              legend:{display:true,position:'top',labels:{color:'var(--text2)',font:{family:'Tajawal',size:10},boxWidth:10}},
+              tooltip:{callbacks:{
+                title:ctx=>{const q=qS[ctx[0].dataIndex];return q?q.text.slice(0,50)+'…':'';},
+                label:ctx=>ctx.datasetIndex===0?` M = ${ctx.raw.toFixed(3)} — ${interp(ctx.raw).l}`:` SD = ${ctx.raw.toFixed(3)}`
+              }}
+            },
+            scales:{
+              y:{min:1,max:5,ticks:{color:'var(--text3)',stepSize:1},grid:{color:'rgba(0,0,0,.04)'}},
+              x:{ticks:{color:'var(--text2)',font:{family:'Tajawal',size:10}},grid:{display:false}}
+            }
+          }
+        });
+        fN2++;
+      });
+    });
+  },100);
+
+  // ═══════════════════════════════════
+  //  CORRELATION MATRIX BETWEEN DIMS
+  // ═══════════════════════════════════
+  const ch=document.getElementById('dim-corr-head');
+  const cb=document.getElementById('dim-corr-body');
+  if(ch&&cb){
+    const dN=dimEntries.length;
+    const dimScoreVecs=dimEntries.map(d=>comp.map(r=>d.qs.reduce((s,q)=>s+(r.answers[q.id]||0),0)/d.qs.length));
+    ch.innerHTML=`<tr><th>البُعد</th>${dimEntries.map((_,i)=>`<th>ب${i+1}</th>`).join('')}<th>المتوسط</th></tr>`;
+    cb.innerHTML=dimEntries.map((d,i)=>{
+      const row=dimEntries.map((_,j)=>{
+        if(i===j)return`<td style="font-weight:800;background:${AX_COL_FULL[d.axis-1]}22">1.000</td>`;
+        const r=pearson(dimScoreVecs[i],dimScoreVecs[j]);
+        const sig=Math.abs(r)>=.6?'**':Math.abs(r)>=.3?'*':'';
+        const col=Math.abs(r)>=.6?'var(--green)':Math.abs(r)>=.3?'var(--amber)':'var(--text3)';
+        return`<td style="color:${col};font-weight:600">${r.toFixed(3)}<sup style="color:${col}">${sig}</sup></td>`;
+      }).join('');
+      return`<tr><td style="text-align:right;font-size:11px;font-weight:700">ب${i+1}: ${d.name.slice(0,20)}…</td>${row}<td style="font-weight:800;color:${d.ip.c}">${d.m.toFixed(3)}</td></tr>`;
+    }).join('');
+  }
+}
+
+// ── Helper: getQSD (getQM already defined at line 1603)
+function getQSD(qid){
+  const comp=getComp();
+  if(!comp.length)return 0;
+  const vals=comp.map(r=>r.answers[qid]||0);
+  const m=mean(vals);
+  return std(vals,m);
+}
+
+// ── Export Dimensions to Word
+function exportDimensionsToWord(){
+  const comp=getComp(),n=comp.length;
+  if(!n){showToast('لا توجد بيانات','err');return;}
+  const dimsMap={};
+  QUESTIONS.forEach(q=>{if(!dimsMap[q.dim])dimsMap[q.dim]={axis:q.axis,axName:AX_NAMES[q.axis-1],qs:[]};dimsMap[q.dim].qs.push(q);});
+  const AX_COL_FULL=['#3b6ff0','#059669','#d97706'];
+  const dimEntries=Object.entries(dimsMap).map(([name,d])=>{
+    const scores=comp.map(r=>d.qs.reduce((s,q)=>s+(r.answers[q.id]||0),0)/d.qs.length);
+    const m=mean(scores),sd=std(scores,m);
+    return{name,axis:d.axis,axName:d.axName,qs:d.qs,scores,m,sd,ip:interp(m)};
+  });
+  const sorted=[...dimEntries].sort((a,b)=>b.m-a.m);
+  const now=new Date();
+
+  let html=`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">
+<style>
+  body{font-family:Arial,sans-serif;font-size:11pt;direction:rtl;margin:2cm;color:#111}
+  h1{font-size:16pt;color:#1a3a6b;border-bottom:2pt solid #1a3a6b;text-align:center;padding-bottom:8pt}
+  h2{font-size:14pt;color:#2b5eb8;border-right:4pt solid #2b5eb8;padding-right:8pt;margin-top:18pt}
+  h3{font-size:12pt;color:#374151;margin-top:12pt}
+  table{width:100%;border-collapse:collapse;margin:8pt 0;font-size:10pt}
+  th{background:#1a3a6b;color:#fff;padding:5pt;text-align:center;border:1pt solid #bbb}
+  td{padding:4pt 6pt;border:1pt solid #bbb;text-align:center}
+  tr:nth-child(even){background:#f5f7ff}
+  .ai-box{background:#f0f7ff;border-right:3pt solid #3b6ff0;padding:10pt;margin:8pt 0;font-size:10pt}
+  .imp{font-weight:bold;color:#1a3a6b}
+  .src{font-size:9pt;color:#6b7280;font-style:italic;text-align:center}
+  .badge-h{color:#059669;font-weight:bold} .badge-m{color:#d97706;font-weight:bold} .badge-l{color:#dc2626;font-weight:bold}
+</style></head><body>
+<h1>الفصل الرابع — تحليل أبعاد الاستبيان</h1>
+<p style="text-align:center;color:#6b7280">ن=${n} مستجيب | تاريخ التحليل: ${now.toLocaleDateString('ar-DZ')}</p>
+
+<h2>أولاً: الجدول الإجمالي لنتائج الأبعاد</h2>
+<table>
+  <tr><th>الترتيب</th><th>البُعد</th><th>المحور</th><th>الفقرات</th><th>M</th><th>SD</th><th>المستوى</th></tr>
+  ${sorted.map((d,i)=>`<tr><td>${i+1}</td><td style="text-align:right">${d.name}</td><td>م${d.axis}: ${d.axName}</td><td>${d.qs.length}</td><td class="imp">${d.m.toFixed(3)}</td><td>${d.sd.toFixed(3)}</td><td class="${d.m>=3.68?'badge-h':d.m>=2.34?'badge-m':'badge-l'}">${d.ip.l}</td></tr>`).join('')}
+  <tr style="background:#e8f0ff"><td colspan="4"><strong>المتوسط العام</strong></td><td class="imp">${mean(sorted.map(d=>d.m)).toFixed(3)}</td><td>${mean(sorted.map(d=>d.sd)).toFixed(3)}</td><td>—</td></tr>
+</table>
+<p class="src">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS (2026).</p>
+
+<h2>ثانياً: تفسير كل بُعد بالتفصيل</h2>
+${sorted.map((d,i)=>{
+  const qS=[...d.qs].sort((a,b)=>getQM(b.id)-getQM(a.id));
+  const top=qS[0];const bot=qS[qS.length-1];
+  return`
+<h3>${i+1}. بُعد "${d.name}" (المحور ${d.axis}: ${d.axName})</h3>
+<table>
+  <tr><th>رقم الفقرة</th><th>نص الفقرة</th><th>M</th><th>SD</th><th>المستوى</th><th>الترتيب</th></tr>
+  ${qS.map((q,qi)=>{const m=getQM(q.id),sd=getQSD(q.id),ip=interp(m);return`<tr><td>Q${q.id}</td><td style="text-align:right">${q.text}</td><td class="${m>=3.68?'badge-h':m>=2.34?'badge-m':'badge-l'}">${m.toFixed(3)}</td><td>${sd.toFixed(3)}</td><td>${ip.l}</td><td>${qi+1}</td></tr>`;}).join('')}
+  <tr style="background:#e8f0ff"><td colspan="2"><strong>المتوسط الكلي للبُعد</strong></td><td class="imp">${d.m.toFixed(3)}</td><td>${d.sd.toFixed(3)}</td><td class="${d.m>=3.68?'badge-h':d.m>=2.34?'badge-m':'badge-l'}">${d.ip.l}</td><td>—</td></tr>
+</table>
+<p class="src">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS (2026).</p>
+<div class="ai-box">
+⭐ مهم — التفسير: يتضح من الجدول أعلاه أن بُعد "${d.name}" حقق متوسطاً حسابياً قدره (M=${d.m.toFixed(3)}) وانحرافاً معيارياً (SD=${d.sd.toFixed(3)}). وتُصنّف هذه القيمة ضمن المستوى "${d.ip.l}" وفق سلم ليكرت الخماسي. وقد جاءت أعلى فقرة "${top.text}" بمتوسط (${getQM(top.id).toFixed(3)})، في حين حصلت الفقرة "${bot.text}" على أدنى متوسط (${getQM(bot.id).toFixed(3)}). ${d.m>=3.68?'وهذا يدل على موافقة أفراد العينة على هذا البُعد بمستوى مرتفع.':'وهذا يستدعي مراجعة تطبيق هذا البُعد في الواقع المهني.'}
+<br><em>(المصدر: من إعداد الباحث اعتماداً على نتائج SPSS، 2026)</em>
+${localStorage.getItem('ai_interp_dimensions')?'<br><br>التفسير الآلي بالذكاء الاصطناعي: '+localStorage.getItem('ai_interp_dimensions'):''}
+</div>`;}).join('')}
+
+<hr>
+<p class="src">تم إعداد هذا التقرير بواسطة لوحة التحكم الإحصائي — ${now.toLocaleDateString('ar-DZ')}</p>
+</body></html>`;
+
+  const blob=new Blob([html],{type:'application/msword;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`تحليل_الأبعاد_${Date.now()}.doc`;
+  a.click();
+  showToast('✅ تم تصدير تحليل الأبعاد إلى Word','ok');
 }
 
 // ═══════════════════════════════════
