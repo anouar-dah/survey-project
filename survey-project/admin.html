@@ -1663,16 +1663,41 @@ tbody tr:last-child td{border-bottom:none}
 
 <!-- IMPORT MODAL -->
 <div id="import-modal" class="modal-overlay">
-  <div class="modal-box">
+  <div class="modal-box" style="max-width:480px">
     <h3>📥 استيراد بيانات</h3>
-    <div style="border:2px dashed var(--border2);border-radius:var(--r2);padding:2rem;text-align:center;cursor:pointer;font-size:13px;color:var(--text3)" onclick="document.getElementById('fi').click()" id="dz" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor=''" ondrop="handleDrop(event)">
-      📁 اسحب ملف JSON أو CSV هنا<br><small style="margin-top:4px;display:block">أو انقر للاختيار</small>
+
+    <!-- مؤشر Firebase -->
+    <div id="import-fb-status" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r2);margin-bottom:1rem;font-size:12px;font-weight:700;background:rgba(5,150,105,.08);color:#059669;border:1px solid rgba(5,150,105,.2)">
+      <span id="import-fb-dot" style="width:8px;height:8px;border-radius:50%;background:#059669;display:inline-block"></span>
+      <span id="import-fb-text">Firebase متصل — البيانات ستُحفظ بشكل دائم ومشترك</span>
+    </div>
+
+    <!-- منطقة السحب والإفلات -->
+    <div style="border:2px dashed var(--border2);border-radius:var(--r2);padding:2rem;text-align:center;cursor:pointer;transition:.2s"
+      onclick="document.getElementById('fi').click()" id="dz"
+      ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+      ondragleave="this.style.borderColor=''"
+      ondrop="handleDrop(event)">
+      <div style="font-size:28px;margin-bottom:8px">📁</div>
+      <div style="font-size:13px;color:var(--text2);font-weight:600">اسحب ملف JSON أو CSV هنا</div>
+      <small style="display:block;margin-top:4px;color:var(--text3)">أو انقر للاختيار</small>
     </div>
     <input type="file" id="fi" style="display:none" accept=".json,.csv" onchange="handleImportFile(event)">
-    <div id="import-msg" style="margin-top:1rem;font-size:13px;display:none"></div>
-    <div class="modal-actions" style="margin-top:1.5rem">
-      <button class="btn btn-ghost" onclick="document.getElementById('import-modal').classList.remove('show')">إغلاق</button>
-      <button class="btn btn-primary" id="import-ok" style="display:none" onclick="confirmImport()">✓ استيراد</button>
+
+    <!-- رسالة الحالة -->
+    <div id="import-msg" style="margin-top:1rem;font-size:13px;line-height:1.7;display:none"></div>
+
+    <!-- تلميح -->
+    <div style="margin-top:.875rem;font-size:10.5px;color:var(--text3);background:var(--bg3);border-radius:var(--r2);padding:.625rem .875rem;line-height:1.7">
+      ✅ JSON: نتائج تصدير الموقع أو Firebase<br>
+      ✅ CSV: ملفات Excel المُصدَّرة من لوحة التحكم<br>
+      🔄 البيانات المكررة (نفس المفتاح) تُتخطى تلقائياً<br>
+      🔒 عند الاتصال بـ Firebase: تُرفع مباشرة وتظهر لجميع المديرين
+    </div>
+
+    <div class="modal-actions" style="margin-top:1.25rem">
+      <button class="btn btn-ghost" onclick="document.getElementById('import-modal').classList.remove('show');pendingImport=null">إغلاق</button>
+      <button class="btn btn-primary" id="import-ok" style="display:none" onclick="confirmImport()">☁ رفع إلى Firebase</button>
     </div>
   </div>
 </div>
@@ -3718,7 +3743,7 @@ function exportSection(sectionId, title){
     ${section.innerHTML}
     <div style="margin-top:30px;border-top:1px solid #dde2f5;padding-top:12px;font-size:10px;color:#9ca3af">تم التصدير من نظام تحليل الاستبيان الذكي</div>
     <button onclick="window.print()" style="margin-top:16px;padding:8px 20px;background:#3b6ff0;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:Tajawal,sans-serif;font-size:13px">🖨 طباعة / حفظ PDF</button>
-  </body></html>`);
+  <\/body><\/html>`);
   win.document.close();
 }
 
@@ -4892,7 +4917,33 @@ function toggleTheme(){setTheme(document.documentElement.getAttribute('data-them
 // ═══════════════════════════════════
 //  IMPORT / EXPORT
 // ═══════════════════════════════════
-function openImport(){document.getElementById('import-modal').classList.add('show')}
+function openImport(){
+  // تحديث مؤشر Firebase
+  const fb=window.__fbdb;
+  const dot=document.getElementById('import-fb-dot');
+  const txt=document.getElementById('import-fb-text');
+  const btn=document.getElementById('import-ok');
+  if(fb){
+    dot.style.background='#059669';
+    txt.style.color='#059669';
+    txt.textContent='Firebase متصل — البيانات ستُرفع وتُحفظ بشكل دائم ومشترك ☁';
+    document.getElementById('import-fb-status').style.background='rgba(5,150,105,.08)';
+    document.getElementById('import-fb-status').style.borderColor='rgba(5,150,105,.2)';
+    if(btn)btn.textContent='☁ رفع إلى Firebase';
+  } else {
+    dot.style.background='#d97706';
+    txt.style.color='#d97706';
+    txt.textContent='Firebase غير متصل — البيانات ستُحفظ محلياً مؤقتاً فقط';
+    document.getElementById('import-fb-status').style.background='rgba(217,119,6,.08)';
+    document.getElementById('import-fb-status').style.borderColor='rgba(217,119,6,.2)';
+    if(btn)btn.textContent='💾 استيراد محلي';
+  }
+  // إعادة تعيين
+  document.getElementById('import-msg').style.display='none';
+  if(btn)btn.style.display='none';
+  pendingImport=null;
+  document.getElementById('import-modal').classList.add('show');
+}
 function handleDrop(e){e.preventDefault();document.getElementById('dz').style.borderColor='';const f=e.dataTransfer.files[0];if(f)readImportFile(f)}
 function handleImportFile(e){const f=e.target.files[0];if(f)readImportFile(f)}
 function readImportFile(f){
@@ -4902,38 +4953,101 @@ function readImportFile(f){
       let data;
       if(f.name.endsWith('.json')){
         const j=JSON.parse(e.target.result);
-        data=Array.isArray(j)?j:j.respondents||[];
+        data=Array.isArray(j)?j:(j.respondents||Object.values(j)||[]);
       } else {
         data=parseCSV(e.target.result);
       }
+      // تطهير البيانات
+      data=data.filter(r=>r&&r.answers&&Object.keys(r.answers).length>0);
       pendingImport=data;
-      document.getElementById('import-msg').innerHTML=`<span style="color:var(--green)">✓ تم قراءة ${data.length} سجل</span>`;
+      document.getElementById('import-msg').innerHTML=
+        `<span style="color:var(--green)">✓ تم قراءة <strong>${data.length}</strong> سجل صالح — سيتم رفعها إلى Firebase</span>`;
       document.getElementById('import-msg').style.display='block';
       document.getElementById('import-ok').style.display='inline-flex';
     }catch(err){
-      document.getElementById('import-msg').innerHTML=`<span style="color:var(--red)">خطأ: ${err.message}</span>`;
+      document.getElementById('import-msg').innerHTML=`<span style="color:var(--red)">خطأ في قراءة الملف: ${err.message}</span>`;
       document.getElementById('import-msg').style.display='block';
     }
   };
   r.readAsText(f,'UTF-8');
 }
-function parseCSV(text){
-  const lines=text.split('\n').filter(l=>l.trim());
-  return lines.slice(1).map(line=>{
-    const v=line.split(',').map(x=>x.replace(/"/g,'').trim());
-    const r={category:v[1],education:v[2],experience:v[3],aiUsage:v[4],answers:{}};
-    QUESTIONS.forEach((q,i)=>{const val=parseInt(v[5+i]);if(val>=1&&val<=5)r.answers[q.id]=val});
-    return r;
-  }).filter(r=>r.category);
-}
-function confirmImport(){
-  if(!pendingImport)return;
-  respondents=[...respondents,...pendingImport];
+
+async function confirmImport(){
+  if(!pendingImport||!pendingImport.length)return;
+  const btn=document.getElementById('import-ok');
+  const msgEl=document.getElementById('import-msg');
+  btn.disabled=true;
+
+  const fb=window.__fbdb;
+  let savedToFirebase=0, savedLocally=0, skipped=0;
+  const total=pendingImport.length;
+
+  for(let i=0;i<pendingImport.length;i++){
+    const rec=pendingImport[i];
+
+    // شريط التقدم
+    msgEl.style.display='block';
+    msgEl.innerHTML=`<div style="margin-bottom:6px;font-size:12px">⏳ جارٍ الرفع... <strong>${i+1}</strong> / <strong>${total}</strong></div>
+      <div style="height:8px;background:var(--bg4);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${((i+1)/total*100).toFixed(0)}%;background:var(--accent);border-radius:99px;transition:width .15s"></div>
+      </div>`;
+
+    // تحقق من التكرار
+    if(rec._key && respondents.find(r=>r._key===rec._key)){skipped++;continue;}
+
+    // تنظيف السجل
+    const clean={
+      category:   rec.category   ||'',
+      education:  rec.education  ||'',
+      experience: rec.experience ||'',
+      aiUsage:    rec.aiUsage    ||'',
+      answers:    rec.answers    ||{},
+      submittedAt:rec.submittedAt||new Date().toISOString(),
+      _source:    'imported'
+    };
+    delete clean._key; // لا نرفع المفتاح القديم
+
+    if(fb){
+      try{
+        const newRef=await fb.push(fb.ref(fb.db,'submissions'),clean);
+        clean._key=newRef.key;
+        respondents.push(clean);
+        savedToFirebase++;
+      }catch(e){
+        console.warn('Firebase push failed:',e);
+        respondents.push(clean);
+        savedLocally++;
+      }
+    } else {
+      respondents.push(clean);
+      savedLocally++;
+    }
+  }
+
+  btn.disabled=false;
+  btn.textContent=fb?'☁ رفع إلى Firebase':'💾 استيراد محلي';
+  document.getElementById('import-modal').classList.remove('show');
+  pendingImport=null;
+
   refreshAll();
   runFullAnalysis(true);
-  document.getElementById('import-modal').classList.remove('show');
-  showToast(`✓ تم استيراد ${pendingImport.length} سجل`,'ok');
-  pendingImport=null;
+
+  let msg='';
+  if(savedToFirebase>0) msg+=`✅ رُفع ${savedToFirebase} سجل إلى Firebase `;
+  if(savedLocally>0)    msg+=`💾 ${savedLocally} محلي مؤقت `;
+  if(skipped>0)         msg+=`⏭ ${skipped} مكرر تُخطي`;
+  showToast(msg||`✓ تمت المعالجة`,'ok');
+}
+function parseCSV(text){
+  const lines=text.split('\n').filter(l=>l.trim());
+  if(!lines.length)return[];
+  const headers=lines[0].split(',').map(x=>x.replace(/"/g,'').trim());
+  return lines.slice(1).map(line=>{
+    const v=line.split(',').map(x=>x.replace(/"/g,'').trim());
+    const r={category:v[1]||'',education:v[2]||'',experience:v[3]||'',aiUsage:v[4]||'',answers:{}};
+    QUESTIONS.forEach((q,i)=>{const val=parseInt(v[5+i]);if(val>=1&&val<=5)r.answers[q.id]=val;});
+    return r;
+  }).filter(r=>r.category&&Object.keys(r.answers).length>0);
 }
 function exportAll(){
   const comp=getComp();
@@ -5571,7 +5685,7 @@ ${(()=>{
 </style></head><body>
 <div class="no-print"><button onclick="window.print()" style="padding:10px 28px;background:#1a3a6b;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:Tajawal,sans-serif;font-size:14px;font-weight:700">🖨 طباعة / حفظ PDF</button></div>
 <div class="page-wrap">${body}</div>
-<script>window.onload=()=>{setTimeout(()=>window.print(),800)}<\/script>
+<scr'+'ipt>window.onload=()=>{setTimeout(()=>window.print(),800)}<'+'/script>
 </body></html>`);
   pw.document.close();
   showToast('✅ تم فتح PDF — اضغط Ctrl+P','ok');
