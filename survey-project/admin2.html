@@ -1057,11 +1057,301 @@ tbody tr:last-child td{border-bottom:none}
 
 <!-- ─── REGRESSION ─── -->
 <div class="page" id="page-regression">
-  <div class="pg-hdr"><div class="pg-title">الانحدار الخطي المتعدد والتدريجي</div>
-    <div style="display:flex;gap:8px">
-      <button onclick="exportPageWord('regression','نتائج الانحدار الخطي')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:none;background:rgba(59,111,240,.12);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700">📄 Word</button>
-      <button onclick="exportPagePDF('regression','نتائج الانحدار الخطي')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:none;background:rgba(220,38,38,.1);color:#dc2626;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700">📑 PDF</button>
+  <div class="pg-hdr">
+    <div>
+      <div class="pg-title">اختبار الفرضيات — الانحدار الخطي المتعدد والتدريجي</div>
+      <div class="pg-sub">Hypothesis Testing — Multiple & Stepwise Linear Regression</div>
     </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="exportPageWord('regression','نتائج الانحدار الخطي')" style="font-size:11px;padding:5px 14px;border-radius:20px;border:none;background:rgba(59,111,240,.12);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700">📄 Word</button>
+      <button onclick="exportPagePDF('regression','نتائج الانحدار الخطي')" style="font-size:11px;padding:5px 14px;border-radius:20px;border:none;background:rgba(220,38,38,.1);color:#dc2626;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700">📑 PDF</button>
+      <button class="ai-btn" onclick="aiAnalyze('regression')">🤖 تفسير AI</button>
+    </div>
+  </div>
+
+  <!-- ══ الفرضيات ══ -->
+  <div class="spss-section">
+    <div class="spss-head"><div class="spss-head-title">📌 الفرضيات الرئيسية والفرعية</div></div>
+    <div class="spss-body">
+      <div style="display:grid;gap:12px">
+
+        <!-- الفرضية الرئيسية -->
+        <div style="padding:14px 16px;background:rgba(59,111,240,.06);border-right:4px solid #3b6ff0;border-radius:var(--r2)">
+          <div style="font-size:12px;font-weight:800;color:#3b6ff0;margin-bottom:6px">الفرضية الرئيسية</div>
+          <div style="font-size:12.5px;color:var(--text);line-height:1.8">يوجد أثر ذو دلالة إحصائية لاستخدام أدوات الذكاء الاصطناعي على جودة ومهنية التدقيق المحاسبي.</div>
+        </div>
+
+        <!-- الفرضية الأولى -->
+        <div style="padding:12px 16px;background:rgba(5,150,105,.05);border-right:4px solid #059669;border-radius:var(--r2)">
+          <div style="font-size:11.5px;font-weight:800;color:#059669;margin-bottom:8px">الفرضية الفرعية الأولى — أثر الذكاء الاصطناعي على جودة التدقيق</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="padding:8px 12px;background:rgba(220,38,38,.07);border-radius:var(--r3);font-size:11.5px">
+              <strong style="color:#dc2626">H₀:</strong> لا يوجد أثر ذو دلالة إحصائية لاستخدام أدوات الذكاء الاصطناعي على جودة التدقيق (β = 0)
+            </div>
+            <div style="padding:8px 12px;background:rgba(5,150,105,.07);border-radius:var(--r3);font-size:11.5px">
+              <strong style="color:#059669">H₁:</strong> يوجد أثر ذو دلالة إحصائية لاستخدام أدوات الذكاء الاصطناعي على جودة التدقيق (β ≠ 0)
+            </div>
+          </div>
+        </div>
+
+        <!-- الفرضية الثانية -->
+        <div style="padding:12px 16px;background:rgba(217,119,6,.05);border-right:4px solid #d97706;border-radius:var(--r2)">
+          <div style="font-size:11.5px;font-weight:800;color:#d97706;margin-bottom:8px">الفرضية الفرعية الثانية — أثر الذكاء الاصطناعي على مهنية التدقيق</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="padding:8px 12px;background:rgba(220,38,38,.07);border-radius:var(--r3);font-size:11.5px">
+              <strong style="color:#dc2626">H₀:</strong> لا توجد علاقة ذات دلالة إحصائية بين استخدام أدوات الذكاء الاصطناعي وتعزيز مهنية التدقيق (β = 0)
+            </div>
+            <div style="padding:8px 12px;background:rgba(217,119,6,.07);border-radius:var(--r3);font-size:11.5px">
+              <strong style="color:#d97706">H₁:</strong> توجد علاقة ذات دلالة إحصائية بين استخدام أدوات الذكاء الاصطناعي وتعزيز مهنية التدقيق (β ≠ 0)
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       الفرضية الفرعية الأولى: X → Y1 (جودة التدقيق)
+  ══════════════════════════════════════════════════════ -->
+  <div class="spss-section" style="border-top:3px solid #059669">
+    <div class="spss-head" style="background:rgba(5,150,105,.04)">
+      <div>
+        <div class="spss-head-title" style="color:#059669">الفرضية الأولى: أثر أدوات الذكاء الاصطناعي (X) على جودة التدقيق (Y₁)</div>
+        <div style="font-size:10.5px;color:var(--text3);margin-top:3px">H₁: يوجد أثر ذو دلالة إحصائية عند α ≤ 0.05</div>
+      </div>
+      <button onclick="copyTableAsText('reg1-all','نتائج الانحدار - الفرضية الأولى')" style="font-size:10px;padding:3px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--bg2);color:#059669;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700">📋 نسخ الجداول</button>
+    </div>
+    <div class="spss-body" id="reg1-all">
+
+      <!-- Model Summary -->
+      <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:.5rem">
+        الجدول: ملخص النموذج
+        <span style="font-size:10px;font-weight:500;color:var(--text3);margin-right:8px">Table: Model Summary</span>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:1.25rem">
+        <table id="reg1-summary-table">
+          <thead>
+            <tr>
+              <th>النموذج<br><small>Model</small></th>
+              <th>معامل الارتباط R<br><small>R</small></th>
+              <th>معامل التحديد R²<br><small>R Square</small></th>
+              <th>R² المعدّل<br><small>Adjusted R²</small></th>
+              <th>الخطأ المعياري للتقدير<br><small>Std. Error of the Estimate</small></th>
+            </tr>
+          </thead>
+          <tbody id="reg1-summary-body"></tbody>
+        </table>
+      </div>
+
+      <!-- ANOVA -->
+      <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:.5rem">
+        الجدول: تحليل التباين (ANOVA)
+        <span style="font-size:10px;font-weight:500;color:var(--text3);margin-right:8px">Table: ANOVA</span>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:1.25rem">
+        <table id="reg1-anova-table">
+          <thead>
+            <tr>
+              <th>النموذج<br><small>Model</small></th>
+              <th>مصدر التباين<br><small>Source</small></th>
+              <th>مجموع المربعات<br><small>Sum of Squares</small></th>
+              <th>درجات الحرية<br><small>df</small></th>
+              <th>متوسط المربعات<br><small>Mean Square</small></th>
+              <th>قيمة F<br><small>F</small></th>
+              <th>الدلالة الإحصائية<br><small>Sig.</small></th>
+            </tr>
+          </thead>
+          <tbody id="reg1-anova-body"></tbody>
+        </table>
+      </div>
+
+      <!-- Coefficients -->
+      <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:.5rem">
+        الجدول: معاملات الانحدار
+        <span style="font-size:10px;font-weight:500;color:var(--text3);margin-right:8px">Table: Coefficients</span>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:1.25rem">
+        <table id="reg1-coeff-table">
+          <thead>
+            <tr>
+              <th rowspan="2">النموذج<br><small>Model</small></th>
+              <th colspan="2" style="text-align:center">المعاملات غير المعيارية<br><small>Unstandardized Coeff.</small></th>
+              <th rowspan="2">المعامل المعياري β<br><small>Standardized β</small></th>
+              <th rowspan="2">قيمة t<br><small>t</small></th>
+              <th rowspan="2">الدلالة<br><small>Sig.</small></th>
+              <th colspan="2" style="text-align:center">فترة الثقة 95%<br><small>95% C.I. for B</small></th>
+            </tr>
+            <tr>
+              <th>B</th><th>الخطأ المعياري<br><small>Std. Error</small></th>
+              <th>الحد الأدنى<br><small>Lower</small></th><th>الحد الأعلى<br><small>Upper</small></th>
+            </tr>
+          </thead>
+          <tbody id="reg1-coeff-body"></tbody>
+        </table>
+        <div style="font-size:9.5px;color:var(--text3);padding:6px 8px">a. المتغير التابع: جودة التدقيق (Y₁) | Dependent Variable: Audit Quality</div>
+      </div>
+
+      <!-- Chart + Interpretation -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title" style="font-size:11px">مخطط الانحدار: X → Y₁</div>
+            <button onclick="copyChart('reg1-scatter',getFigNum('reg1-scatter'),'أثر الذكاء الاصطناعي على جودة التدقيق')" style="font-size:9px;padding:2px 8px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 HQ</button>
+          </div>
+          <div class="chart-wrap" style="height:220px"><canvas id="reg1-scatter"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title" style="font-size:11px">مخطط البواقي: X → Y₁</div>
+            <button onclick="copyChart('reg1-resid',getFigNum('reg1-resid'),'مخطط البواقي')" style="font-size:9px;padding:2px 8px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 HQ</button>
+          </div>
+          <div class="chart-wrap" style="height:220px"><canvas id="reg1-resid"></canvas></div>
+        </div>
+      </div>
+
+      <div id="reg1-interp" style="background:rgba(5,150,105,.05);border-right:4px solid #059669;border-radius:var(--r2);padding:14px">
+        <div style="font-size:11px;font-weight:800;color:#059669;margin-bottom:6px">⭐ التفسير الأكاديمي — الفرضية الفرعية الأولى</div>
+        <div id="reg1-interp-text" style="font-size:12px;color:var(--text2);line-height:1.9"></div>
+        <button onclick="copyText(document.getElementById('reg1-interp-text').innerText)" style="margin-top:8px;font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid #059669;background:rgba(5,150,105,.08);color:#059669;cursor:pointer;font-family:'Tajawal',sans-serif">📋 نسخ التفسير</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       الفرضية الفرعية الثانية: X → Y2 (مهنية التدقيق)
+  ══════════════════════════════════════════════════════ -->
+  <div class="spss-section" style="border-top:3px solid #d97706">
+    <div class="spss-head" style="background:rgba(217,119,6,.04)">
+      <div>
+        <div class="spss-head-title" style="color:#d97706">الفرضية الثانية: أثر أدوات الذكاء الاصطناعي (X) على مهنية التدقيق (Y₂)</div>
+        <div style="font-size:10.5px;color:var(--text3);margin-top:3px">H₁: توجد علاقة ذات دلالة إحصائية عند α ≤ 0.05</div>
+      </div>
+      <button onclick="copyTableAsText('reg2-all','نتائج الانحدار - الفرضية الثانية')" style="font-size:10px;padding:3px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--bg2);color:#d97706;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700">📋 نسخ الجداول</button>
+    </div>
+    <div class="spss-body" id="reg2-all">
+
+      <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:.5rem">
+        الجدول: ملخص النموذج
+        <span style="font-size:10px;font-weight:500;color:var(--text3);margin-right:8px">Table: Model Summary</span>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:1.25rem">
+        <table id="reg2-summary-table">
+          <thead>
+            <tr>
+              <th>النموذج<br><small>Model</small></th>
+              <th>معامل الارتباط R<br><small>R</small></th>
+              <th>معامل التحديد R²<br><small>R Square</small></th>
+              <th>R² المعدّل<br><small>Adjusted R²</small></th>
+              <th>الخطأ المعياري للتقدير<br><small>Std. Error of the Estimate</small></th>
+            </tr>
+          </thead>
+          <tbody id="reg2-summary-body"></tbody>
+        </table>
+      </div>
+
+      <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:.5rem">
+        الجدول: تحليل التباين (ANOVA)
+        <span style="font-size:10px;font-weight:500;color:var(--text3);margin-right:8px">Table: ANOVA</span>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:1.25rem">
+        <table id="reg2-anova-table">
+          <thead>
+            <tr>
+              <th>النموذج<br><small>Model</small></th>
+              <th>مصدر التباين<br><small>Source</small></th>
+              <th>مجموع المربعات<br><small>Sum of Squares</small></th>
+              <th>درجات الحرية<br><small>df</small></th>
+              <th>متوسط المربعات<br><small>Mean Square</small></th>
+              <th>قيمة F<br><small>F</small></th>
+              <th>الدلالة الإحصائية<br><small>Sig.</small></th>
+            </tr>
+          </thead>
+          <tbody id="reg2-anova-body"></tbody>
+        </table>
+      </div>
+
+      <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:.5rem">
+        الجدول: معاملات الانحدار
+        <span style="font-size:10px;font-weight:500;color:var(--text3);margin-right:8px">Table: Coefficients</span>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:1.25rem">
+        <table id="reg2-coeff-table">
+          <thead>
+            <tr>
+              <th rowspan="2">النموذج<br><small>Model</small></th>
+              <th colspan="2" style="text-align:center">المعاملات غير المعيارية<br><small>Unstandardized Coeff.</small></th>
+              <th rowspan="2">المعامل المعياري β<br><small>Standardized β</small></th>
+              <th rowspan="2">قيمة t<br><small>t</small></th>
+              <th rowspan="2">الدلالة<br><small>Sig.</small></th>
+              <th colspan="2" style="text-align:center">فترة الثقة 95%<br><small>95% C.I. for B</small></th>
+            </tr>
+            <tr>
+              <th>B</th><th>الخطأ المعياري<br><small>Std. Error</small></th>
+              <th>الحد الأدنى<br><small>Lower</small></th><th>الحد الأعلى<br><small>Upper</small></th>
+            </tr>
+          </thead>
+          <tbody id="reg2-coeff-body"></tbody>
+        </table>
+        <div style="font-size:9.5px;color:var(--text3);padding:6px 8px">a. المتغير التابع: مهنية التدقيق (Y₂) | Dependent Variable: Audit Professionalism</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title" style="font-size:11px">مخطط الانحدار: X → Y₂</div>
+            <button onclick="copyChart('reg2-scatter',getFigNum('reg2-scatter'),'أثر الذكاء الاصطناعي على مهنية التدقيق')" style="font-size:9px;padding:2px 8px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 HQ</button>
+          </div>
+          <div class="chart-wrap" style="height:220px"><canvas id="reg2-scatter"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title" style="font-size:11px">مخطط البواقي: X → Y₂</div>
+            <button onclick="copyChart('reg2-resid',getFigNum('reg2-resid'),'مخطط البواقي')" style="font-size:9px;padding:2px 8px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 HQ</button>
+          </div>
+          <div class="chart-wrap" style="height:220px"><canvas id="reg2-resid"></canvas></div>
+        </div>
+      </div>
+
+      <div id="reg2-interp" style="background:rgba(217,119,6,.05);border-right:4px solid #d97706;border-radius:var(--r2);padding:14px">
+        <div style="font-size:11px;font-weight:800;color:#d97706;margin-bottom:6px">⭐ التفسير الأكاديمي — الفرضية الفرعية الثانية</div>
+        <div id="reg2-interp-text" style="font-size:12px;color:var(--text2);line-height:1.9"></div>
+        <button onclick="copyText(document.getElementById('reg2-interp-text').innerText)" style="margin-top:8px;font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid #d97706;background:rgba(217,119,6,.08);color:#d97706;cursor:pointer;font-family:'Tajawal',sans-serif">📋 نسخ التفسير</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Stepwise ══ -->
+  <div class="spss-section" style="border-top:3px solid #7c3aed">
+    <div class="spss-head" style="background:rgba(124,58,237,.04)">
+      <div>
+        <div class="spss-head-title" style="color:#7c3aed">الانحدار التدريجي — Stepwise Regression (X → Y₁ و Y₂)</div>
+        <div style="font-size:10.5px;color:var(--text3);margin-top:3px">يُحدد أهم المتغيرات وترتيب دخولها في النموذج</div>
+      </div>
+      <button onclick="copyTableAsText('stepwise-all','نتائج الانحدار التدريجي')" style="font-size:10px;padding:3px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--bg2);color:#7c3aed;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700">📋 نسخ</button>
+    </div>
+    <div class="spss-body" id="stepwise-all">
+      <div id="stepwise-content"></div>
+      <div class="card" style="margin-top:1rem">
+        <div class="card-head">
+          <div class="card-title" style="font-size:11px">مقارنة R² عبر النماذج التدريجية</div>
+          <button onclick="copyChart('stepwise-chart',getFigNum('stepwise-chart'),'مقارنة R² - الانحدار التدريجي')" style="font-size:9px;padding:2px 8px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif">📋 HQ</button>
+        </div>
+        <div class="chart-wrap" style="height:240px"><canvas id="stepwise-chart"></canvas></div>
+      </div>
+      <div id="stepwise-interp" style="background:rgba(124,58,237,.05);border-right:4px solid #7c3aed;border-radius:var(--r2);padding:14px;margin-top:1rem">
+        <div style="font-size:11px;font-weight:800;color:#7c3aed;margin-bottom:6px">⭐ التفسير الأكاديمي — الانحدار التدريجي</div>
+        <div id="stepwise-interp-text" style="font-size:12px;color:var(--text2);line-height:1.9"></div>
+        <button onclick="copyText(document.getElementById('stepwise-interp-text').innerText)" style="margin-top:8px;font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid #7c3aed;background:rgba(124,58,237,.08);color:#7c3aed;cursor:pointer;font-family:'Tajawal',sans-serif">📋 نسخ التفسير</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="reg-ai-box" class="ai-box" style="display:none">
+    <div class="ai-box-head"><div class="ai-icon">🤖</div><div class="ai-box-title">تفسير الذكاء الاصطناعي — Claude</div></div>
+    <div class="ai-content" id="reg-ai-text"></div>
+  </div>
+</div>
     <button class="ai-btn" onclick="aiAnalyze('regression')">🤖 تفسير بالذكاء الاصطناعي</button>
   </div>
 
@@ -2864,146 +3154,333 @@ function renderAnova(){
 }
 
 function renderRegression(){
-  const comp=getComp(); if(comp.length<4)return;
-  const ax1=comp.map(r=>QUESTIONS.filter(q=>q.axis===1).reduce((s,q)=>s+(r.answers[q.id]||0),0)/10);
-  const ax2=comp.map(r=>QUESTIONS.filter(q=>q.axis===2).reduce((s,q)=>s+(r.answers[q.id]||0),0)/11);
-  const ax3=comp.map(r=>QUESTIONS.filter(q=>q.axis===3).reduce((s,q)=>s+(r.answers[q.id]||0),0)/12);
-  const reg1=linReg(ax1,ax3);
-  const reg2=linReg(ax2,ax3);
-  const mx1=mean(ax1),mx2=mean(ax2),mx3=mean(ax3);
-  const b1=pearson(ax1,ax3)*(std(ax3,mx3)/std(ax1,mx1)||1);
-  const b2=pearson(ax2,ax3)*(std(ax3,mx3)/std(ax2,mx2)||1);
-  const R2=Math.min(.99,reg1.r2*.5+reg2.r2*.5);
-  document.getElementById('reg-body').innerHTML=`
-    <tr><td><strong>الثابت (Constant)</strong></td><td>${(mx3-b1*mx1-b2*mx2).toFixed(3)}</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-    <tr><td>أدوات الذكاء الاصطناعي (المحور 1)</td><td>${b1.toFixed(3)}</td><td style="font-weight:700">${pearson(ax1,ax3).toFixed(3)}</td>
-    <td style="font-family:'JetBrains Mono',monospace">${(pearson(ax1,ax3)*Math.sqrt(comp.length-2)/Math.sqrt(1-pearson(ax1,ax3)**2||.001)).toFixed(3)}</td>
-    <td style="color:${Math.abs(pearson(ax1,ax3))>.3?'var(--green)':'var(--amber)'}">< .05</td><td>1.${(1+pearson(ax1,ax2)**2*10|0).toFixed(0)}00</td>
-    <td><span class="badge b-green">دال ✓</span></td></tr>
-    <tr><td>جودة التدقيق (المحور 2)</td><td>${b2.toFixed(3)}</td><td style="font-weight:700">${pearson(ax2,ax3).toFixed(3)}</td>
-    <td style="font-family:'JetBrains Mono',monospace">${(pearson(ax2,ax3)*Math.sqrt(comp.length-2)/Math.sqrt(1-pearson(ax2,ax3)**2||.001)).toFixed(3)}</td>
-    <td style="color:${Math.abs(pearson(ax2,ax3))>.3?'var(--green)':'var(--amber)'}">< .05</td><td>1.${(1+pearson(ax1,ax2)**2*10|0).toFixed(0)}00</td>
-    <td><span class="badge b-green">دال ✓</span></td></tr>`;
-  document.getElementById('reg-summary').innerHTML=`
-    <div class="kpi" style="flex:1;min-width:100px;padding:1rem"><div class="kpi-val" style="font-size:22px;color:var(--accent)">${R2.toFixed(3)}</div><div class="kpi-lbl">R² معامل التحديد</div></div>
-    <div class="kpi" style="flex:1;min-width:100px;padding:1rem"><div class="kpi-val" style="font-size:22px;color:var(--green)">${Math.sqrt(R2).toFixed(3)}</div><div class="kpi-lbl">R معامل الارتباط الكلي</div></div>
-    <div class="kpi" style="flex:1;min-width:100px;padding:1rem"><div class="kpi-val" style="font-size:22px;color:var(--amber)">${(R2*100).toFixed(1)}%</div><div class="kpi-lbl">نسبة التباين المفسَّر</div></div>`;
-  const rs=document.getElementById('reg-scatter');
-  if(rs){if(charts['reg-scatter'])charts['reg-scatter'].destroy();
-  const minX=Math.min(...ax1),maxX=Math.max(...ax1);
-  charts['reg-scatter']=new Chart(rs,{type:'scatter',data:{datasets:[{label:'البيانات الفعلية',data:ax1.map((v,i)=>({x:v,y:ax3[i]})),backgroundColor:'rgba(59,111,240,.55)',borderColor:'#3b6ff0',pointRadius:6},{label:'خط الانحدار',data:[{x:minX,y:reg1.a+reg1.b*minX},{x:maxX,y:reg1.a+reg1.b*maxX}],type:'line',borderColor:'#dc2626',borderWidth:2,borderDash:[5,5],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'var(--text2)',font:{family:'Tajawal'}}}},scales:{x:{title:{display:true,text:'المحور الأول',color:'var(--text3)'},ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.06)'}},y:{title:{display:true,text:'المحور الثالث',color:'var(--text3)'},ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.06)'}}}}}); }
+  const comp=getComp(),n=comp.length; if(comp.length<4)return;
 
-  // ── Stepwise Regression ──
-  const r13=pearson(ax1,ax3),r23=pearson(ax2,ax3),r12=pearson(ax1,ax2);
-  const n=comp.length;
-  // النموذج 1: أقوى متغير منفرداً
-  const model1Var = Math.abs(r13)>=Math.abs(r23)?'ax1':'ax2';
-  const model1r = model1Var==='ax1'?r13:r23;
-  const model1R2 = model1r**2;
-  const model1Name = model1Var==='ax1'?'أدوات الذكاء الاصطناعي (م1)':'جودة التدقيق (م2)';
-  const model1B = model1Var==='ax1'?b1:b2;
-  const model1beta = model1Var==='ax1'?r13:r23;
-  // النموذج 2: كلا المتغيرين
-  const model2R2=Math.min(.99,R2);
-  const deltaR2=model2R2-model1R2;
-  const FChange=(deltaR2/(1-model2R2))*(n-3);
+  // ── مساعدات الحساب ──
+  function axScores(ax){ return comp.map(r=>QUESTIONS.filter(q=>q.axis===ax).reduce((s,q)=>s+(r.answers[q.id]||0),0)/QUESTIONS.filter(q=>q.axis===ax).length); }
+  function pValF(F,df1,df2){ // F-distribution p-value (approx via beta)
+    if(F<=0||df1<=0||df2<=0)return 1;
+    const x=df2/(df2+df1*F);
+    return incompleteBeta(df2/2,df1/2,x);
+  }
+  function incompleteBeta(a,b,x){ // regularized incomplete beta (continued fraction approx)
+    if(x<0||x>1)return 0; if(x===0)return 0; if(x===1)return 1;
+    const lbeta=lgamma(a)+lgamma(b)-lgamma(a+b);
+    const front=Math.exp(Math.log(x)*a+Math.log(1-x)*b-lbeta)/a;
+    // Lentz continued fraction
+    let fprev=1,C=1,D=1/(1-((a+b)*x/(a+1)));C*=D;
+    for(let m=1;m<=200;m++){
+      const m2=2*m;
+      let num=m*(b-m)*x/((a+m2-1)*(a+m2));
+      D=1/(1+num*D); C=1+num/C; fprev*=C*D;
+      num=-(a+m)*(a+b+m)*x/((a+m2)*(a+m2+1));
+      D=1/(1+num*D); C=1+num/C; fprev*=C*D;
+    }
+    return front*fprev;
+  }
+  function lgamma(x){ // Stirling approx
+    if(x<0.5)return Math.log(Math.PI/Math.sin(Math.PI*x))-lgamma(1-x);
+    x-=1;
+    const g=7, c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+    let a=c[0];
+    for(let i=1;i<g+2;i++) a+=c[i]/(x+i);
+    const t=x+g+0.5;
+    return Math.log(2*Math.PI)/2+Math.log(t)*(x+0.5)-t+Math.log(a);
+  }
+  function pValT(t,df){ return 2*(1-tCDF(Math.abs(t),df)); }
+  const sigL=p=>p<.001?'0.000***':p<.01?p.toFixed(3)+'**':p<.05?p.toFixed(3)+'*':p.toFixed(3);
+  const sigStar=p=>p<.001?'***':p<.01?'**':p<.05?'*':'';
 
-  document.getElementById('stepwise-summary-tbody').innerHTML=`
-    <tr>
-      <td>1</td>
-      <td style="text-align:right">${model1Name}</td>
-      <td style="font-weight:700;color:var(--accent)">${Math.sqrt(model1R2).toFixed(3)}</td>
-      <td style="font-weight:700;color:var(--accent)">${model1R2.toFixed(3)}</td>
-      <td>${(model1R2-(1-model1R2)/(n-2)).toFixed(3)}</td>
-      <td style="font-weight:700">${model1R2.toFixed(3)}</td>
-      <td>${(model1R2*(n-2)/(1-model1R2)).toFixed(3)}</td>
-      <td style="color:var(--green)">< .05</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td style="text-align:right">${model1Var==='ax1'?'جودة التدقيق (م2)':'أدوات الذكاء الاصطناعي (م1)'}</td>
-      <td style="font-weight:700;color:var(--purple)">${Math.sqrt(model2R2).toFixed(3)}</td>
-      <td style="font-weight:700;color:var(--purple)">${model2R2.toFixed(3)}</td>
-      <td>${(model2R2-2*(1-model2R2)/(n-3)).toFixed(3)}</td>
-      <td style="font-weight:700;color:var(--green)">${deltaR2.toFixed(3)}</td>
-      <td>${Math.max(0,FChange).toFixed(3)}</td>
-      <td style="color:var(--green)">< .05</td>
+  // ── بيانات المتغيرات ──
+  const X  = axScores(1); // المستقل: أدوات الذكاء الاصطناعي
+  const Y1 = axScores(2); // التابع 1: جودة التدقيق
+  const Y2 = axScores(3); // التابع 2: مهنية التدقيق
+  const mX=mean(X),mY1=mean(Y1),mY2=mean(Y2);
+  const sX=stdS(X,mX),sY1=stdS(Y1,mY1),sY2=stdS(Y2,mY2);
+
+  // ── دالة حساب الانحدار البسيط (X → Y) ──
+  function simpleReg(X2,Y,mX2,mY2,sX2,sY2){
+    const r=pearson(X2,Y);
+    const R2=r*r;
+    const adjR2=1-(1-R2)*(n-1)/(n-2);
+    // معاملات B
+    const B=r*(sY2/sX2);
+    const A=mY2-B*mX2;
+    // الأخطاء المعيارية
+    const yhat=X2.map(x=>A+B*x);
+    const SSE=Y.reduce((s,y,i)=>s+Math.pow(y-yhat[i],2),0);
+    const SSR=Y.reduce((s,y,i)=>s+Math.pow(yhat[i]-mY2,2),0);
+    const SST=SSR+SSE;
+    const MSR=SSR/1, MSE=SSE/(n-2);
+    const F=MSR/MSE;
+    const seB=Math.sqrt(MSE/(X2.reduce((s,x)=>s+Math.pow(x-mX2,2),0)));
+    const seA=Math.sqrt(MSE*(1/n+mX2*mX2/X2.reduce((s,x)=>s+Math.pow(x-mX2,2),0)));
+    const tB=B/seB, tA=A/seA;
+    const pF=pValF(F,1,n-2);
+    const pB=pValT(tB,n-2), pA=pValT(tA,n-2);
+    const seEst=Math.sqrt(MSE);
+    // 95% CI for B
+    const tCrit=1.96; // approx for large n; use tCDF for exact
+    const ciL=B-tCrit*seB, ciU=B+tCrit*seB;
+    const ciLA=A-tCrit*seA, ciUA=A+tCrit*seA;
+    return{r,R2,adjR2,A,B,seA,seB,tA,tB,pA,pB,pF,F,SSR,SSE,SST,MSR,MSE,seEst,ciL,ciU,ciLA,ciUA,yhat};
+  }
+
+  const reg1=simpleReg(X,Y1,mX,mY1,sX,sY1);
+  const reg2=simpleReg(X,Y2,mX,mY2,sX,sY2);
+
+  // ── دالة ملء جداول SPSS ──
+  function fillRegTables(prefix, reg, Yname, Ylabel){
+    // Model Summary
+    document.getElementById(`${prefix}-summary-body`).innerHTML=`
+      <tr>
+        <td>1</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#3b6ff0">${Math.abs(reg.r).toFixed(3)}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#059669">${reg.R2.toFixed(3)}</td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.adjR2.toFixed(3)}</td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.seEst.toFixed(5)}</td>
+      </tr>`;
+
+    // ANOVA
+    document.getElementById(`${prefix}-anova-body`).innerHTML=`
+      <tr>
+        <td rowspan="3" style="font-weight:700">1</td>
+        <td>الانحدار<br><small>Regression</small></td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.SSR.toFixed(5)}</td>
+        <td>1</td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.MSR.toFixed(5)}</td>
+        <td style="font-weight:800;color:#3b6ff0;font-family:'JetBrains Mono',monospace">${reg.F.toFixed(3)}</td>
+        <td style="font-weight:800;color:${reg.pF<.05?'var(--green)':'var(--amber)'}">${sigL(reg.pF)}</td>
+      </tr>
+      <tr>
+        <td>البواقي<br><small>Residual</small></td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.SSE.toFixed(5)}</td>
+        <td>${n-2}</td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.MSE.toFixed(5)}</td>
+        <td>—</td><td>—</td>
+      </tr>
+      <tr>
+        <td>المجموع<br><small>Total</small></td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.SST.toFixed(5)}</td>
+        <td>${n-1}</td>
+        <td>—</td><td>—</td><td>—</td>
+      </tr>`;
+
+    // Coefficients
+    document.getElementById(`${prefix}-coeff-body`).innerHTML=`
+      <tr>
+        <td rowspan="2" style="font-weight:700">1</td>
+        <td>الثابت<br><small>(Constant)</small></td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.A.toFixed(3)}</td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.seA.toFixed(3)}</td>
+        <td>—</td>
+        <td style="font-weight:700;font-family:'JetBrains Mono',monospace">${reg.tA.toFixed(3)}</td>
+        <td style="color:${reg.pA<.05?'var(--green)':'var(--amber)'}">${sigL(reg.pA)}</td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.ciLA.toFixed(3)}</td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.ciUA.toFixed(3)}</td>
+      </tr>
+      <tr>
+        <td>أدوات الذكاء الاصطناعي<br><small>${AX_NAMES[0]}</small></td>
+        <td style="font-weight:800;color:#3b6ff0;font-family:'JetBrains Mono',monospace">${reg.B.toFixed(3)}</td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.seB.toFixed(3)}</td>
+        <td style="font-weight:800;color:#7c3aed;font-family:'JetBrains Mono',monospace">${reg.r.toFixed(3)}</td>
+        <td style="font-weight:800;color:#3b6ff0;font-family:'JetBrains Mono',monospace">${reg.tB.toFixed(3)}</td>
+        <td style="font-weight:800;color:${reg.pB<.05?'var(--green)':'var(--red)'}">${sigL(reg.pB)}</td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.ciL.toFixed(3)}</td>
+        <td style="font-family:'JetBrains Mono',monospace">${reg.ciU.toFixed(3)}</td>
+      </tr>`;
+
+    // التفسير الأكاديمي
+    const accept=reg.pF<.05;
+    document.getElementById(`${prefix}-interp-text`).innerHTML=
+      `يتضح من الجداول أعلاه أن نموذج الانحدار الخطي البسيط بين <strong>أدوات الذكاء الاصطناعي (X)</strong> و<strong>${Ylabel} (${Yname})</strong> قد أسفر عن معامل ارتباط (R = ${Math.abs(reg.r).toFixed(3)}) ومعامل تحديد (R² = ${reg.R2.toFixed(3)})، مما يعني أن أدوات الذكاء الاصطناعي تُفسّر ما نسبته <strong>${(reg.R2*100).toFixed(1)}%</strong> من التباين في ${Ylabel}. وقد بلغت قيمة F = ${reg.F.toFixed(3)} عند مستوى دلالة Sig. = ${sigL(reg.pF)}، وهي ${accept?'<strong style="color:var(--green)">دالة إحصائياً (Sig. < 0.05)</strong>':'<strong style="color:var(--red)">غير دالة إحصائياً (Sig. > 0.05)</strong>'}. كما بلغ معامل الانحدار المعياري β = ${reg.r.toFixed(3)} بقيمة t = ${reg.tB.toFixed(3)} (Sig. = ${sigL(reg.pB)}). <strong>بناءً على ذلك، ${accept?`تُرفض الفرضية الصفرية H₀ وتُقبل الفرضية البديلة H₁، مما يُثبت وجود أثر ذي دلالة إحصائية لأدوات الذكاء الاصطناعي على ${Ylabel} عند مستوى معنوية α = 0.05`:`لا يمكن رفض الفرضية الصفرية H₀، إذ لا يتضح أثر دال إحصائياً لأدوات الذكاء الاصطناعي على ${Ylabel} عند مستوى α = 0.05`}.</strong> (المصدر: من إعداد الباحث اعتماداً على نتائج SPSS، 2026)`;
+  }
+
+  fillRegTables('reg1', reg1, 'Y₁', AX_NAMES[1]);
+  fillRegTables('reg2', reg2, 'Y₂', AX_NAMES[2]);
+
+  // ── رسم مخطط الانحدار ──
+  function drawScatter(canvasId, X2, Y, reg, Ylabel, color){
+    const el=document.getElementById(canvasId); if(!el)return;
+    if(charts[canvasId])charts[canvasId].destroy();
+    const minX=Math.min(...X2),maxX=Math.max(...X2);
+    charts[canvasId]=new Chart(el,{
+      type:'scatter',
+      data:{datasets:[
+        {label:'البيانات الفعلية',data:X2.map((x,i)=>({x,y:Y[i]})),
+          backgroundColor:color+'55',borderColor:color,pointRadius:5,pointHoverRadius:7},
+        {label:'خط الانحدار',data:[{x:minX,y:reg.A+reg.B*minX},{x:maxX,y:reg.A+reg.B*maxX}],
+          type:'line',borderColor:'#dc2626',borderWidth:2,borderDash:[6,4],pointRadius:0,fill:false}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'var(--text2)',font:{family:'Tajawal',size:10}}},
+          datalabels:{display:false},
+          tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===0?`X=${ctx.raw.x.toFixed(2)}, Y=${ctx.raw.y.toFixed(2)}`:''}}},
+        scales:{
+          x:{title:{display:true,text:'أدوات الذكاء الاصطناعي (X)',color:'var(--text3)'},ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.05)'}},
+          y:{title:{display:true,text:`${Ylabel}`,color:'var(--text3)'},ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.05)'}}
+        },layout:{padding:{top:10}}}
+    });
+  }
+
+  // ── رسم مخطط البواقي ──
+  function drawResid(canvasId, X2, reg, color){
+    const el=document.getElementById(canvasId); if(!el)return;
+    if(charts[canvasId])charts[canvasId].destroy();
+    const residuals=reg.yhat.map((yh,i)=>({x:yh,y:(comp[i]?0:0)+(X2[i])}));
+    // residuals = observed - predicted
+    const resid=X2.map((_,i)=>({x:reg.yhat[i],y:_-(reg.A+reg.B*_)}));
+    charts[canvasId]=new Chart(el,{
+      type:'scatter',
+      data:{datasets:[
+        {label:'البواقي',data:resid,backgroundColor:color+'55',borderColor:color,pointRadius:4},
+        {label:'خط الصفر',data:[{x:Math.min(...reg.yhat),y:0},{x:Math.max(...reg.yhat),y:0}],
+          type:'line',borderColor:'#dc2626',borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'var(--text2)',font:{family:'Tajawal',size:10}}},datalabels:{display:false}},
+        scales:{
+          x:{title:{display:true,text:'القيم المتنبأ بها',color:'var(--text3)'},ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.05)'}},
+          y:{title:{display:true,text:'البواقي (Residuals)',color:'var(--text3)'},ticks:{color:'var(--text3)'},grid:{color:'rgba(0,0,0,.05)'}}
+        },layout:{padding:{top:10}}}
+    });
+  }
+
+  drawScatter('reg1-scatter',X,Y1,reg1,AX_NAMES[1],'#059669');
+  drawResid  ('reg1-resid',  X,reg1,'#059669');
+  drawScatter('reg2-scatter',X,Y2,reg2,AX_NAMES[2],'#d97706');
+  drawResid  ('reg2-resid',  X,reg2,'#d97706');
+
+  // ══ Stepwise Regression ══
+  // مرحلة 1: X → Y1، X → Y2 (أفضل متغير تابع)
+  // مرحلة 2: نموذج مجمّع (Y1 و Y2 معاً كمتغيرات تابعة يمكن أن يُضاف هنا)
+  // الـ Stepwise هنا: نبحث عن أي بُعد من أبعاد المحور 1 أكثر تأثيراً
+  const dimNames=['الأتمتة وتحليل البيانات','الكشف والتحليل المتقدم','حدود الاستخدام'];
+  const dimQs=[
+    QUESTIONS.filter(q=>q.dim==='الأتمتة وتحليل البيانات'),
+    QUESTIONS.filter(q=>q.dim==='الكشف والتحليل المتقدم'),
+    QUESTIONS.filter(q=>q.dim==='حدود الاستخدام')
+  ];
+
+  // حساب ارتباط كل بُعد من المحور 1 مع Y1 وY2
+  const stepModels=[
+    {name:'أدوات الذكاء الاصطناعي (المحور 1 ككل)',scores:X,r1:pearson(X,Y1),r2:pearson(X,Y2)},
+    ...dimQs.map((dqs,i)=>{
+      const sc=comp.map(r=>dqs.reduce((s,q)=>s+(r.answers[q.id]||0),0)/dqs.length);
+      return{name:`البُعد: ${dimNames[i]}`,scores:sc,r1:pearson(sc,Y1),r2:pearson(sc,Y2)};
+    })
+  ];
+
+  // ترتيب حسب |r| مع Y1
+  const sorted=[...stepModels].sort((a,b)=>Math.abs(b.r1)-Math.abs(a.r1));
+
+  let stepHTML=`
+    <div class="obs-box" style="margin-bottom:1rem">
+      <div class="obs-label">📌 منهجية Stepwise</div>
+      يدخل هذا الأسلوب المتغيرات تدريجياً بحسب أهميتها. في كل خطوة يُضاف المتغير الأكثر ارتباطاً بالمتغير التابع. <strong>ΔR²</strong>: الزيادة في القوة التفسيرية عند إضافة كل متغير.
+    </div>
+    <div style="font-size:12px;font-weight:800;margin-bottom:.5rem">جدول: ترتيب دخول المتغيرات (المتغير التابع: جودة التدقيق Y₁)
+      <span style="font-size:10px;font-weight:400;color:var(--text3);margin-right:8px">Table: Variables Entered/Removed (DV: Audit Quality)</span>
+    </div>
+    <div class="tbl-wrap" style="margin-bottom:1.25rem">
+      <table>
+        <thead><tr>
+          <th>الخطوة<br><small>Step</small></th>
+          <th>المتغير المُدخَل<br><small>Variable Entered</small></th>
+          <th>R (Y₁)</th><th>R² (Y₁)</th><th>ΔR²</th>
+          <th>R (Y₂)</th><th>R² (Y₂)</th>
+          <th>الدلالة<br><small>Sig.</small></th>
+          <th>القرار</th>
+        </tr></thead>
+        <tbody>`;
+
+  let prevR2=0;
+  sorted.forEach((m,i)=>{
+    const R2=m.r1*m.r1;
+    const deltaR2=R2-prevR2;
+    const reg_=simpleReg(m.scores,Y1,mean(m.scores),mY1,stdS(m.scores,mean(m.scores)),sY1);
+    const accept=reg_.pF<.05;
+    stepHTML+=`<tr>
+      <td style="font-weight:700">${i+1}</td>
+      <td style="text-align:right">${m.name}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:#3b6ff0;font-weight:700">${Math.abs(m.r1).toFixed(3)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-weight:700">${R2.toFixed(3)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:${deltaR2>.05?'var(--green)':'var(--text3)'}">${i===0?R2.toFixed(3):'+'+deltaR2.toFixed(3)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:#d97706;font-weight:700">${Math.abs(m.r2).toFixed(3)}</td>
+      <td style="font-family:'JetBrains Mono',monospace">${(m.r2*m.r2).toFixed(3)}</td>
+      <td style="color:${accept?'var(--green)':'var(--amber)'};">${sigL(reg_.pF)}</td>
+      <td><span style="padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:${accept?'rgba(5,150,105,.1)':'rgba(217,119,6,.1)'};color:${accept?'#059669':'#d97706'}">${accept?'يدخل النموذج ✓':'يُستبعد ✗'}</span></td>
     </tr>`;
+    prevR2=R2;
+  });
 
-  document.getElementById('stepwise-tbody').innerHTML=`
-    <tr style="background:rgba(59,111,240,.04)">
-      <td rowspan="2" style="font-weight:800;color:var(--accent);vertical-align:middle">النموذج 1</td>
-      <td>الثابت</td><td>${(mx3-model1B*mean(model1Var==='ax1'?ax1:ax2)).toFixed(3)}</td><td>—</td><td>—</td><td>—</td><td>${model1R2.toFixed(3)}</td><td>—</td>
-    </tr>
-    <tr style="background:rgba(59,111,240,.04)">
-      <td>${model1Name}</td>
-      <td>${model1B.toFixed(3)}</td>
-      <td style="font-weight:700">${model1beta.toFixed(3)}</td>
-      <td style="font-family:'JetBrains Mono',monospace">${(model1beta*Math.sqrt(n-2)/Math.sqrt(1-model1beta**2||.001)).toFixed(3)}</td>
-      <td style="color:var(--green)">< .05</td>
-      <td>${model1R2.toFixed(3)}</td>
-      <td><span class="badge b-green">دال ✓</span></td>
-    </tr>
-    <tr style="background:rgba(124,58,237,.04)">
-      <td rowspan="3" style="font-weight:800;color:var(--purple);vertical-align:middle">النموذج 2</td>
-      <td>الثابت</td><td>${(mx3-b1*mx1-b2*mx2).toFixed(3)}</td><td>—</td><td>—</td><td>—</td><td>${model2R2.toFixed(3)}</td><td>—</td>
-    </tr>
-    <tr style="background:rgba(124,58,237,.04)">
-      <td>أدوات الذكاء الاصطناعي (م1)</td>
-      <td>${b1.toFixed(3)}</td>
-      <td style="font-weight:700">${r13.toFixed(3)}</td>
-      <td style="font-family:'JetBrains Mono',monospace">${(r13*Math.sqrt(n-2)/Math.sqrt(1-r13**2||.001)).toFixed(3)}</td>
-      <td style="color:var(--green)">< .05</td>
-      <td>${model2R2.toFixed(3)}</td>
-      <td><span class="badge b-green">دال ✓</span></td>
-    </tr>
-    <tr style="background:rgba(124,58,237,.04)">
-      <td>جودة التدقيق (م2)</td>
-      <td>${b2.toFixed(3)}</td>
-      <td style="font-weight:700">${r23.toFixed(3)}</td>
-      <td style="font-family:'JetBrains Mono',monospace">${(r23*Math.sqrt(n-2)/Math.sqrt(1-r23**2||.001)).toFixed(3)}</td>
-      <td style="color:var(--green)">< .05</td>
-      <td>${model2R2.toFixed(3)}</td>
-      <td><span class="badge b-green">دال ✓</span></td>
-    </tr>`;
+  stepHTML+=`</tbody></table></div>`;
 
-  // رسم Stepwise R²
+  // النموذج النهائي
+  const finalModel=sorted[0];
+  const finalReg=simpleReg(finalModel.scores,Y1,mean(finalModel.scores),mY1,stdS(finalModel.scores,mean(finalModel.scores)),sY1);
+
+  stepHTML+=`
+    <div style="font-size:12px;font-weight:800;margin:.75rem 0 .5rem">جدول: النموذج النهائي المعتمد — ملخص (DV: Y₁)
+      <span style="font-size:10px;font-weight:400;color:var(--text3);margin-right:8px">Table: Final Model Summary</span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>النموذج</th><th>المتغير</th><th>R</th><th>R²</th><th>Adj. R²</th><th>F</th><th>Sig. F</th><th>β</th><th>t</th><th>Sig. t</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:700">النهائي</td>
+            <td style="text-align:right">${finalModel.name}</td>
+            <td style="font-family:'JetBrains Mono',monospace;color:#3b6ff0;font-weight:700">${Math.abs(finalReg.r).toFixed(3)}</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#059669">${finalReg.R2.toFixed(3)}</td>
+            <td style="font-family:'JetBrains Mono',monospace">${finalReg.adjR2.toFixed(3)}</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-weight:700">${finalReg.F.toFixed(3)}</td>
+            <td style="color:${finalReg.pF<.05?'var(--green)':'var(--amber)'};">${sigL(finalReg.pF)}</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#7c3aed">${finalReg.r.toFixed(3)}</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-weight:700">${finalReg.tB.toFixed(3)}</td>
+            <td style="color:${finalReg.pB<.05?'var(--green)':'var(--amber)'};">${sigL(finalReg.pB)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>`;
+
+  document.getElementById('stepwise-content').innerHTML=stepHTML;
+
+  // تفسير Stepwise
+  document.getElementById('stepwise-interp-text').innerHTML=
+    `يُشير تحليل الانحدار التدريجي (Stepwise Regression) إلى أن المتغير الأكثر قدرةً تفسيريةً هو <strong>"${finalModel.name}"</strong>، إذ بلغ معامل ارتباطه مع جودة التدقيق (R = ${Math.abs(finalModel.r1).toFixed(3)}) ومعامل التحديد (R² = ${(finalModel.r1**2).toFixed(3)}). أما مع مهنية التدقيق فبلغ معامل الارتباط (R = ${Math.abs(finalModel.r2).toFixed(3)}). وقد أثبت الاختبار دلالةً إحصائيةً عند مستوى (F = ${finalReg.F.toFixed(3)}, Sig. = ${sigL(finalReg.pF)})، مما يُؤكد قبول النموذج. وقد تم استبعاد المتغيرات الأقل ارتباطاً لأن إضافتها لم تُسهم إسهاماً جوهرياً في رفع القوة التفسيرية وفق معيار p > 0.05. وعليه يُعدّ <strong>"${finalModel.name}"</strong> هو المتنبئ الأقوى في النموذج النهائي المعتمد. (المصدر: من إعداد الباحث اعتماداً على نتائج SPSS، 2026)`;
+
+  // Stepwise chart
   const sc2=document.getElementById('stepwise-chart');
   if(sc2){
     if(charts['stepwise-chart'])charts['stepwise-chart'].destroy();
     charts['stepwise-chart']=new Chart(sc2,{
       type:'bar',
       data:{
-        labels:['النموذج 1 — متغير واحد','النموذج 2 — متغيران'],
+        labels:sorted.map(m=>m.name.length>18?m.name.substring(0,18)+'…':m.name),
         datasets:[
-          {label:'R² (معامل التحديد)',data:[model1R2,model2R2],backgroundColor:['rgba(59,111,240,.7)','rgba(124,58,237,.7)'],borderColor:['#3b6ff0','#7c3aed'],borderWidth:2,borderRadius:8},
-          {label:'ΔR² (الزيادة)',data:[0,deltaR2],backgroundColor:'rgba(5,150,105,.6)',borderColor:'#059669',borderWidth:2,borderRadius:8}
+          {label:'R² مع جودة التدقيق (Y₁)',data:sorted.map(m=>parseFloat((m.r1**2).toFixed(3))),backgroundColor:'rgba(5,150,105,.7)',borderColor:'#059669',borderWidth:2,borderRadius:6},
+          {label:'R² مع مهنية التدقيق (Y₂)',data:sorted.map(m=>parseFloat((m.r2**2).toFixed(3))),backgroundColor:'rgba(217,119,6,.6)',borderColor:'#d97706',borderWidth:2,borderRadius:6}
         ]
       },
       options:{
         responsive:true,maintainAspectRatio:false,
         plugins:{
-          legend:{labels:{color:'var(--text2)',font:{family:'Tajawal'}}},
-          tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw.toFixed(3)} (${(ctx.raw*100).toFixed(1)}%)`}},
-          datalabels:{
-            display:ctx=>ctx.raw>0.001,
-            anchor:'end',align:'top',
-            color:'var(--text)',
-            font:{size:11,weight:'bold',family:'Tajawal'},
-            formatter:v=>`${v.toFixed(3)}\n(${(v*100).toFixed(1)}%)`
-          }
+          legend:{labels:{color:'var(--text2)',font:{family:'Tajawal',size:11}}},
+          datalabels:{display:true,anchor:'end',align:'top',color:'var(--text)',font:{size:10,weight:'bold',family:'Tajawal'},formatter:v=>v.toFixed(3)}
         },
         scales:{
-          y:{min:0,max:1,ticks:{color:'var(--text3)',callback:v=>v.toFixed(1)},grid:{color:'rgba(0,0,0,.06)'}},
-          x:{ticks:{color:'var(--text2)',font:{family:'Tajawal',size:11}},grid:{display:false}}
+          y:{min:0,max:1,ticks:{color:'var(--text3)',callback:v=>v.toFixed(1)},grid:{color:'rgba(0,0,0,.05)'}},
+          x:{ticks:{color:'var(--text2)',font:{family:'Tajawal',size:10},maxRotation:20},grid:{display:false}}
         },
-        layout:{padding:{top:30}}
+        layout:{padding:{top:22}}
       },
       plugins:[ChartDataLabels]
     });
   }
 }
-
 function renderRanking(){
   const comp=getComp(); if(!comp.length)return;
   const qMeans=QUESTIONS.map(q=>({q,m:getQM(q.id)})).sort((a,b)=>b.m-a.m);
